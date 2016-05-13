@@ -27,6 +27,7 @@ public class TestStudents {
 	
 	@Test
 	public void testSchema() {
+		
 		/*
 		Configuration config = new Configuration().configure();
 		//ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().configure().build();
