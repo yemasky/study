@@ -91,13 +91,17 @@ jQuery(function($){
 	</div>
 
     <div id="chapterTemplate"  style="display:none">
-       <li class="clearfix open"><a href="#">
+    <ul>
+       <li class="clearfix open">
+	       <a href="#">
 				<div class="openicon"></div>
 				<div class="outline_list l">
-						<h5 class="outline_name"></h5>
-						<p class="outline_descr"></p>
+					<h5 class="outline_name"></h5>
+					<p class="outline_descr"></p>
 				</div>
-		 </a></li>
+			</a>
+		</li>
+	</ul>
     </div>
 
 </body>
