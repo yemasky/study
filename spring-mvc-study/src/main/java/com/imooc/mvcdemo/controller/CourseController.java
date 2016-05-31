@@ -45,7 +45,7 @@ public class CourseController {
 		this.courseService = courseService;
 	}
 
-	
+
 	//本方法将处理 /courses/view?courseId=123 形式的URL
 	@RequestMapping(value="/view", method=RequestMethod.GET)
 	public String viewCourse(@RequestParam("courseId") Integer courseId,
