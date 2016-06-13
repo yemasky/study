@@ -19,6 +19,7 @@ public class TestStudents {
 		Configuration config = new Configuration().configure();
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(config.getProperties()).build();
 		SessionFactory sessionFactory = config.buildSessionFactory(serviceRegistry);
+		@SuppressWarnings("unused")
 		Session session = sessionFactory.getCurrentSession();
 		SchemaExport export = new SchemaExport(config);
 		export.create(true, true);
