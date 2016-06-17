@@ -1,8 +1,8 @@
 /***********************************************************************  
  *  
- *   @package£ºjdbc.mysql,@class-name£ºConnsecionsPool.java  
+ *   @packageï¼šjdbc.mysql,@class-nameï¼šConnsecionsPool.java  
  *   
- *   ÊÜµ½·¨ÂÉµÄ±£»¤£¬ÈÎºÎ¹«Ë¾»ò¸öÈË£¬Î´¾­ÊÚÈ¨²»µÃÉÃ×Ô¿½±´¡£   
+ *   å—åˆ°æ³•å¾‹çš„ä¿æŠ¤ï¼Œä»»ä½•å…¬å¸æˆ–ä¸ªäººï¼Œæœªç»æˆæƒä¸å¾—æ“…è‡ªæ‹·è´ã€‚   
  *   @copyright       Copyright:   2016-2018     
  *   @creator         YEMASKY
  *   @create-time     2016 {time}

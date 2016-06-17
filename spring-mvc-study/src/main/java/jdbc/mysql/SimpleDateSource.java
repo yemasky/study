@@ -1,8 +1,8 @@
 /***********************************************************************  
  *  
- *   @package£ºjdbc.mysql,@class-name£ºSimpleDateSource.java  
+ *   @packageï¼šjdbc.mysql,@class-nameï¼šSimpleDateSource.java  
  *   
- *   ÊÜµ½·¨ÂÉµÄ±£»¤£¬ÈÎºÎ¹«Ë¾»ò¸öÈË£¬Î´¾­ÊÚÈ¨²»µÃÉÃ×Ô¿½±´¡£   
+ *   å—åˆ°æ³•å¾‹çš„ä¿æŠ¤ï¼Œä»»ä½•å…¬å¸æˆ–ä¸ªäººï¼Œæœªç»æˆæƒä¸å¾—æ“…è‡ªæ‹·è´ã€‚   
  *   @copyright       Copyright:   2016-2018     
  *   @creator         YEMASKY
  *   @create-time     2016 {time}
@@ -31,7 +31,7 @@ import java.sql.DriverManager;
 import java.io.PrintWriter;
 
 /**
- * Ò»¸ö¼òµ¥µÄDataSourceÊµÏÖ
+ * ä¸€ä¸ªç®€å•çš„DataSourceå®ç°
  * 
  * @author leizhimin 2010-1-14 0:03:17
  */
@@ -41,7 +41,7 @@ public class SimpleDateSource implements DataSource {
 	private static final String url = "jdbc:mysql://127.0.0.1:3306/testdb";
 	private static final String user = "root";
 	private static final String pswd = "leizhimin";
-	// Á¬½Ó³Ø
+	// è¿æ¥æ± 
 	private static LinkedList<Connection> pool = (LinkedList<Connection>) Collections
 			.synchronizedList(new LinkedList<Connection>());
 	private static SimpleDateSource instance = new SimpleDateSource();
@@ -50,7 +50,7 @@ public class SimpleDateSource implements DataSource {
 		try {
 			Class.forName(dirverClassName);
 		} catch (ClassNotFoundException e) {
-			log.error("ÕÒ²»µ½Çı¶¯Àà£¡", e);
+			log.error("æ‰¾ä¸åˆ°é©±åŠ¨ç±»ï¼", e);
 		}
 	}
 
@@ -58,9 +58,9 @@ public class SimpleDateSource implements DataSource {
 	}
 
 	/**
-	 * »ñÈ¡Êı¾İÔ´µ¥Àı
+	 * è·å–æ•°æ®æºå•ä¾‹
 	 * 
-	 * @return Êı¾İÔ´µ¥Àı
+	 * @return æ•°æ®æºå•ä¾‹
 	 */
 	public SimpleDateSource instance() {
 		if (instance == null)
@@ -69,9 +69,9 @@ public class SimpleDateSource implements DataSource {
 	}
 
 	/**
-	 * »ñÈ¡Ò»¸öÊı¾İ¿âÁ¬½Ó
+	 * è·å–ä¸€ä¸ªæ•°æ®åº“è¿æ¥
 	 * 
-	 * @return Ò»¸öÊı¾İ¿âÁ¬½Ó
+	 * @return ä¸€ä¸ªæ•°æ®åº“è¿æ¥
 	 * @throws SQLException
 	 */
 	public Connection getConnection() throws SQLException {
@@ -84,7 +84,7 @@ public class SimpleDateSource implements DataSource {
 	}
 
 	/**
-	 * Á¬½Ó¹é³Ø
+	 * è¿æ¥å½’æ± 
 	 * 
 	 * @param conn
 	 */

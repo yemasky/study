@@ -16,20 +16,20 @@ import org.w3c.dom.Element;
  *
  */
 public class ConnectionManager {
-	static private ConnectionManager instance;// Î¨Ò»Êı¾İ¿âÁ¬½Ó³Ø¹ÜÀíÊµÀıÀà
-	static private int clients; // ¿Í»§Á¬½ÓÊı
-	private Vector<Config> drivers = new Vector<Config>();// Çı¶¯ĞÅÏ¢
-	private Hashtable<String, ConnectionPools> pools = new Hashtable<String, ConnectionPools>();// Á¬½Ó³Ø
+	static private ConnectionManager instance;// å”¯ä¸€æ•°æ®åº“è¿æ¥æ± ç®¡ç†å®ä¾‹ç±»
+	static private int clients; // å®¢æˆ·è¿æ¥æ•°
+	private Vector<Config> drivers = new Vector<Config>();// é©±åŠ¨ä¿¡æ¯
+	private Hashtable<String, ConnectionPools> pools = new Hashtable<String, ConnectionPools>();// è¿æ¥æ± 
 
 	/**
-	 * ÊµÀı»¯¹ÜÀíÀà
+	 * å®ä¾‹åŒ–ç®¡ç†ç±»
 	 */
 	public ConnectionManager() {
 		this.init();
 	}
 
 	/**
-	 * µÃµ½Î¨Ò»ÊµÀı¹ÜÀíÀà
+	 * å¾—åˆ°å”¯ä¸€å®ä¾‹ç®¡ç†ç±»
 	 * 
 	 * @return
 	 */
@@ -42,20 +42,20 @@ public class ConnectionManager {
 	}
 
 	/**
-	 * ÊÍ·ÅÁ¬½Ó
+	 * é‡Šæ”¾è¿æ¥
 	 * 
 	 * @param connectionName
 	 * @param connection
 	 *            ConnectionPoolDataSource
 	 */
 	public void releaseConnection(String connectionName, Connection connection) {
-		ConnectionPools pool = (ConnectionPools) pools.get(connectionName);// ¸ù¾İ¹Ø¼üÃû×ÖµÃµ½Á¬½Ó³Ø
+		ConnectionPools pool = (ConnectionPools) pools.get(connectionName);// æ ¹æ®å…³é”®åå­—å¾—åˆ°è¿æ¥æ± 
 		if (pool != null)
-			pool.releaseConnection(connection);// ÊÍ·ÅÁ¬½Ó
+			pool.releaseConnection(connection);// é‡Šæ”¾è¿æ¥
 	}
 
 	/**
-	 * µÃµ½Ò»¸öÁ¬½Ó¸ù¾İÁ¬½Ó³ØµÄÃû×Öname
+	 * å¾—åˆ°ä¸€ä¸ªè¿æ¥æ ¹æ®è¿æ¥æ± çš„åå­—name
 	 * 
 	 * @param name
 	 * @return
@@ -63,15 +63,15 @@ public class ConnectionManager {
 	public Connection getConnection(String connectionName) {
 		ConnectionPools pool = null;
 		Connection connection = null;
-		pool = (ConnectionPools) pools.get(connectionName);// ´ÓÃû×ÖÖĞ»ñÈ¡Á¬½Ó³Ø
-		connection = pool.getConnection();// ´ÓÑ¡¶¨µÄÁ¬½Ó³ØÖĞ»ñµÃÁ¬½Ó
+		pool = (ConnectionPools) pools.get(connectionName);// ä»åå­—ä¸­è·å–è¿æ¥æ± 
+		connection = pool.getConnection();// ä»é€‰å®šçš„è¿æ¥æ± ä¸­è·å¾—è¿æ¥
 		if (connection != null)
-			System.out.println("µÃµ½Á¬½Ó...");
+			System.out.println("å¾—åˆ°è¿æ¥...");
 		return connection;
 	}
 
 	/**
-	 * µÃµ½Ò»¸öÁ¬½Ó£¬¸ù¾İÁ¬½Ó³ØµÄÃû×ÖºÍµÈ´ıÊ±¼ä
+	 * å¾—åˆ°ä¸€ä¸ªè¿æ¥ï¼Œæ ¹æ®è¿æ¥æ± çš„åå­—å’Œç­‰å¾…æ—¶é—´
 	 * 
 	 * @param name
 	 * @param time
@@ -80,14 +80,14 @@ public class ConnectionManager {
 	public Connection getConnection(String connectionName, long timeout) {
 		ConnectionPools pool = null;
 		Connection connection = null;
-		pool = (ConnectionPools) pools.get(connectionName);// ´ÓÃû×ÖÖĞ»ñÈ¡Á¬½Ó³Ø
-		connection = pool.getConnection(timeout);// ´ÓÑ¡¶¨µÄÁ¬½Ó³ØÖĞ»ñµÃÁ¬½Ó
-		System.out.println("µÃµ½Á¬½Ó...");
+		pool = (ConnectionPools) pools.get(connectionName);// ä»åå­—ä¸­è·å–è¿æ¥æ± 
+		connection = pool.getConnection(timeout);// ä»é€‰å®šçš„è¿æ¥æ± ä¸­è·å¾—è¿æ¥
+		System.out.println("å¾—åˆ°è¿æ¥...");
 		return connection;
 	}
 
 	/**
-	 * ÊÍ·ÅËùÓĞÁ¬½Ó
+	 * é‡Šæ”¾æ‰€æœ‰è¿æ¥
 	 */
 	public synchronized void release() {
 		Enumeration<ConnectionPools> allpools = pools.elements();
@@ -100,7 +100,7 @@ public class ConnectionManager {
 	}
 
 	/**
-	 * ´´½¨Á¬½Ó³Ø
+	 * åˆ›å»ºè¿æ¥æ± 
 	 * 
 	 * @param props
 	 */
@@ -117,23 +117,23 @@ public class ConnectionManager {
 	}
 
 	/**
-	 * ³õÊ¼»¯Á¬½Ó³ØµÄ²ÎÊı
+	 * åˆå§‹åŒ–è¿æ¥æ± çš„å‚æ•°
 	 */
 	private void init() {
-		// ¼ÓÔØÇı¶¯³ÌĞò
+		// åŠ è½½é©±åŠ¨ç¨‹åº
 		this.loadDrivers();
-		// ´´½¨Á¬½Ó³Ø
+		// åˆ›å»ºè¿æ¥æ± 
 		Iterator<Config> driver = drivers.iterator();
 		while (driver.hasNext()) {
 			this.createPools((Config) driver.next());
-			System.out.println("´´½¨Á¬½Ó³Ø¡£¡£¡£");
+			System.out.println("åˆ›å»ºè¿æ¥æ± ã€‚ã€‚ã€‚");
 
 		}
-		System.out.println("´´½¨Á¬½Ó³ØÍê±Ï¡£¡£¡£");
+		System.out.println("åˆ›å»ºè¿æ¥æ± å®Œæ¯•ã€‚ã€‚ã€‚");
 	}
 
 	/**
-	 * ¼ÓÔØÇı¶¯³ÌĞò
+	 * åŠ è½½é©±åŠ¨ç¨‹åº
 	 * 
 	 * @param props
 	 * @return 
@@ -166,8 +166,8 @@ public class ConnectionManager {
 
 	
 		return drivers;
-		// ¶ÁÈ¡Êı¾İ¿âÅäÖÃÎÄ¼ş
+		// è¯»å–æ•°æ®åº“é…ç½®æ–‡ä»¶
 		//drivers = config.readConfigInfo();
-		//System.out.println("¼ÓÔØÇı¶¯³ÌĞò¡£¡£¡£");
+		//System.out.println("åŠ è½½é©±åŠ¨ç¨‹åºã€‚ã€‚ã€‚");
 	}
 }

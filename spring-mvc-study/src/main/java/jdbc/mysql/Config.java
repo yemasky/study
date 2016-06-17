@@ -1,8 +1,8 @@
 /***********************************************************************  
  *  
- *   @package£ºjdbc.mysql,@class-name£ºConfig.java  
+ *   @packageï¼šjdbc.mysql,@class-nameï¼šConfig.java  
  *   
- *   ÊÜµ½·¨ÂÉµÄ±£»¤£¬ÈÎºÎ¹«Ë¾»ò¸öÈË£¬Î´¾­ÊÚÈ¨²»µÃÉÃ×Ô¿½±´¡£   
+ *   å—åˆ°æ³•å¾‹çš„ä¿æŠ¤ï¼Œä»»ä½•å…¬å¸æˆ–ä¸ªäººï¼Œæœªç»æˆæƒä¸å¾—æ“…è‡ªæ‹·è´ã€‚   
  *   @copyright       Copyright:   2016-2018     
  *   @creator         YEMASKY
  *   @create-time     2016 {time}
@@ -23,13 +23,13 @@ import org.w3c.dom.Element;
  * @throws Exception
  */
 public class Config {
-	private String type = ""; // Êı¾İ¿âÀàĞÍ
-	private String connectionName = ""; // Á¬½Ó³ØÃû×Ö
-	private String driver = ""; // Êı¾İ¿âÇı¶¯
-	private String url = ""; // Êı¾İ¿âurl
-	private String username = ""; // ÓÃ»§Ãû
-	private String password = ""; // ÃÜÂë
-	private int maxConnection = 300; // ×î´óÁ¬½ÓÊı
+	private String type = ""; // æ•°æ®åº“ç±»å‹
+	private String connectionName = ""; // è¿æ¥æ± åå­—
+	private String driver = ""; // æ•°æ®åº“é©±åŠ¨
+	private String url = ""; // æ•°æ®åº“url
+	private String username = ""; // ç”¨æˆ·å
+	private String password = ""; // å¯†ç 
+	private int maxConnection = 300; // æœ€å¤§è¿æ¥æ•°
 
 	public Config() {
 	}

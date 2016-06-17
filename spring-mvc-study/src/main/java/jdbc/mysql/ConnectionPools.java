@@ -13,16 +13,16 @@ import java.util.Timer;
  */
 public class ConnectionPools {
 	private Connection connection = null;
-	private int inUsed = 0; // Ê¹ÓÃµÄÁ¬½ÓÊı
-	private ArrayList<Connection> freeConnectionsList = new ArrayList<Connection>();// ÈİÆ÷£¬¿ÕÏĞÁ¬½Ó
-	private int minConnection; // ×îĞ¡Á¬½ÓÊı
-	private int maxConnection; // ×î´óÁ¬½Ó
-	private String connectionName; // Á¬½Ó³ØÃû×Ö
-	private String user; // ÓÃ»§Ãû
-	private String password; // ÃÜÂë
-	private String url; // Êı¾İ¿âÁ¬½ÓµØÖ·
-	private String driver; // Çı¶¯
-	public Timer timer; // ¶¨Ê±
+	private int inUsed = 0; // ä½¿ç”¨çš„è¿æ¥æ•°
+	private ArrayList<Connection> freeConnectionsList = new ArrayList<Connection>();// å®¹å™¨ï¼Œç©ºé—²è¿æ¥
+	private int minConnection; // æœ€å°è¿æ¥æ•°
+	private int maxConnection; // æœ€å¤§è¿æ¥
+	private String connectionName; // è¿æ¥æ± åå­—
+	private String user; // ç”¨æˆ·å
+	private String password; // å¯†ç 
+	private String url; // æ•°æ®åº“è¿æ¥åœ°å€
+	private String driver; // é©±åŠ¨
+	public Timer timer; // å®šæ—¶
 
 	/**
 	  *
@@ -31,7 +31,7 @@ public class ConnectionPools {
 	}
 
 	/**
-	 * ´´½¨Á¬½Ó³Ø
+	 * åˆ›å»ºè¿æ¥æ± 
 	 * 
 	 * @param driver
 	 * @param name
@@ -50,17 +50,17 @@ public class ConnectionPools {
 	}
 
 	/**
-	 * ÓÃÍê£¬ÊÍ·ÅÁ¬½Ó
+	 * ç”¨å®Œï¼Œé‡Šæ”¾è¿æ¥
 	 * 
 	 * @param con
 	 */
 	public synchronized void releaseConnection(Connection connection) {
-		this.freeConnectionsList.add(connection);// Ìí¼Óµ½¿ÕÏĞÁ¬½ÓµÄÄ©Î²
+		this.freeConnectionsList.add(connection);// æ·»åŠ åˆ°ç©ºé—²è¿æ¥çš„æœ«å°¾
 		this.inUsed--;
 	}
 
 	/**
-	 * timeout ¸ù¾İtimeoutµÃµ½Á¬½Ó
+	 * timeout æ ¹æ®timeoutå¾—åˆ°è¿æ¥
 	 * 
 	 * @param timeout
 	 * @return
@@ -70,12 +70,12 @@ public class ConnectionPools {
 		if (this.freeConnectionsList.size() > 0) {
 			connection = (Connection) this.freeConnectionsList.get(0);
 			if (connection == null)
-				connection = getConnection(timeout); // ¼ÌĞø»ñµÃÁ¬½Ó
+				connection = getConnection(timeout); // ç»§ç»­è·å¾—è¿æ¥
 		} else {
-			connection = createConnection(); // ĞÂ½¨Á¬½Ó
+			connection = createConnection(); // æ–°å»ºè¿æ¥
 		}
 		if (this.maxConnection == 0 || this.maxConnection < this.inUsed) {
-			connection = null;// ´ïµ½×î´óÁ¬½ÓÊı£¬ÔİÊ±²»ÄÜ»ñµÃÁ¬½ÓÁË¡£
+			connection = null;// è¾¾åˆ°æœ€å¤§è¿æ¥æ•°ï¼Œæš‚æ—¶ä¸èƒ½è·å¾—è¿æ¥äº†ã€‚
 		}
 		if (connection != null) {
 			this.inUsed++;
@@ -85,7 +85,7 @@ public class ConnectionPools {
 
 	/**
 	 *
-	 * ´ÓÁ¬½Ó³ØÀïµÃµ½Á¬½Ó
+	 * ä»è¿æ¥æ± é‡Œå¾—åˆ°è¿æ¥
 	 * 
 	 * @return
 	 */
@@ -93,24 +93,24 @@ public class ConnectionPools {
 		Connection connection = null;
 		if (this.freeConnectionsList.size() > 0) {
 			connection = (Connection) this.freeConnectionsList.get(0);
-			this.freeConnectionsList.remove(0);// Èç¹ûÁ¬½Ó·ÖÅä³öÈ¥ÁË£¬¾Í´Ó¿ÕÏĞÁ¬½ÓÀïÉ¾³ı
+			this.freeConnectionsList.remove(0);// å¦‚æœè¿æ¥åˆ†é…å‡ºå»äº†ï¼Œå°±ä»ç©ºé—²è¿æ¥é‡Œåˆ é™¤
 			if (connection == null)
-				connection = getConnection(); // ¼ÌĞø»ñµÃÁ¬½Ó
+				connection = getConnection(); // ç»§ç»­è·å¾—è¿æ¥
 		} else {
-			connection = createConnection(); // ĞÂ½¨Á¬½Ó
+			connection = createConnection(); // æ–°å»ºè¿æ¥
 		}
 		if (this.maxConnection == 0 || this.maxConnection < this.inUsed) {
-			connection = null;// µÈ´ı ³¬¹ı×î´óÁ¬½ÓÊ±
+			connection = null;// ç­‰å¾… è¶…è¿‡æœ€å¤§è¿æ¥æ—¶
 		}
 		if (connection != null) {
 			this.inUsed++;
-			System.out.println("µÃµ½¡¡" + this.connectionName + "¡¡µÄÁ¬½Ó£¬ÏÖÓĞ" + inUsed + "¸öÁ¬½ÓÔÚÊ¹ÓÃ!");
+			System.out.println("å¾—åˆ°ã€€" + this.connectionName + "ã€€çš„è¿æ¥ï¼Œç°æœ‰" + inUsed + "ä¸ªè¿æ¥åœ¨ä½¿ç”¨!");
 		}
 		return connection;
 	}
 
 	/**
-	 * ÊÍ·ÅÈ«²¿Á¬½Ó
+	 * é‡Šæ”¾å…¨éƒ¨è¿æ¥
 	 *
 	 */
 	public synchronized void release() {
@@ -128,7 +128,7 @@ public class ConnectionPools {
 	}
 
 	/**
-	 * ´´½¨ĞÂÁ¬½Ó
+	 * åˆ›å»ºæ–°è¿æ¥
 	 * 
 	 * @return
 	 */
@@ -147,10 +147,10 @@ public class ConnectionPools {
 	}
 
 	/**
-	 * ¶¨Ê±´¦Àíº¯Êı
+	 * å®šæ—¶å¤„ç†å‡½æ•°
 	 */
 	public synchronized void TimerEvent() {
-		// ÔİÊ±»¹Ã»ÓĞÊµÏÖÒÔºó»á¼ÓÉÏµÄ
+		// æš‚æ—¶è¿˜æ²¡æœ‰å®ç°ä»¥åä¼šåŠ ä¸Šçš„
 	}
 
 	/**
