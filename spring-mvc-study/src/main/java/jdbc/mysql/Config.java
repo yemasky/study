@@ -10,12 +10,6 @@
  ***********************************************************************/
 package jdbc.mysql;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import org.w3c.dom.Element;
-
 /**
  * @author YEMASKY
  * @param
@@ -24,7 +18,7 @@ import org.w3c.dom.Element;
  */
 public class Config {
 	private String type = ""; // 数据库类型
-	private String connectionName = ""; // 连接池名字
+	private String connectionName = "default_db"; // 连接池名字
 	private String driver = ""; // 数据库驱动
 	private String url = ""; // 数据库url
 	private String username = ""; // 用户名

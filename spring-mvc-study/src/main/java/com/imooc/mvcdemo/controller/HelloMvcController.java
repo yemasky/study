@@ -1,7 +1,12 @@
 package com.imooc.mvcdemo.controller;
 
+import java.sql.SQLException;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import jdbc.mysql.Config;
+import jdbc.mysql.MysqlConnection;
 
 //告诉DispatcherServlet相关的容器， 这是一个Controller， 管理好这个bean哦
 @Controller
@@ -12,8 +17,11 @@ public class HelloMvcController {
 	
 	//方法级别的RequestMapping， 限制并缩小了URL路径匹配，同类级别的标签协同工作，最终确定拦截到的URL由那个方法处理
 	@RequestMapping("/mvc")
-	public String helloMvc() {
-		
+	public String helloMvc() throws SQLException {
+		Config config = new Config();
+		MysqlConnection conn = new MysqlConnection();
+		conn.createPools(config);
+		conn.getConnection(config.getConnectionName());
 		//视图渲染，/WEB-INF/jsps/home.jsp
 		return "home";
 	}
