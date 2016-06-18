@@ -19,21 +19,22 @@ import org.w3c.dom.Element;
 public class MysqlConnection {
 	static private MysqlConnection instance;// 唯一数据库连接池管理实例类
 	private Vector<Config> drivers = new Vector<Config>();// 驱动信息
-	private Hashtable<String, MysqlDateSource> pools = new Hashtable<String, MysqlDateSource>();// 多数据连接池
+	private Hashtable<String, MysqlConnectionPool> pools = new Hashtable<String, MysqlConnectionPool>();// 多数据连接池
 
 	/**
 	 * 实例化管理类
-	 * @throws SQLException 
+	 * 
+	 * @throws SQLException
 	 */
-	public MysqlConnection()  {
-		//this.init();
+	public MysqlConnection() {
+		// this.init();
 	}
 
 	/**
 	 * 得到唯一实例管理类
 	 * 
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	static synchronized public MysqlConnection getInstance() throws SQLException {
 		if (instance == null) {
@@ -51,7 +52,7 @@ public class MysqlConnection {
 	 *            ConnectionPoolDataSource
 	 */
 	public void releaseConnection(String connectionName, Connection connection) {
-		MysqlDateSource pool = pools.get(connectionName);// 根据关键名字得到连接池
+		MysqlConnectionPool pool = pools.get(connectionName);// 根据关键名字得到连接池
 		if (pool != null)
 			pool.freeConnection(connection);// 释放连接
 	}
@@ -61,10 +62,10 @@ public class MysqlConnection {
 	 * 
 	 * @param name
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public Connection getConnection(String connectionName) throws SQLException {
-		MysqlDateSource pool = null;
+		MysqlConnectionPool pool = null;
 		Connection connection = null;
 		pool = pools.get(connectionName);// 从名字中获取连接池
 		connection = pool.getConnection();// 从选定的连接池中获得连接
@@ -75,12 +76,13 @@ public class MysqlConnection {
 
 	/**
 	 * 释放所有连接
-	 * @throws SQLException 
+	 * 
+	 * @throws SQLException
 	 */
 	public void release() throws SQLException {
-		Enumeration<MysqlDateSource> allpools = pools.elements();
+		Enumeration<MysqlConnectionPool> allpools = pools.elements();
 		while (allpools.hasMoreElements()) {
-			MysqlDateSource pool = allpools.nextElement();
+			MysqlConnectionPool pool = allpools.nextElement();
 			if (pool != null)
 				pool.closeConnection(pool.getConnection());
 		}
@@ -91,10 +93,10 @@ public class MysqlConnection {
 	 * 创建连接池
 	 * 
 	 * @param props
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public void createPools(Config config) throws SQLException {
-		MysqlDateSource mysqlDateSource = new MysqlDateSource();
+		MysqlConnectionPool mysqlDateSource = new MysqlConnectionPool();
 		mysqlDateSource.init();
 		pools.put(config.getConnectionName(), mysqlDateSource);
 		System.out.println("pool:" + config.getMaxConnection());
@@ -102,7 +104,8 @@ public class MysqlConnection {
 
 	/**
 	 * 初始化连接池的参数
-	 * @throws SQLException 
+	 * 
+	 * @throws SQLException
 	 */
 	private void init() throws SQLException {
 		// 加载驱动程序
@@ -121,12 +124,12 @@ public class MysqlConnection {
 	 * 加载驱动程序
 	 * 
 	 * @param props
-	 * @return 
+	 * @return
 	 */
 	private Vector<Config> loadDrivers() {
 		drivers = null;
 		try {
-	
+
 			List<?> pools = null;
 			Element pool = null;
 			Iterator<?> allPool = pools.iterator();
@@ -149,10 +152,13 @@ public class MysqlConnection {
 			e.printStackTrace();
 		}
 
-	
 		return drivers;
 		// 读取数据库配置文件
-		//drivers = config.readConfigInfo();
-		//System.out.println("加载驱动程序。。。");
+		// drivers = config.readConfigInfo();
+		// System.out.println("加载驱动程序。。。");
 	}
+
+	public void finalize() {
+		System.out.println("ok释放连接.");
+	} 
 }

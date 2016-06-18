@@ -32,7 +32,7 @@ import java.io.PrintWriter;
  * 
  * @author
  */
-public class MysqlDateSource implements DataSource {
+public class MysqlConnectionPool implements DataSource {
 	private static final Logger logger = Logger.getLogger("jdbc.mysql.MysqlDateSource");
 	private static final String dirverClassName = "com.mysql.jdbc.Driver";
 	private String dbUrl = "jdbc:mysql://127.0.0.1:3306/test?useSSL=false";
@@ -44,7 +44,7 @@ public class MysqlDateSource implements DataSource {
 	// 连接池
 	private static LinkedList<Connection> pool = new LinkedList<Connection>();
 
-	private static MysqlDateSource instance = new MysqlDateSource();
+	private static MysqlConnectionPool instance = new MysqlConnectionPool();
 
 	static {
 		try {
@@ -54,7 +54,7 @@ public class MysqlDateSource implements DataSource {
 		}
 	}
 
-	public MysqlDateSource() {
+	public MysqlConnectionPool() {
 	}
 
 	/**
@@ -62,9 +62,9 @@ public class MysqlDateSource implements DataSource {
 	 * 
 	 * @return 数据源单例
 	 */
-	public MysqlDateSource instance() {
+	public MysqlConnectionPool instance() {
 		if (instance == null)
-			instance = new MysqlDateSource();
+			instance = new MysqlConnectionPool();
 		return instance;
 	}
 
