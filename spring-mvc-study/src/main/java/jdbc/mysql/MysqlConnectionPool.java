@@ -43,6 +43,8 @@ public class MysqlConnectionPool implements DataSource {
 	private int timeout = 1000; // 连接时间
 	// 连接池
 	private static LinkedList<Connection> pool = new LinkedList<Connection>();
+	private static int usePool = 0;
+
 
 	private static MysqlConnectionPool instance = new MysqlConnectionPool();
 
@@ -76,10 +78,12 @@ public class MysqlConnectionPool implements DataSource {
 	 */
 	public Connection getConnection() throws SQLException {
 		synchronized (pool) {
-			if (pool.size() > 0)
+			if (pool.size() > 0) {
+				usePool++;
 				return pool.removeFirst();
-			else
+			} else {
 				return createConnection();
+			}
 		}
 	}
 
