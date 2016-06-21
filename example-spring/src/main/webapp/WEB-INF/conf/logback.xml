@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+	<property name="logPath" value="D:/workspace/logs/ask_center" />
+	
+	<appender name="stdout_appender" class="ch.qos.logback.core.ConsoleAppender">
+		<Target>System.out</Target>
+		<encoder>
+			<pattern>%n%msg%n%date [%level] [%thread] %logger{80} %line%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="file"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${logPath}/ask.center.log</File>
+		<encoder>
+			<pattern>%n%msg%n%date [%level] [%thread] %logger{80} %line%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logPath}/ask.center.log_%d{yyyy-MM-dd}</fileNamePattern>
+		</rollingPolicy>
+	</appender>
+	
+	<appender name="requestLogger"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${logPath}/request.log</File>
+		<encoder>
+			<pattern>%date | %msg%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logPath}/request.log_%d{yyyy-MM-dd}</fileNamePattern>
+		</rollingPolicy>
+	</appender>
+
+	<logger name="cn.itcast.ask.center.server.web.controller.AskCenterController" additivity="false">
+		<level value="info" />
+		<appender-ref ref="requestLogger" />
+	</logger>
+	
+	<logger name="cn.itcast" additivity="false">
+		<level value="info" />
+		<appender-ref ref="stdout_appender" />
+	</logger>
+
+	<logger name="org.springframework.jdbc.core" additivity="false">
+		<level value="warn" /><!--debug print sql-->
+		<appender-ref ref="stdout_appender" />
+	</logger>
+
+	<root>
+		<level value="warn" />
+		<appender-ref ref="stdout_appender" />
+		<!--<appender-ref ref="file"/> -->
+	</root>
+
+</configuration>
