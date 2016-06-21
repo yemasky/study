@@ -76,5 +76,11 @@
 		<property name="defaultEncoding" value="UTF-8" />
 		<property name="resolveLazily" value="true" />
 	</bean>
+	
+	<!-- 例子 -->
+	<bean id="exampleInitBean" class="example.ExampleBean" init-method="init" destroy-method="clearup" />
+	
+	
+	
 
 </beans>

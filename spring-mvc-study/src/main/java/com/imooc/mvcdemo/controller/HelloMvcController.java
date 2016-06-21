@@ -17,11 +17,12 @@ public class HelloMvcController {
 	
 	//方法级别的RequestMapping， 限制并缩小了URL路径匹配，同类级别的标签协同工作，最终确定拦截到的URL由那个方法处理
 	@RequestMapping("/mvc")
-	public String helloMvc() throws SQLException {
+	public String helloMvc() throws Exception {
 		Config config = new Config();
 		MysqlConnection conn = new MysqlConnection();
 		conn.createPools(config);
 		conn.getConnection(config.getConnectionName());
+		conn.sss(config.getConnectionName());
 		//视图渲染，/WEB-INF/jsps/home.jsp
 		return "home";
 	}

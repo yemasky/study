@@ -62,16 +62,26 @@ public class MysqlConnection {
 	 * 
 	 * @param name
 	 * @return
-	 * @throws SQLException
+	 * @throws Exception
 	 */
-	public Connection getConnection(String connectionName) throws SQLException {
+	public Connection getConnection(String connectionName) throws Exception {
 		MysqlConnectionPool pool = null;
 		Connection connection = null;
 		pool = pools.get(connectionName);// 从名字中获取连接池
+		if (pool == null) {
+			throw new Exception("没有找到: " + connectionName + " 的连接池.");
+		}
 		connection = pool.getConnection();// 从选定的连接池中获得连接
 		if (connection != null)
 			System.out.println("得到连接...");
 		return connection;
+	}
+	
+	public void sss(String connectionName) {
+		MysqlConnectionPool pool = null;
+		Connection connection = null;
+		pool = pools.get(connectionName);// 从名字中获取连接池
+		pool.threadConnectionStatus();
 	}
 
 	/**
@@ -158,7 +168,9 @@ public class MysqlConnection {
 		// System.out.println("加载驱动程序。。。");
 	}
 
-	public void finalize() {
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
 		System.out.println("ok释放连接.");
-	} 
+	}
 }

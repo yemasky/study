@@ -15,13 +15,14 @@ public class test {
 
 	/**
 	 * @param args
-	 * @throws SQLException 
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws SQLException {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		Config config = new Config();
 		MysqlConnection conn = new MysqlConnection();
 		conn.createPools(config);
+		conn.getConnection(config.getConnectionName());
 		
 		//
 		
