@@ -19,28 +19,12 @@ package jdbc.db.mysql;
 public class Config {
 	private String type = ""; // 数据库类型
 	private String connectionName = "default_db"; // 连接池名字
-	private String driver = ""; // 数据库驱动
 	private String url = ""; // 数据库url
 	private String username = ""; // 用户名
 	private String password = ""; // 密码
 	private int maxConnection = 300; // 最大连接数
 
 	public Config() {
-	}
-
-	/**
-	 * @return the driver
-	 */
-	public String getDriver() {
-		return driver;
-	}
-
-	/**
-	 * @param driver
-	 *            the driver to set
-	 */
-	public void setDriver(String driver) {
-		this.driver = driver;
 	}
 
 	/**
