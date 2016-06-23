@@ -8,7 +8,7 @@
  *   @create-time     2016 {time}
  *   @revision        Id: 1.0    
  ***********************************************************************/
-package jdbc.mysql;
+package example.jdbc.mysql;
 
 /**
  * @author YEMASKY

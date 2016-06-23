@@ -1,6 +1,6 @@
 /***********************************************************************  
  *  
- *   @package：jdbc.mysql,@class-name：SimpleDateSource.java  
+ *   @package：jdbc.db.mysql,@class-name：ConnectionPool.java  
  *   
  *   受到法律的保护，任何公司或个人，未经授权不得擅自拷贝。   
  *   @copyright       Copyright:   2016-2018     
@@ -8,14 +8,8 @@
  *   @create-time     2016 {time}
  *   @revision        Id: 1.0    
  ***********************************************************************/
-package jdbc.mysql;
+package jdbc.db.mysql;
 
-/**
- * @author YEMASKY
- * @param
- * @return
- * @throws Exception 
- */
 import javax.sql.DataSource;
 
 import java.util.LinkedList;
@@ -28,12 +22,12 @@ import java.sql.DriverManager;
 import java.io.PrintWriter;
 
 /**
- * 一个简单的DataSource实现
+ * ConnectionPool实现
  * 
- * @author
+ * @author YEMASKY
  */
-public class MysqlConnectionPool implements DataSource {
-	private static final Logger logger = Logger.getLogger("jdbc.mysql.MysqlDateSource");
+public class ConnectionPool implements DataSource {
+	private static final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPool");
 	private static final String dirverClassName = "com.mysql.jdbc.Driver";
 	private static String dbUrl = "jdbc:mysql://127.0.0.1:3306/test?useSSL=false";
 	private static String dbUsername = "root";
@@ -44,9 +38,10 @@ public class MysqlConnectionPool implements DataSource {
 	// 连接池
 	private static LinkedList<Connection> pool = new LinkedList<Connection>();
 	private static int usedPool = 0;
-	private static final ThreadLocal<Connection> threadConnection = new ThreadLocal<Connection>();  
-
-	private static MysqlConnectionPool instance = new MysqlConnectionPool();
+	//当前使用connection
+	private final ThreadLocal<Connection> threadConnection = new ThreadLocal<Connection>();  
+	
+	
 
 	static {
 		try {
@@ -56,18 +51,7 @@ public class MysqlConnectionPool implements DataSource {
 		}
 	}
 
-	public MysqlConnectionPool() {
-	}
-
-	/**
-	 * 获取数据源单例
-	 * 
-	 * @return 数据源单例
-	 */
-	public MysqlConnectionPool instance() {
-		if (instance == null)
-			instance = new MysqlConnectionPool();
-		return instance;
+	public ConnectionPool() {
 	}
 
 	/**
@@ -84,7 +68,7 @@ public class MysqlConnectionPool implements DataSource {
 				setUsedPool(getUsedPool() + 1);
 				logger.info("used:"+getUsedPool());
 				connection = pool.removeFirst();
-				//threadConnection.set(connection);
+				threadConnection.set(connection);
 				return connection;
 				//return pool.removeFirst();
 			} else {
@@ -97,11 +81,11 @@ public class MysqlConnectionPool implements DataSource {
 	}
 
 	public void init() throws SQLException {
-		if(pool.size() == 0) {
-			Connection conn = null;
+		if(pool.size() == 0 && usedPool == 0) {
+			Connection connection = null;
 			for (int i = 0; i < minConnection; i++) {
-				conn = createConnection();
-				freeConnection(conn);
+				connection = createConnection();
+				pool.addLast(connection);
 			}
 			logger.info("连接池初始化完毕.");
 		}
@@ -110,14 +94,22 @@ public class MysqlConnectionPool implements DataSource {
 	public void threadConnectionStatus() {
 		//logger.info(threadConnection.hashCode() + ";ss");
 	}
+	
+	//释放连接资源
+	public void release() {
+		if(threadConnection.get() != null)
+			freeConnection(threadConnection.get());
+	}
 
 	/**
 	 * 连接归池
 	 * 
-	 * @param conn
+	 * @param connection
 	 */
 	public void freeConnection(Connection connection) {
 		pool.addLast(connection);
+		setUsedPool(getUsedPool() - 1);
+		logger.info("used:"+getUsedPool());
 	}
 
 	public void closeConnection(Connection connection) throws SQLException {
@@ -165,40 +157,40 @@ public class MysqlConnectionPool implements DataSource {
 		return dbUrl;
 	}
 
-	public void setDbUrl(String dbUrl) {
-		MysqlConnectionPool.dbUrl = dbUrl;
+	public void setDbUrl(String dbURL) {
+		dbUrl = dbURL;
 	}
 
 	public String getDbUsername() {
 		return dbUsername;
 	}
 
-	public void setDbUsername(String dbUsername) {
-		MysqlConnectionPool.dbUsername = dbUsername;
+	public void setDbUsername(String dbUserName) {
+		dbUsername = dbUserName;
 	}
 
 	public String getDbPassword() {
 		return dbPassword;
 	}
 
-	public void setDbPassword(String dbPassword) {
-		MysqlConnectionPool.dbPassword = dbPassword;
+	public void setDbPassword(String dbPassWord) {
+		dbPassword = dbPassWord;
 	}
 
 	public int getMinConnection() {
 		return minConnection;
 	}
 
-	public void setMinConnection(int minConnection) {
-		MysqlConnectionPool.minConnection = minConnection;
+	public void setMinConnection(int min) {
+		minConnection = min;
 	}
 
 	public int getMaxConnection() {
 		return maxConnection;
 	}
 
-	public void setMaxConnection(int maxConnection) {
-		MysqlConnectionPool.maxConnection = maxConnection;
+	public void setMaxConnection(int max) {
+		maxConnection = max;
 	}
 
 	public int getUsedPool() {

@@ -1,12 +1,12 @@
 package com.imooc.mvcdemo.controller;
 
-import java.sql.SQLException;
+//import java.sql.SQLException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import jdbc.mysql.Config;
-import jdbc.mysql.MysqlConnection;
+import example.jdbc.mysql.Config;
+import example.jdbc.mysql.MysqlConnection;
 
 //告诉DispatcherServlet相关的容器， 这是一个Controller， 管理好这个bean哦
 @Controller

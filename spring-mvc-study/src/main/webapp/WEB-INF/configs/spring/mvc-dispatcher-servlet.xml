@@ -81,6 +81,5 @@
 	<bean id="exampleInitBean" class="example.ExampleBean" init-method="init" destroy-method="clearup" />
 	
 	
-	
 
 </beans>

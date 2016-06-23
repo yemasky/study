@@ -1,4 +1,4 @@
-package jdbc.mysql;
+package example.jdbc.mysql;
 
 import java.sql.Connection;
 import java.util.Enumeration;

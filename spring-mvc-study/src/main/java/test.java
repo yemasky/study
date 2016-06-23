@@ -1,7 +1,7 @@
 import java.sql.SQLException;
 
-import jdbc.mysql.Config;
-import jdbc.mysql.MysqlConnection;
+import example.jdbc.mysql.Config;
+import example.jdbc.mysql.MysqlConnection;
 
 /**
  * 

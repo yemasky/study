@@ -1,4 +1,4 @@
-package jdbc.mysql;
+package example.jdbc.mysql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
  *
  */
 public class MysqlConnection {
-	static private MysqlConnection instance;// 唯一数据库连接池管理实例类
+	private static MysqlConnection instance;// 唯一数据库连接池管理实例类
 	private Vector<Config> drivers = new Vector<Config>();// 驱动信息
 	private Hashtable<String, MysqlConnectionPool> pools = new Hashtable<String, MysqlConnectionPool>();// 多数据连接池
 
