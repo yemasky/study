@@ -29,7 +29,7 @@ import java.io.PrintWriter;
 public class ConnectionPool implements DataSource {
 	private static final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPool");
 	private static final String dirverClassName = "com.mysql.jdbc.Driver";
-	private static String dbUrl = "jdbc:mysql://127.0.0.1:3306/test?useSSL=false";
+	private static String dbUrl = "jdbc:mysql://127.0.0.1:3306/test?user=root&password=root&useSSL=false";
 	private static String dbUsername = "root";
 	private static String dbPassword = "root";
 	private static int minConnection = 5; // 最小连接数
@@ -70,7 +70,6 @@ public class ConnectionPool implements DataSource {
 				connection = pool.removeFirst();
 				threadConnection.set(connection);
 				return connection;
-				//return pool.removeFirst();
 			} else {
 				if(getUsedPool() == maxConnection) {
 					return null;
@@ -92,7 +91,6 @@ public class ConnectionPool implements DataSource {
 	}
 	
 	public void threadConnectionStatus() {
-		//logger.info(threadConnection.hashCode() + ";ss");
 	}
 	
 	//释放连接资源
@@ -117,7 +115,7 @@ public class ConnectionPool implements DataSource {
 	}
 
 	private Connection createConnection() throws SQLException {
-		return DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+		return DriverManager.getConnection(dbUrl);
 	}
 
 	public Connection getConnection(String username, String password) throws SQLException {

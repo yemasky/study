@@ -10,22 +10,17 @@
  ***********************************************************************/
 package jdbc.db.mysql;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Logger;
-
-import org.w3c.dom.Element;
-
-import example.jdbc.mysql.Config;
 
 /**
  * @author CooC
@@ -34,7 +29,7 @@ import example.jdbc.mysql.Config;
 public class ConnectionPoolManager {
 	private final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPoolManager");
 	private Hashtable<String, ConnectionPool> pools = new Hashtable<String, ConnectionPool>();// 连接池
-	private Vector<Config> drivers = new Vector<Config>();// 驱动信息
+	private static Map<String, Config> drivers = new HashMap<String, Config>();// 驱动信息
 
 	/**
 	 * 创建连接池
@@ -85,36 +80,32 @@ public class ConnectionPoolManager {
 			pool.freeConnection(connection);// 释放连接
 	}
 
-	public Vector<Config> loadDrivers() throws FileNotFoundException {
+	public Map<String, Config> loadDrivers() throws FileNotFoundException {
 		drivers = null;
 		try {
 
-			/*List<?> pools = null;
-			Element pool = null;
-			Iterator<?> allPool = pools.iterator();
-			while (allPool.hasNext()) {
-				pool = (Element) allPool.next();
-				Config dscBean = new Config();
-				dscBean.setType(pool.getAttribute("type"));
-				dscBean.setConnectionName(pool.getAttribute("name"));
-				System.out.println(dscBean.getConnectionName());
-				dscBean.setDriver(pool.getAttribute("driver"));
-				dscBean.setUrl(pool.getAttribute("url"));
-				dscBean.setUsername(pool.getAttribute("username"));
-				dscBean.setPassword(pool.getAttribute("password"));
-				dscBean.setMaxConnection(Integer.parseInt(pool.getAttribute("maxconn")));
-				drivers.add(dscBean);
-			}*/
+			/*
+			 * List<?> pools = null; Element pool = null; Iterator<?> allPool =
+			 * pools.iterator(); while (allPool.hasNext()) { pool = (Element)
+			 * allPool.next(); Config dscBean = new Config();
+			 * dscBean.setType(pool.getAttribute("type"));
+			 * dscBean.setConnectionName(pool.getAttribute("name"));
+			 * System.out.println(dscBean.getConnectionName());
+			 * dscBean.setDriver(pool.getAttribute("driver"));
+			 * dscBean.setUrl(pool.getAttribute("url"));
+			 * dscBean.setUsername(pool.getAttribute("username"));
+			 * dscBean.setPassword(pool.getAttribute("password"));
+			 * dscBean.setMaxConnection(Integer.parseInt(pool.getAttribute(
+			 * "maxconn"))); drivers.add(dscBean); }
+			 */
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		
 		InputStream ferr = this.getClass().getClassLoader().getResourceAsStream("config/jdbc.db.properties");
 		Properties properties = new Properties();
-		//FileInputStream ferr = new FileInputStream((this.getClass().getClassLoader().getResource("config/host.properties")).toString().substring(6));// 用subString(6)去掉：file:/
 
 		try {
 			properties.load(ferr);
@@ -123,10 +114,32 @@ public class ConnectionPoolManager {
 			Iterator<Object> it = set.iterator();
 			String key = "";
 			String value = "";
+			Config config = null;
 			while (it.hasNext()) {
 				key = (String) it.next();
 				value = properties.getProperty(key);
-				System.out.println(key + "<====>" + value);
+				logger.info("loading config: key->" + key + ", value->" + value);
+				String[] keyArray = key.split(".");
+				if (drivers.get(keyArray[1]) != null) {
+					config = drivers.get(keyArray[1]);
+				} else {
+					config = new Config();
+					config.setConnectionName(keyArray[1]);
+				}
+				if (keyArray[2] == "url") {
+					config.setUrl(value);
+				}
+				if (keyArray[2] == "username") {
+					config.setUsername(value);
+				}
+				if (keyArray[2] == "password") {
+					config.setPassword(value);
+				}
+				if (keyArray[2] == "maxConnection") {
+					config.setMaxConnection(Integer.parseInt(value));
+				}
+				logger.info(config.getConnectionName());
+				drivers.put(keyArray[1], config);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -134,5 +147,5 @@ public class ConnectionPoolManager {
 		return drivers;
 
 	}
-	
+
 }
