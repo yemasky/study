@@ -113,21 +113,22 @@ public class ConnectionPoolManager {
 
 		
 		InputStream ferr = this.getClass().getClassLoader().getResourceAsStream("config/jdbc.db.properties");
-		Properties p = new Properties();
+		Properties properties = new Properties();
 		//FileInputStream ferr = new FileInputStream((this.getClass().getClassLoader().getResource("config/host.properties")).toString().substring(6));// 用subString(6)去掉：file:/
-		try {
-			p.load(ferr);
-			ferr.close();
-			Set<Object> s = p.keySet();
-			Iterator<Object> it = s.iterator();
-			while (it.hasNext()) {
-				String id = (String) it.next();
-				String value = p.getProperty(id);
-				System.out.println(id + "<====>" + value);
-			}
-		} catch (
 
-		Exception e) {
+		try {
+			properties.load(ferr);
+			ferr.close();
+			Set<Object> set = properties.keySet();
+			Iterator<Object> it = set.iterator();
+			String key = "";
+			String value = "";
+			while (it.hasNext()) {
+				key = (String) it.next();
+				value = properties.getProperty(key);
+				System.out.println(key + "<====>" + value);
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return drivers;
