@@ -151,4 +151,30 @@ public class ConnectionPoolManager {
 		}
 		logger.info("创建连接池完毕.");
 	}
+
+	// 释放资源
+	public void release() {
+		Iterator<Entry<String, Config>> driver = drivers.entrySet().iterator();
+		while (driver.hasNext()) {
+			this.releaseConnection(driver.next().getKey());
+		}
+		logger.info("释放连接池完毕.");
+	}
+
+	// 关闭资源
+	public void close(String connectionName) throws SQLException {
+		ConnectionPool pool = (ConnectionPool) pools.get(connectionName);
+		pool.close();
+		logger.info("关闭资源完毕.");
+	}
+
+	// 关闭所有空余资源
+	public void close() throws SQLException {
+		Iterator<Entry<String, Config>> driver = drivers.entrySet().iterator();
+		while (driver.hasNext()) {
+			ConnectionPool pool = (ConnectionPool) pools.get(driver.next().getKey());
+			pool.close();
+		}
+		logger.info("关闭空余资源完毕.");
+	}
 }

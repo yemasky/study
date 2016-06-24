@@ -22,6 +22,8 @@ public class HelloMvcController {
 		connectionPoolManager.getConnection("test");
 		connectionPoolManager.getConnection("test");
 		connectionPoolManager.getConnection("test");
+		connectionPoolManager.getConnection("mytest");
+		connectionPoolManager.getConnection("mytest");
 		connectionPoolManager.releaseConnection("test");
 		//视图渲染，/WEB-INF/jsps/home.jsp
 		return "home";

@@ -89,7 +89,10 @@ public class ConnectionPool implements DataSource {
 				if (getUsedPool() == config.getMaxConnection()) {
 					return null;
 				}
-				return createConnection();
+				connection = createConnection();
+				threadConnection.get(config.getConnectionName()).set(connection);
+				setUsedPool(getUsedPool() + 1);
+				return connection;
 			}
 		}
 	}
@@ -117,7 +120,17 @@ public class ConnectionPool implements DataSource {
 		setUsedPool(getUsedPool() - 1);
 		logger.info("used:" + getUsedPool());
 	}
-
+	// 释放空闲连接资源 保留min的连接资源在连接池
+	public synchronized void close() throws SQLException {
+		int size = pool.get(config.getConnectionName()).size();
+		int min = config.getMinConnection();
+		if (size > min) {
+			for(int i = 0; i < (size - min); i++) {
+				this.closeConnection(pool.get(config.getConnectionName()).removeFirst());
+			}
+		}
+	}
+	
 	public void closeConnection(Connection connection) throws SQLException {
 		connection.close();
 	}
