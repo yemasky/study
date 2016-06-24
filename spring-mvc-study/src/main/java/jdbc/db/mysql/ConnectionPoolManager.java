@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -31,18 +32,20 @@ public class ConnectionPoolManager {
 	private Hashtable<String, ConnectionPool> pools = new Hashtable<String, ConnectionPool>();// 连接池
 	private static Map<String, Config> drivers = new HashMap<String, Config>();// 驱动信息
 
+	public ConnectionPoolManager() {
+	}
+
 	/**
 	 * 创建连接池
 	 * 
 	 * @param
+	 * @throws SQLException
 	 */
-	public void createPools(Config config) {
-		ConnectionPool pool = new ConnectionPool();
-		pool.setDbUrl(config.getUrl());
-		pool.setDbUsername(config.getUsername());
-		pool.setDbPassword(config.getPassword());
-		pool.setMaxConnection(config.getMaxConnection());
+	public void createPools(Config config) throws SQLException {
+		ConnectionPool pool = new ConnectionPool(config);
+		pool.init();
 		pools.put(config.getConnectionName(), pool);
+		logger.info("创建连接池：" + config.getConnectionName());
 	}
 
 	/**
@@ -58,7 +61,7 @@ public class ConnectionPoolManager {
 		if (connection != null) {
 			logger.info("得到连接.");
 		} else {
-			if (pool.getMaxConnection() == pool.getUsedPool()) {
+			if (drivers.get(connectionName).getMaxConnection() == pool.getUsedPool()) {
 				throw new SQLException("没有取到连接.连接已满.");
 			} else {
 				throw new SQLException("没有取到连接.连接异常.");
@@ -80,36 +83,19 @@ public class ConnectionPoolManager {
 			pool.freeConnection(connection);// 释放连接
 	}
 
-	public Map<String, Config> loadDrivers() throws FileNotFoundException {
-		drivers = null;
+	public void releaseConnection(String connectionName) {
+		ConnectionPool pool = (ConnectionPool) pools.get(connectionName);// 根据关键名字得到连接池
+		if (pool != null)
+			pool.release();// 释放连接
+	}
+
+	private Map<String, Config> loadDrivers() throws FileNotFoundException {
+		logger.info("开始加载数据库驱动."); // 加载驱动程序
 		try {
-
-			/*
-			 * List<?> pools = null; Element pool = null; Iterator<?> allPool =
-			 * pools.iterator(); while (allPool.hasNext()) { pool = (Element)
-			 * allPool.next(); Config dscBean = new Config();
-			 * dscBean.setType(pool.getAttribute("type"));
-			 * dscBean.setConnectionName(pool.getAttribute("name"));
-			 * System.out.println(dscBean.getConnectionName());
-			 * dscBean.setDriver(pool.getAttribute("driver"));
-			 * dscBean.setUrl(pool.getAttribute("url"));
-			 * dscBean.setUsername(pool.getAttribute("username"));
-			 * dscBean.setPassword(pool.getAttribute("password"));
-			 * dscBean.setMaxConnection(Integer.parseInt(pool.getAttribute(
-			 * "maxconn"))); drivers.add(dscBean); }
-			 */
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		InputStream ferr = this.getClass().getClassLoader().getResourceAsStream("config/jdbc.db.properties");
-		Properties properties = new Properties();
-
-		try {
-			properties.load(ferr);
-			ferr.close();
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("config/jdbc.db.properties");
+			Properties properties = new Properties();
+			properties.load(inputStream);
+			inputStream.close();
 			Set<Object> set = properties.keySet();
 			Iterator<Object> it = set.iterator();
 			String key = "";
@@ -119,33 +105,50 @@ public class ConnectionPoolManager {
 				key = (String) it.next();
 				value = properties.getProperty(key);
 				logger.info("loading config: key->" + key + ", value->" + value);
-				String[] keyArray = key.split(".");
+				String[] keyArray = key.split("\\.");
+				String[] valueArray = value.substring(value.indexOf("?") + 1).split("&");
 				if (drivers.get(keyArray[1]) != null) {
 					config = drivers.get(keyArray[1]);
 				} else {
 					config = new Config();
 					config.setConnectionName(keyArray[1]);
 				}
-				if (keyArray[2] == "url") {
-					config.setUrl(value);
+				if (keyArray.length > 0 && valueArray.length > 0) {
+					config.setDbUrl(value);
+					for (int i = 0; i < valueArray.length; i++) {
+						String[] resuleArray = valueArray[i].split("=");
+						if (resuleArray.length == 2) {
+							if (resuleArray[0] == "user")
+								config.setDbUsername(resuleArray[1]);
+							if (resuleArray[0] == "password")
+								config.setDbPassword(resuleArray[1]);
+							if (resuleArray[0] == "maxConnection")
+								config.setMaxConnection(Integer.parseInt(resuleArray[1]));
+						}
+					}
+					drivers.put(keyArray[1], config);
+				} else {
+					continue;
 				}
-				if (keyArray[2] == "username") {
-					config.setUsername(value);
-				}
-				if (keyArray[2] == "password") {
-					config.setPassword(value);
-				}
-				if (keyArray[2] == "maxConnection") {
-					config.setMaxConnection(Integer.parseInt(value));
-				}
-				logger.info(config.getConnectionName());
-				drivers.put(keyArray[1], config);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return drivers;
-
 	}
 
+	/**
+	 * 初始化连接池的参数
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws SQLException
+	 */
+	public void init() throws FileNotFoundException, SQLException {
+		this.loadDrivers();
+		Iterator<Entry<String, Config>> driver = drivers.entrySet().iterator();
+		while (driver.hasNext()) {
+			this.createPools((Config) driver.next().getValue());
+		}
+		logger.info("创建连接池完毕.");
+	}
 }

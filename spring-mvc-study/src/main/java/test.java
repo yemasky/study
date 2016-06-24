@@ -16,7 +16,7 @@ public class test {
 	 */
 	public static void main(String[] args) throws Exception {
 		ConnectionPoolManager ss = new ConnectionPoolManager();
-		ss.loadDrivers();
+		ss.init();
 		// TODO Auto-generated method stub
 		/*
 		 * Config config = new Config(); MysqlConnection conn = new

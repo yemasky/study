@@ -18,12 +18,14 @@ package example.jdbc.mysql;
  */
 public class Config {
 	private String type = ""; // 数据库类型
-	private String connectionName = "default_db"; // 连接池名字
+	private String connectionName = "default"; // 连接池名字
 	private String driver = ""; // 数据库驱动
 	private String url = ""; // 数据库url
+	//dbUrl = "jdbc:mysql://127.0.0.1:3306/test?user=root&password=root&useSSL=false";
 	private String username = ""; // 用户名
 	private String password = ""; // 密码
 	private int maxConnection = 300; // 最大连接数
+	private int minConnection = 5; // 最大连接数
 
 	public Config() {
 	}
@@ -56,6 +58,14 @@ public class Config {
 	 */
 	public void setMaxConnection(int maxConnection) {
 		this.maxConnection = maxConnection;
+	}
+
+	public int getMinConnection() {
+		return minConnection;
+	}
+
+	public void setMinConnection(int minConnection) {
+		this.minConnection = minConnection;
 	}
 
 	/**

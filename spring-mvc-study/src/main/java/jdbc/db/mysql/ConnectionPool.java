@@ -12,7 +12,9 @@ package jdbc.db.mysql;
 
 import javax.sql.DataSource;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.Connection;
@@ -27,31 +29,41 @@ import java.io.PrintWriter;
  * @author YEMASKY
  */
 public class ConnectionPool implements DataSource {
-	private static final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPool");
-	private static final String dirverClassName = "com.mysql.jdbc.Driver";
-	private static String dbUrl = "jdbc:mysql://127.0.0.1:3306/test?user=root&password=root&useSSL=false";
-	private static String dbUsername = "root";
-	private static String dbPassword = "root";
-	private static int minConnection = 5; // 最小连接数
-	private static int maxConnection = 1000; // 最大连接
-	private static int timeout = 1000; // 连接时间
+	private final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPool");
+	private final String dirverClassName = "com.mysql.jdbc.Driver";
+	private Config config = null;
 	// 连接池
-	private static LinkedList<Connection> pool = new LinkedList<Connection>();
-	private static int usedPool = 0;
-	//当前使用connection
-	private final ThreadLocal<Connection> threadConnection = new ThreadLocal<Connection>();  
-	
-	
+	private static Map<String, LinkedList<Connection>> pool = new HashMap<String, LinkedList<Connection>>();
+	private static Map<String, Integer> usedPool = new HashMap<String, Integer>();
+	// 当前使用connection
+	private final Map<String, ThreadLocal<Connection>> threadConnection = new HashMap<String, ThreadLocal<Connection>>();
 
-	static {
+	public ConnectionPool() {
+	}
+
+	public ConnectionPool(Config config) {
 		try {
 			Class.forName(dirverClassName);
 		} catch (ClassNotFoundException e) {
 			logger.log(Level.SEVERE, "找不到驱动类.", e);
 		}
+		this.config = config;
 	}
 
-	public ConnectionPool() {
+	public void init() throws SQLException {
+		if (pool.get(config.getConnectionName()) == null) {
+			pool.put(config.getConnectionName(), new LinkedList<Connection>());
+			usedPool.put(config.getConnectionName(), 0);
+			threadConnection.put(config.getConnectionName(), new ThreadLocal<Connection>());
+		}
+		if (pool.get(config.getConnectionName()).size() == 0 && usedPool.get(config.getConnectionName()) == 0) {
+			Connection connection = null;
+			for (int i = 0; i < config.getMinConnection(); i++) {
+				connection = createConnection();
+				pool.get(config.getConnectionName()).addLast(connection);
+			}
+			logger.info("连接池初始化完毕.");
+		}
 	}
 
 	/**
@@ -61,17 +73,20 @@ public class ConnectionPool implements DataSource {
 	 * @throws SQLException
 	 */
 	public Connection getConnection() throws SQLException {
-		synchronized (pool) {
-			Connection connection = threadConnection.get();
-			if(connection != null) return connection;
-			if (pool.size() > 0) {
+		synchronized (pool.get(config.getConnectionName())) {
+			logger.info("threadConnection.get");
+			Connection connection = threadConnection.get(config.getConnectionName()).get();
+			if (connection != null)
+				return connection;
+			logger.info("not threadConnection.get");
+			if (pool.get(config.getConnectionName()).size() > 0) {
 				setUsedPool(getUsedPool() + 1);
-				logger.info("used:"+getUsedPool());
-				connection = pool.removeFirst();
-				threadConnection.set(connection);
+				logger.info("used:" + getUsedPool());
+				connection = pool.get(config.getConnectionName()).removeFirst();
+				threadConnection.get(config.getConnectionName()).set(connection);
 				return connection;
 			} else {
-				if(getUsedPool() == maxConnection) {
+				if (getUsedPool() == config.getMaxConnection()) {
 					return null;
 				}
 				return createConnection();
@@ -79,24 +94,17 @@ public class ConnectionPool implements DataSource {
 		}
 	}
 
-	public void init() throws SQLException {
-		if(pool.size() == 0 && usedPool == 0) {
-			Connection connection = null;
-			for (int i = 0; i < minConnection; i++) {
-				connection = createConnection();
-				pool.addLast(connection);
-			}
-			logger.info("连接池初始化完毕.");
-		}
+	public Connection getConnection(String username, String password) throws SQLException {
+		return DriverManager.getConnection(config.getDbUrl(), config.getDbUsername(), config.getDbPassword());
 	}
-	
+
 	public void threadConnectionStatus() {
 	}
-	
-	//释放连接资源
+
+	// 释放连接资源
 	public void release() {
-		if(threadConnection.get() != null)
-			freeConnection(threadConnection.get());
+		if (threadConnection.get(config.getConnectionName()).get() != null)
+			freeConnection(threadConnection.get(config.getConnectionName()).get());
 	}
 
 	/**
@@ -105,9 +113,9 @@ public class ConnectionPool implements DataSource {
 	 * @param connection
 	 */
 	public void freeConnection(Connection connection) {
-		pool.addLast(connection);
+		pool.get(config.getConnectionName()).addLast(connection);
 		setUsedPool(getUsedPool() - 1);
-		logger.info("used:"+getUsedPool());
+		logger.info("used:" + getUsedPool());
 	}
 
 	public void closeConnection(Connection connection) throws SQLException {
@@ -115,11 +123,7 @@ public class ConnectionPool implements DataSource {
 	}
 
 	private Connection createConnection() throws SQLException {
-		return DriverManager.getConnection(dbUrl);
-	}
-
-	public Connection getConnection(String username, String password) throws SQLException {
-		return DriverManager.getConnection(dbUrl, username, password);
+		return DriverManager.getConnection(config.getDbUrl());
 	}
 
 	public PrintWriter getLogWriter() throws SQLException {
@@ -131,11 +135,10 @@ public class ConnectionPool implements DataSource {
 	}
 
 	public void setLoginTimeout(int seconds) throws SQLException {
-		timeout = seconds;
 	}
 
 	public int getLoginTimeout() throws SQLException {
-		return timeout;
+		return 0;
 	}
 
 	public <T> T unwrap(Class<T> iface) throws SQLException {
@@ -151,51 +154,19 @@ public class ConnectionPool implements DataSource {
 		throw new SQLFeatureNotSupportedException();
 	}
 
-	public String getDbUrl() {
-		return dbUrl;
-	}
-
-	public void setDbUrl(String dbURL) {
-		dbUrl = dbURL;
-	}
-
-	public String getDbUsername() {
-		return dbUsername;
-	}
-
-	public void setDbUsername(String dbUserName) {
-		dbUsername = dbUserName;
-	}
-
-	public String getDbPassword() {
-		return dbPassword;
-	}
-
-	public void setDbPassword(String dbPassWord) {
-		dbPassword = dbPassWord;
-	}
-
-	public int getMinConnection() {
-		return minConnection;
-	}
-
-	public void setMinConnection(int min) {
-		minConnection = min;
-	}
-
-	public int getMaxConnection() {
-		return maxConnection;
-	}
-
-	public void setMaxConnection(int max) {
-		maxConnection = max;
-	}
-
 	public int getUsedPool() {
-		return usedPool;
+		return usedPool.get(config.getConnectionName());
 	}
 
-	public static void setUsedPool(int used) {
-		usedPool = used;
+	public void setUsedPool(int used) {
+		usedPool.put(config.getConnectionName(), used);
+	}
+
+	public Config getConfig() {
+		return config;
+	}
+
+	public void setConfig(Config config) {
+		this.config = config;
 	}
 }

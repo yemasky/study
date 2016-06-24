@@ -17,12 +17,12 @@ package jdbc.db.mysql;
  * @throws Exception
  */
 public class Config {
-	private String type = ""; // 数据库类型
-	private String connectionName = "default_db"; // 连接池名字
-	private String url = ""; // 数据库url
-	private String username = ""; // 用户名
-	private String password = ""; // 密码
+	private String connectionName = "default"; // 连接池名字
+	private String dbUrl = "jdbc:mysql://127.0.0.1:3306/test?user=root&password=root&useSSL=false"; // 数据库url
+	private String dbUsername = "root"; // 用户名
+	private String dbPassword = "root"; // 密码
 	private int maxConnection = 300; // 最大连接数
+	private int minConnection = 5; // 最大连接数
 
 	public Config() {
 	}
@@ -42,6 +42,14 @@ public class Config {
 		this.maxConnection = maxConnection;
 	}
 
+	public int getMinConnection() {
+		return minConnection;
+	}
+
+	public void setMinConnection(int minConnection) {
+		this.minConnection = minConnection;
+	}
+
 	/**
 	 * @return the name
 	 */
@@ -57,63 +65,29 @@ public class Config {
 		this.connectionName = connectionName;
 	}
 
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
+	public String getDbUrl() {
+		return dbUrl;
 	}
 
-	/**
-	 * @param password
-	 *            the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
+	public void setDbUrl(String dbUrl) {
+		this.dbUrl = dbUrl;
 	}
 
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
+	public String getDbUsername() {
+		return dbUsername;
 	}
 
-	/**
-	 * @param type
-	 *            the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
+	public void setDbUsername(String dbUsername) {
+		this.dbUsername = dbUsername;
 	}
 
-	/**
-	 * @return the url
-	 */
-	public String getUrl() {
-		return url;
+	public String getDbPassword() {
+		return dbPassword;
 	}
 
-	/**
-	 * @param url
-	 *            the url to set
-	 */
-	public void setUrl(String url) {
-		this.url = url;
+	public void setDbPassword(String dbPassword) {
+		this.dbPassword = dbPassword;
 	}
 
-	/**
-	 * @return the username
-	 */
-	public String getUsername() {
-		return username;
-	}
-
-	/**
-	 * @param username
-	 *            the username to set
-	 */
-	public void setUsername(String username) {
-		this.username = username;
-	}
+	
 }
