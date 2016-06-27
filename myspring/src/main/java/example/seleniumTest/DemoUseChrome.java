@@ -29,7 +29,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class DemoUseChrome {
 	public static void main(String[] args) {
 		// 配置服务器.\\res\\chromedriver.exe
-		System.setProperty("webdriver.chrome.driver", "D:\\chrome\\chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", "drivers/chromedriver.exe");
 		
 		// 创建一个WebDriver实例
 		//DesiredCapabilities capabilities = DesiredCapabilities.chrome();
@@ -39,7 +39,7 @@ public class DemoUseChrome {
 		mobileEmulation.put("userAgent", "Mozilla/5.0 (Linux; Android 5.1.1; Nexus 6 Build/LYZ28E) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.23 Mobile Safari/537.36");
 		mobileEmulation.put("deviceName", "Nexus 6P");
 		mobileEmulation.put("deviceMetrics", "435x773");		
-		options.setExperimentalOption("mobileEmulation", mobileEmulation);
+		//options.setExperimentalOption("mobileEmulation", mobileEmulation);
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
