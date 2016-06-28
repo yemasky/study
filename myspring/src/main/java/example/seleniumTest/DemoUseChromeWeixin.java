@@ -15,9 +15,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -39,7 +42,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class DemoUseChromeWeixin {
 	private static BufferedReader br;
-	private static String dt;
 
 	public static void main(String[] args) throws InterruptedException {
 		// 配置服务器.\\res\\chromedriver.exe
@@ -64,7 +66,7 @@ public class DemoUseChromeWeixin {
 			readCookie(driver);
 			driver.get("https://wx2.qq.com/");
 			Thread.sleep(5000);
-			
+
 		} else {
 			// 另一种访问方法
 			// driver.navigate().to("http://www.google.com");
@@ -180,10 +182,12 @@ public class DemoUseChromeWeixin {
 					String domain = str.nextToken();
 					String path = str.nextToken();
 					Date expiry = null;
-					dt = null;
-					if (!(dt = str.nextToken()).equals(null)) {
-						// expiry=new Date(dt);
-						System.out.println();
+					String dt = str.nextToken();
+					if (!dt.equals(null) && !dt.equals("null")) {
+						SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US);  
+						expiry = format.parse(dt);
+						System.out.println(expiry);
+						//expiry = null;
 					}
 					boolean isSecure = new Boolean(str.nextToken()).booleanValue();
 					Cookie ck = new Cookie(name, value, domain, path, expiry, isSecure);
