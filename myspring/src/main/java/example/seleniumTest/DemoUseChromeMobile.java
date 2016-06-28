@@ -15,7 +15,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class DemoUseChromeMobile {
 	public static void main(String[] args) {
 		// 配置服务器.\\res\\chromedriver.exe
-		System.setProperty("webdriver.chrome.driver", "D:\\chrome\\chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", "drivers/chromedriver.exe");
 		
 		Map<String, Object> deviceMetrics = new HashMap<String, Object>();
 		deviceMetrics.put("width", 360);
