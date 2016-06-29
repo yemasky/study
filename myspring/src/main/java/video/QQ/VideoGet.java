@@ -57,7 +57,6 @@ public class VideoGet {
 						videoSrc.put(md5Key, src);
 						System.out.println("-->" + src);
 					}
-
 				}
 				// System.out.println(EntityUtils.toString(entity));
 

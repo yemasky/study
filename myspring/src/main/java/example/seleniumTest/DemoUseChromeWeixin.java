@@ -126,7 +126,7 @@ public class DemoUseChromeWeixin {
 			if ((i + 1) == fontElement.size()) {
 				// yy = null;
 				fontElement = driver.findElements(By.cssSelector("div.read_item.slide-left.ng-scope"));
-				i = 13;
+				i = fontElement.size() - 1;
 			}
 
 		}
