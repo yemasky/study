@@ -16,7 +16,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import encrypt.Md5Encrypt;
+import app.util.encrypt.Md5Encrypt;
 
 public class VideoGet {
 	private Map<String, String> videoSrc = new HashMap<String, String>();

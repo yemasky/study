@@ -183,7 +183,7 @@ public class DemoUseChromeWeixin {
 					Date expiry = null;
 					String dt = str.nextToken();
 					if (!dt.equals(null) && !dt.equals("null")) {
-						SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US);  
+						SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US);
 						expiry = format.parse(dt);
 						System.out.println(expiry);
 						//expiry = null;
