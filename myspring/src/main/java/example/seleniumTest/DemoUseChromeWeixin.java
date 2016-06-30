@@ -119,7 +119,7 @@ public class DemoUseChromeWeixin {
 			// videoElement.findElement(By.className("video_iframe"));
 			System.out.println(videoElement.getAttribute("src"));
 			// if (fontElement.size() > (i + 1))
-			// actions.moveToElement(driver.findElement(By.id("voiceMsgPlayer"))).perform();//
+			actions.moveToElement(driver.findElement(By.id("voiceMsgPlayer"))).perform();//
 			// voiceMsgPlayer
 
 			if ((i + 1) == fontElement.size()) {
@@ -134,7 +134,7 @@ public class DemoUseChromeWeixin {
 		// jse.executeScript(setscroll);
 		// ((JavascriptExecutor) driver).executeScript("window.scrollTo(0,
 		// document.body.scrollHeight)");
-		((JavascriptExecutor) driver).executeScript("window.scrollBy(0, 700)");
+		//((JavascriptExecutor) driver).executeScript("window.scrollBy(0, 700)");
 
 		// 显示查询结果title
 		System.out.println("Page title is: " + driver.getTitle());
