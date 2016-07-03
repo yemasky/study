@@ -10,6 +10,9 @@
  ***********************************************************************/
 package tool.crawler.video.QQ;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
 
 /**
  * @author admin
@@ -23,7 +26,26 @@ public class ExcuestQQ {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		VideoGet videoGet = new VideoGet();
-		videoGet.getVideoUrl(null);
+		try {
+			videoGet.getBeginVideoUrl();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			videoGet.getVideoIframeUrl();
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		videoGet.getVideoUrl();
+
 	}
 
 }
