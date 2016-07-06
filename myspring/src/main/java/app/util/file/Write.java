@@ -22,7 +22,7 @@ public class Write {
 		if (!file.exists()) {
 			file.createNewFile();
 		}
-		FileWriter fileWritter = new FileWriter(file.getName(), true);
+		FileWriter fileWritter = new FileWriter(file, true);
 		BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
 		bufferWritter.write(data);
 		bufferWritter.close();

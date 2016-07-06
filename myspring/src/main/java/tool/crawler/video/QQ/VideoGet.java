@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -16,7 +17,6 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -42,9 +42,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import app.util.file.Write;
 
 public class VideoGet {
-	private Map<String, String> videoSrc = new HashMap<String, String>();
-	private Map<String, String> videoIframeUrl = new HashMap<String, String>();
-	private Map<String, String> baseIframeUrl = new HashMap<String, String>();
+	private Map<String, String> videoSrc = new LinkedHashMap<String, String>();
+	private Map<String, String> videoIframeUrl = new LinkedHashMap<String, String>();
+	private Map<String, String> baseIframeUrl = new LinkedHashMap<String, String>();
 
 	private static BufferedReader br;
 
@@ -162,6 +162,7 @@ public class VideoGet {
 		for (Entry<String, String> entry : baseIframeUrl.entrySet()) {
 			String src = "";
 			String html = getMobileHtml(entry.getValue(), 3);
+			System.out.println("-->" + entry.getKey());
 			// System.out.println(html);
 			Document doc = Jsoup.parse(html);
 			Elements linksElements = doc.getElementsByTag("iframe");
@@ -170,11 +171,12 @@ public class VideoGet {
 				if (src.contains("cKey")) {
 					videoIframeUrl.put(entry.getKey(), src);
 					System.out.println("-->" + src);
-				}
-				src = element.attr("src");
-				if (src.contains("cKey")) {
-					videoIframeUrl.put(entry.getKey(), src);
-					System.out.println("-->" + src);
+				} else {
+					src = element.attr("src");
+					if (src.contains("cKey") || src.contains("vid")) {
+						videoIframeUrl.put(entry.getKey(), src);
+						System.out.println("-->" + src);
+					}
 				}
 			}
 		}
@@ -197,12 +199,13 @@ public class VideoGet {
 		chromeOptions.put("mobileEmulation", mobileEmulation);
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+		System.setProperty("webdriver.chrome.driver", "drivers/chromedriver.exe");
 		WebDriver driver = new ChromeDriver(capabilities);
 		for (Entry<String, String> entry : videoIframeUrl.entrySet()) {
 			driver.get(entry.getValue());
 			// 找到文本框
 			WebElement element = driver.findElement(By.className("tvp_video")).findElement(By.tagName("video"));
-			System.out.println("element is: " + element.getAttribute("src"));
+			System.out.println("element is: " + entry.getKey() + ", src: " + element.getAttribute("src"));
 			Write write = new Write();
 			try {
 				String videoUrl = element.getAttribute("src");
@@ -214,6 +217,10 @@ public class VideoGet {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void setVideoIframeUrl(Map<String, String> videoIframeUrl) {
+		this.videoIframeUrl = videoIframeUrl;
 	}
 
 	public String getMobileHtml(String url, int time) throws InterruptedException {
