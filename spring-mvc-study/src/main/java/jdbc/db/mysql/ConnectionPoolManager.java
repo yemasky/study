@@ -14,9 +14,11 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -30,8 +32,8 @@ import java.util.logging.Logger;
 public class ConnectionPoolManager {
 	private final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPoolManager");
 	private Hashtable<String, ConnectionPool> pools = new Hashtable<String, ConnectionPool>();// 连接池
-	private static Map<String, Config> drivers = new HashMap<String, Config>();// 驱动信息
-
+	private static Map<String, HashMap<String, HashMap<String, Config>>> drivers = new HashMap<String, HashMap<String, HashMap<String, Config>>>();// 驱动信息
+	//test.write.001 config
 	public ConnectionPoolManager() {
 	}
 
@@ -108,13 +110,13 @@ public class ConnectionPoolManager {
 				String[] keyArray = key.split("\\.");
 				String[] valueArray = value.substring(value.indexOf("?") + 1).split("&");
 				if (drivers.get(keyArray[1]) != null) {
-					config = drivers.get(keyArray[1]);
+					config = drivers.get(keyArray[1]).get(keyArray[2]).get(keyArray[3]);
 				} else {
 					config = new Config();
 					config.setConnectionName(keyArray[1]);
 				}
 				if (keyArray.length > 0 && valueArray.length > 0) {
-					config.setDbUrl(value);
+					config.setDbDsn(value);
 					for (int i = 0; i < valueArray.length; i++) {
 						String[] resuleArray = valueArray[i].split("=");
 						if (resuleArray.length == 2) {
@@ -126,7 +128,23 @@ public class ConnectionPoolManager {
 								config.setMaxConnection(Integer.parseInt(resuleArray[1]));
 						}
 					}
-					drivers.put(keyArray[1], config);
+					HashMap<String, Config> pollingList =  new HashMap<String, Config>();
+					if(driverPollingMap.containsKey(keyArray[2])) {
+						driverPollingMap.get(keyArray[2]).put(keyArray[3], config);
+					} else {	
+						pollingList.put(keyArray[3], config);
+						driverPollingMap.put(keyArray[2], pollingList);				
+					}//test.write.001 config
+					
+					if(drivers.containsKey(keyArray[1])) {
+						if(drivers.get(keyArray[1]).containsKey(keyArray[2])) {
+							
+						}
+						HashMap<String, Config> driverPollingMap = new HashMap<String, Config>();
+						driverPollingMap.put(keyArray[3], config);
+						drivers.get(keyArray[1]).put(keyArray[2], driverPollingMap);
+					} else {
+					}
 				} else {
 					continue;
 				}

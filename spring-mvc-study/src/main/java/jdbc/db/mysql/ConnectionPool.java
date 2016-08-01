@@ -98,7 +98,7 @@ public class ConnectionPool implements DataSource {
 	}
 
 	public Connection getConnection(String username, String password) throws SQLException {
-		return DriverManager.getConnection(config.getDbUrl(), config.getDbUsername(), config.getDbPassword());
+		return DriverManager.getConnection(config.getDbDsn(), config.getDbUsername(), config.getDbPassword());
 	}
 
 	public void threadConnectionStatus() {
@@ -136,7 +136,7 @@ public class ConnectionPool implements DataSource {
 	}
 
 	private Connection createConnection() throws SQLException {
-		return DriverManager.getConnection(config.getDbUrl());
+		return DriverManager.getConnection(config.getDbDsn());
 	}
 
 	public PrintWriter getLogWriter() throws SQLException {

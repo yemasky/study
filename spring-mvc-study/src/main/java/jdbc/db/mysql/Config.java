@@ -18,7 +18,7 @@ package jdbc.db.mysql;
  */
 public class Config {
 	private String connectionName = "default"; // 连接池名字
-	private String dbUrl = "jdbc:mysql://127.0.0.1:3306/test?user=root&password=root&useSSL=false"; // 数据库url
+	private String dbDsn = "jdbc:mysql://127.0.0.1:3306/test?user=root&password=root&useSSL=false"; // 数据库url
 	private String dbUsername = "root"; // 用户名
 	private String dbPassword = "root"; // 密码
 	private int maxConnection = 300; // 最大连接数
@@ -65,12 +65,12 @@ public class Config {
 		this.connectionName = connectionName;
 	}
 
-	public String getDbUrl() {
-		return dbUrl;
+	public String getDbDsn() {
+		return dbDsn;
 	}
 
-	public void setDbUrl(String dbUrl) {
-		this.dbUrl = dbUrl;
+	public void setDbDsn(String dbDsn) {
+		this.dbDsn = dbDsn;
 	}
 
 	public String getDbUsername() {
