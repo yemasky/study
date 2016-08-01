@@ -62,7 +62,7 @@ public class ConnectionPool implements DataSource {
 				connection = createConnection();
 				pool.get(config.getConnectionName()).addLast(connection);
 			}
-			logger.info("连接池初始化完毕.");
+			logger.info("连接放进连接池完毕.");
 		}
 	}
 

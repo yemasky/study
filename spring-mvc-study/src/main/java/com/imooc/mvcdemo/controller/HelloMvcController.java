@@ -19,12 +19,12 @@ public class HelloMvcController {
 	public String helloMvc() throws Exception {
 		ConnectionPoolManager connectionPoolManager = new ConnectionPoolManager();
 		connectionPoolManager.init();
-		connectionPoolManager.getConnection("test");
-		connectionPoolManager.getConnection("test");
-		connectionPoolManager.getConnection("test");
-		connectionPoolManager.getConnection("mytest");
-		connectionPoolManager.getConnection("mytest");
-		connectionPoolManager.releaseConnection("test");
+		connectionPoolManager.getConnection("test.write");
+		//connectionPoolManager.getConnection("test");
+		connectionPoolManager.getConnection("test.read");
+		connectionPoolManager.getConnection("test.read.002");
+		//connectionPoolManager.getConnection("mytest");
+		connectionPoolManager.releaseConnection("mytest.read.001");
 		//视图渲染，/WEB-INF/jsps/home.jsp
 		return "home";
 	}
