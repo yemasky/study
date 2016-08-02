@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -26,20 +25,24 @@ import java.util.logging.Logger;
 
 /**
  * @author CooC
+ * @email  yemasky@msn.com
+ * @QQ     6796707
  *
  */
 public class ConnectionPoolManager {
 	private final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPoolManager");
-	private Hashtable<String, ConnectionPool> pools = new Hashtable<String, ConnectionPool>();// 连接池
+	private static Hashtable<String, ConnectionPool> pools = new Hashtable<String, ConnectionPool>();// 连接池
 	private static Map<String, HashMap<String, HashMap<String, Config>>> drivers = new HashMap<String, HashMap<String, HashMap<String, Config>>>();// 驱动信息
 	private static long time = 0;
 	private long timeout = 5000;
+	private static boolean is_init = false;
 	// 当前使用jdbcDsn
 	private final Map<String, ThreadLocal<String>> threadJdbcDsn = new HashMap<String, ThreadLocal<String>>();
 	// private static String dsn = "dsn";
 	// test.write.001 config
 
-	public ConnectionPoolManager() {
+	public ConnectionPoolManager() throws SQLException, IOException {
+		this.init();
 	}
 
 	public Config getConfigByDsn(String jdbcDsn) throws SQLException {
@@ -62,7 +65,8 @@ public class ConnectionPoolManager {
 				String randomKey = keys[random.nextInt(keys.length)];
 				config = drivers.get(keyArray[0]).get(keyArray[1]).get(randomKey);
 			}
-		} else {
+		} 
+		if(config == null){
 			throw new SQLException("没有从drivers取到config.");
 		}
 		return config;
@@ -92,7 +96,11 @@ public class ConnectionPoolManager {
 	public Connection getConnection(String jdbcDsn) throws SQLException, InterruptedException {
 		Config config = this.getConfigByDsn(jdbcDsn);
 		String connectionName = config.getConnectionName();
-		ConnectionPool pool = (ConnectionPool) pools.get(connectionName);// 从名字中获取连接池
+		ConnectionPool pool = pools.get(connectionName);// 从名字中获取连接池
+		if(pool == null) {
+			throw new SQLException("没有取到连接池: " + connectionName);
+		}
+		logger.info("get connection:" + connectionName);
 		Connection connection = pool.getConnection();// 从选定的连接池中获得连接
 		if (connection != null) {
 			logger.info("得到连接.");
@@ -141,7 +149,7 @@ public class ConnectionPoolManager {
 	public void releaseConnection(String jdbcDsn) throws SQLException {
 		if (threadJdbcDsn.containsKey(jdbcDsn)) {
 			String connectionName = threadJdbcDsn.get(jdbcDsn).get();
-			ConnectionPool pool = (ConnectionPool) pools.get(connectionName);// 根据关键名字得到连接池
+			ConnectionPool pool = pools.get(connectionName);// 根据关键名字得到连接池
 			if (pool != null)
 				pool.release();// 释放连接
 		} else {
@@ -172,13 +180,13 @@ public class ConnectionPoolManager {
 			String[] keyArray = key.split("\\.");
 			String[] valueArray = value.substring(value.indexOf("?") + 1).split("&");
 			if (keyArray.length > 3 && valueArray.length > 0) {
-				if (drivers.get(keyArray[1]) != null && drivers.get(keyArray[1]).get(keyArray[2]) != null
+				/*if (drivers.get(keyArray[1]) != null && drivers.get(keyArray[1]).get(keyArray[2]) != null
 						&& drivers.get(keyArray[1]).get(keyArray[2]).get(keyArray[3]) != null) {
 					config = drivers.get(keyArray[1]).get(keyArray[2]).get(keyArray[3]);
-				} else {
-					config = new Config();
-					config.setConnectionName(key);
-				} // test.write.001 config
+				} else {*/
+				config = new Config();
+				config.setConnectionName(key);
+				//} // test.write.001 config
 				config.setDbDsn(value);
 				for (int i = 0; i < valueArray.length; i++) {
 					String[] resuleArray = valueArray[i].split("=");
@@ -221,29 +229,45 @@ public class ConnectionPoolManager {
 	 * @throws IOException
 	 */
 	public void init() throws SQLException, IOException {
+		if(is_init) {
+			logger.info("已经初始化.");
+			return;
+		}
 		this.loadDrivers();
-		Iterator<Entry<String, HashMap<String, HashMap<String, Config>>>> driver = drivers.entrySet().iterator();
+		/*Iterator<Entry<String, HashMap<String, HashMap<String, Config>>>> driver = drivers.entrySet().iterator();
 		while (driver.hasNext()) {
 			Iterator<Entry<String, HashMap<String, Config>>> driverPollingMap = driver.next().getValue().entrySet()
 					.iterator();
 			while (driverPollingMap.hasNext()) {
 				Iterator<Entry<String, Config>> driverMap = driverPollingMap.next().getValue().entrySet().iterator();
-				this.createPools((Config) driverMap.next().getValue());
+				Config config = driverMap.next().getValue();
+				logger.info("init:" + driverMap.next().getKey());
+				this.createPools(config); 
 			}
 			// this.createPools((Config) driver.next().getValue());
+		}*/
+		for(String driverName : drivers.keySet()) {
+			for(String excuteName : drivers.get(driverName).keySet()) {
+				for(String pollingName : drivers.get(driverName).get(excuteName).keySet()) {
+					Config config = drivers.get(driverName).get(excuteName).get(pollingName);
+					this.createPools(config);
+					logger.info("init:" + config.getConnectionName());
+				}
+			}
 		}
 		logger.info("创建连接池完毕.");
+		is_init = true;
 	}
 
 	// 释放资源
-	public void release() throws SQLException {
+	public void releaseConnection() throws SQLException {
 		/*
 		 * Iterator<Entry<String, Config>> driver =
 		 * drivers.entrySet().iterator(); while (driver.hasNext()) {
 		 * this.releaseConnection(driver.next().getKey()); }
 		 */
 
-		Iterator<Entry<String, HashMap<String, HashMap<String, Config>>>> driver = drivers.entrySet().iterator();
+		/*Iterator<Entry<String, HashMap<String, HashMap<String, Config>>>> driver = drivers.entrySet().iterator();
 		while (driver.hasNext()) {
 			Iterator<Entry<String, HashMap<String, Config>>> driverPollingMap = driver.next().getValue().entrySet()
 					.iterator();
@@ -251,19 +275,28 @@ public class ConnectionPoolManager {
 				Iterator<Entry<String, Config>> driverMap = driverPollingMap.next().getValue().entrySet().iterator();
 				this.releaseConnection(driverMap.next().getValue().getConnectionName());
 			}
+		}*/
+		for(String driverName : drivers.keySet()) {
+			for(String excuteName : drivers.get(driverName).keySet()) {
+				for(String pollingName : drivers.get(driverName).get(excuteName).keySet()) {
+					Config config = drivers.get(driverName).get(excuteName).get(pollingName);
+					this.releaseConnection(config.getConnectionName());
+					logger.info("释放空余资源:" + config.getConnectionName());
+				}
+			}
 		}
 		logger.info("释放连接池完毕.");
 	}
 
-	// 关闭资源
-	public void close(String connectionName) throws SQLException {
-		ConnectionPool pool = (ConnectionPool) pools.get(connectionName);
-		pool.close();
-		logger.info("关闭资源完毕.");
+	// 释放资源
+	public void release(String connectionName) throws SQLException {
+		ConnectionPool pool = pools.get(connectionName);
+		pool.releaseFreeConnection();
+		logger.info("释放资源完毕.");
 	}
 
-	// 关闭所有空余资源
-	public void close() throws SQLException {
+	// 释放所有空余资源
+	public void releaseAllConnection() throws SQLException {
 		/*
 		 * Iterator<Entry<String, Config>> driver =
 		 * drivers.entrySet().iterator(); while (driver.hasNext()) {
@@ -271,17 +304,27 @@ public class ConnectionPoolManager {
 		 * pools.get(driver.next().getKey()); pool.close(); }
 		 */
 
-		Iterator<Entry<String, HashMap<String, HashMap<String, Config>>>> driver = drivers.entrySet().iterator();
+		/*Iterator<Entry<String, HashMap<String, HashMap<String, Config>>>> driver = drivers.entrySet().iterator();
 		while (driver.hasNext()) {
 			Iterator<Entry<String, HashMap<String, Config>>> driverPollingMap = driver.next().getValue().entrySet()
 					.iterator();
 			while (driverPollingMap.hasNext()) {
 				Iterator<Entry<String, Config>> driverMap = driverPollingMap.next().getValue().entrySet().iterator();
 				ConnectionPool pool = (ConnectionPool) pools.get(driverMap.next().getValue().getConnectionName());
-				pool.close();
+				pool.releaseFreeConnection();
+			}
+		}*/	
+		for(String driverName : drivers.keySet()) {
+			for(String excuteName : drivers.get(driverName).keySet()) {
+				for(String pollingName : drivers.get(driverName).get(excuteName).keySet()) {
+					Config config = drivers.get(driverName).get(excuteName).get(pollingName);
+					ConnectionPool pool = pools.get(config.getConnectionName());
+					pool.releaseFreeConnection();
+					logger.info("释放空余资源:" + config.getConnectionName());
+				}
 			}
 		}
-		logger.info("关闭空余资源完毕.");
+		logger.info("释放空余资源完毕.");
 	}
 
 	public long getTimeout() {

@@ -18,13 +18,14 @@ public class HelloMvcController {
 	@RequestMapping("/mvc")
 	public String helloMvc() throws Exception {
 		ConnectionPoolManager connectionPoolManager = new ConnectionPoolManager();
-		connectionPoolManager.init();
+		//connectionPoolManager.init();
 		connectionPoolManager.getConnection("test.write");
 		//connectionPoolManager.getConnection("test");
 		connectionPoolManager.getConnection("test.read");
 		connectionPoolManager.getConnection("test.read.002");
-		//connectionPoolManager.getConnection("mytest");
+		connectionPoolManager.getConnection("mytest.read.001");
 		connectionPoolManager.releaseConnection("mytest.read.001");
+		connectionPoolManager.releaseConnection();
 		//视图渲染，/WEB-INF/jsps/home.jsp
 		return "home";
 	}

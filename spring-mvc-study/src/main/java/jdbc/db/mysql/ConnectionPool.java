@@ -24,9 +24,10 @@ import java.sql.DriverManager;
 import java.io.PrintWriter;
 
 /**
- * ConnectionPool实现
- * 
- * @author YEMASKY
+ * @author CooC
+ * @email  yemasky@msn.com
+ * @QQ     6796707
+ *
  */
 public class ConnectionPool implements DataSource {
 	private final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPool");
@@ -62,7 +63,7 @@ public class ConnectionPool implements DataSource {
 				connection = createConnection();
 				pool.get(config.getConnectionName()).addLast(connection);
 			}
-			logger.info("连接放进连接池完毕.");
+			logger.info("连接池初始化.");
 		}
 	}
 
@@ -74,14 +75,14 @@ public class ConnectionPool implements DataSource {
 	 */
 	public Connection getConnection() throws SQLException {
 		synchronized (pool.get(config.getConnectionName())) {
-			logger.info("threadConnection.get");
+			logger.info("threadConnection.get: " + config.getConnectionName());
 			Connection connection = threadConnection.get(config.getConnectionName()).get();
 			if (connection != null)
 				return connection;
-			logger.info("not threadConnection.get");
+			logger.info("new threadConnection.get: " + config.getConnectionName());
 			if (pool.get(config.getConnectionName()).size() > 0) {
 				setUsedPool(getUsedPool() + 1);
-				logger.info("used:" + getUsedPool());
+				logger.info("used: " + config.getConnectionName() + " -> " + getUsedPool());
 				connection = pool.get(config.getConnectionName()).removeFirst();
 				threadConnection.get(config.getConnectionName()).set(connection);
 				return connection;
@@ -118,10 +119,10 @@ public class ConnectionPool implements DataSource {
 	public void freeConnection(Connection connection) {
 		pool.get(config.getConnectionName()).addLast(connection);
 		setUsedPool(getUsedPool() - 1);
-		logger.info("used:" + getUsedPool());
+		logger.info("used:" + config.getConnectionName() + " -> " + getUsedPool());
 	}
 	// 释放空闲连接资源 保留min的连接资源在连接池
-	public synchronized void close() throws SQLException {
+	public synchronized void releaseFreeConnection() throws SQLException {
 		int size = pool.get(config.getConnectionName()).size();
 		int min = config.getMinConnection();
 		if (size > min) {
