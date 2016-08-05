@@ -36,10 +36,9 @@ public class ConnectionPoolManager {
 	private static long time = 0;
 	private long timeout = 5000;
 	private static boolean is_init = false;
-	// 当前使用jdbcDsn
+	// 当前使用jdbcDsn test.write.001 config
 	private final Map<String, ThreadLocal<String>> threadJdbcDsn = new HashMap<String, ThreadLocal<String>>();
 	// private static String dsn = "dsn";
-	// test.write.001 config
 
 	public ConnectionPoolManager() throws SQLException, IOException {
 		this.init();

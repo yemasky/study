@@ -1,4 +1,4 @@
-package jdbc.db.mysql;
+package example.jdbc.mysql;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jdbc.db.mysql.ConnectionPoolManager;
 
 public class DBQuery extends ConnectionPoolManager {
 	public DBQuery() throws SQLException, IOException {
