@@ -2,6 +2,7 @@ package example.jdbc.mysql;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -529,5 +530,56 @@ public class DBQuery extends ConnectionPoolManager {
 			
 		}
 		return obj;
+	}
+	
+
+	// 保存对象 （未关闭数据库 资源） 表名与类名相同
+	private boolean insertObject(Object obj) throws Exception {
+		boolean flag = false;
+		Class<?> cla = obj.getClass();
+		String tableName = getClassNameWithoutPackage(cla);
+		// System.out.println(tableName);
+		Field[] fields = cla.getDeclaredFields();
+		List<Object> valueObj = new ArrayList<Object>();
+		StringBuffer sqlAgo = new StringBuffer("insert into " + tableName + " (");
+		StringBuffer sqlAfter = new StringBuffer("");
+		for (int i = 0; i < fields.length; i++) {
+			String fieldName = fields[i].getName();
+			String methodNameBegin = fieldName.substring(0, 1).toUpperCase();
+			String methodName = "get" + methodNameBegin + fieldName.substring(1);
+
+			Method method = cla.getMethod(methodName);
+			Object tempObj = method.invoke(obj);
+			if (tempObj != null) {
+				valueObj.add(tempObj);
+				sqlAgo.append(fieldName).append(",");
+				sqlAfter.append("?,");
+			}
+		}
+		if (valueObj.size() == 0) {
+			return false;
+		} else {
+			// 最后一位为,，去除
+			if (sqlAgo.charAt(sqlAgo.length() - 1) == ',') {
+				sqlAgo.deleteCharAt(sqlAgo.length() - 1);
+			}
+			if (sqlAfter.charAt(sqlAfter.length() - 1) == ',') {
+				sqlAfter.deleteCharAt(sqlAfter.length() - 1);
+			}
+			sqlAgo.append(") values(").append(sqlAfter).append(")");
+			//conn = new ConnUtil().getConn();
+			PreparedStatement pstat = connection.prepareStatement(sqlAgo.toString());
+			for (int i = 1; i <= valueObj.size(); i++) {
+				pstat.setObject(i, valueObj.get(i - 1));
+			}
+			pstat.executeUpdate();
+		}
+		return flag;
+	}
+
+	// 得到类名，不包含包名
+	private String getClassNameWithoutPackage(Class<?> cls) {
+		String temp = cls.getName();
+		return temp.substring(temp.lastIndexOf(".") + 1);
 	}
 }
