@@ -5,7 +5,7 @@ import jdbc.db.mysql.DBQuery;
 
 public class TestDao extends DBQuery {
 	public TestDao() throws SQLException, IOException {
-		super();
+		super("");
 	}
 	private String table_name = "test";
 	private String primary_key = "id";

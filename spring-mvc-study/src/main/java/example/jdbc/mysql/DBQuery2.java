@@ -1,4 +1,4 @@
-package jdbc.db.mysql;
+package example.jdbc.mysql;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -17,7 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class DBQuery extends ConnectionPoolManager {
+import jdbc.db.mysql.ConnectionPoolManager;
+
+
+
+public class DBQuery2 extends ConnectionPoolManager {
+
 	private final Logger logger = Logger.getLogger("jdbc.db.mysql.DBQuery");
 
 	private String table_name = "";
@@ -40,35 +45,34 @@ public class DBQuery extends ConnectionPoolManager {
 	private Connection readConnection = null;
 	private Connection writeConnection = null;
 	private String jdbcDsn = "test";
-	// LoggableStatement
+	//LoggableStatement
 	private PreparedStatement preparedStatement = null;
 
-	public DBQuery(String jdbcDsn) throws SQLException, IOException {
+	public DBQuery2(String jdbcDsn) throws SQLException, IOException {
 		super();
 		this.jdbcDsn = jdbcDsn;
 	}
 
-	public static DBQuery instance(String jdbcDsn) throws SQLException, IOException, InterruptedException {
-		return new DBQuery(jdbcDsn);
+	public static DBQuery2 instance(String jdbcDsn) throws SQLException, IOException, InterruptedException {
+		return new DBQuery2(jdbcDsn);
 	}
-
-	public DBQuery table(String table_name) {
+	public DBQuery2 table(String table_name) {
 		this.table_name = table_name;
 		return this;
 	}
 
-	public DBQuery table(Class<?> clazz) {
+	public DBQuery2 table(Class<?> clazz) {
 		this.entityClass = clazz;
 		this.table_name = this.getClassName(clazz);
 		return this;
 	}
 
-	public DBQuery insertType(String type) {
+	public DBQuery2 insertType(String type) {
 		this.insertType = type;
 		return this;
 	}
 
-	public DBQuery primaryKey(String primary_key) {
+	public DBQuery2 primaryKey(String primary_key) {
 		this.setPrimary_key(primary_key);
 		return this;
 	}
@@ -76,12 +80,12 @@ public class DBQuery extends ConnectionPoolManager {
 	public void setPrimary_key(String primary_key) {
 		this.primary_key = primary_key;
 	}
-
+	
 	public Object getPrimary_key() {
 		return this.primary_key;
 	}
-
-	public DBQuery where(String whereSQL) {
+	
+	public DBQuery2 where(String whereSQL) {
 		if (this.where.startsWith(" WHERE")) {
 			this.where = this.where + " AND " + whereSQL;
 		} else {
@@ -90,7 +94,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return this;
 	}
 
-	public DBQuery group(String groupSQL) {
+	public DBQuery2 group(String groupSQL) {
 		if (this.group.startsWith(" GROUP BY")) {
 			this.group = this.group + ", " + groupSQL;
 		} else {
@@ -99,7 +103,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return this;
 	}
 
-	public DBQuery order(String orderSQL) {
+	public DBQuery2 order(String orderSQL) {
 		if (this.order.startsWith(" ORDER BY")) {
 			this.order = this.order + ", " + orderSQL;
 		} else {
@@ -108,12 +112,12 @@ public class DBQuery extends ConnectionPoolManager {
 		return this;
 	}
 
-	public DBQuery limit(int offset, int rows) {
+	public DBQuery2 limit(int offset, int rows) {
 		this.limit = " LIMIT " + offset + ", " + rows + ";";
 		return this;
 	}
 
-	public DBQuery where(HashMap<String, String> whereData) {
+	public DBQuery2 where(HashMap<String, String> whereData) {
 		this.whereMap.putAll(whereData);
 		return this;
 	}
@@ -126,14 +130,14 @@ public class DBQuery extends ConnectionPoolManager {
 			for (String key : whereMap.keySet()) {
 				Object value = whereMap.get(key);
 				if (whereSQL.toString().equals("")) {
-					if (value.getClass().isArray()) {
+					if(value.getClass().isArray()) {
 						whereSQL.append(key + " IN( ? ) ");
 
 					} else {
 						whereSQL.append(key + " = ? ");
 					}
 				} else {
-					if (value.getClass().isArray()) {
+					if(value.getClass().isArray()) {
 						whereSQL.append(" AND " + key + " IN( ? ) ");
 
 					} else {
@@ -151,6 +155,11 @@ public class DBQuery extends ConnectionPoolManager {
 		}
 	}
 
+	public DBQuery2 setInsertData(HashMap<String, String> insertData) {
+		insertMap.putAll(insertData);
+		return this;
+	}
+
 	private String sql() {
 		this.where();
 		String sql = "SELECT " + this.field + " FROM " + this.table_name + this.where + this.order + this.group
@@ -160,33 +169,35 @@ public class DBQuery extends ConnectionPoolManager {
 
 	public List<Map<String, Object>> getList() throws SQLException, InterruptedException {
 		String sql = this.sql();
-		if (this.whereParamters == null) {
+		if(this.whereParamters == null) {
 			return this.getList(sql);
 		}
 		return this.getList(sql, whereParamters);
 	}
 
-	public List<Map<String, Object>> getList(String sql, ArrayList<Object> paramters)
-			throws SQLException, InterruptedException {
-		if (paramters != null && paramters.size() > 0) {
+	public List<Map<String, Object>> getList(String sql) throws SQLException, InterruptedException {
+		Object paramter = null;
+		return this.getList(sql, paramter);
+	}
+	
+	public List<Map<String, Object>> getList(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
+		if(paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
 			return this.getList(sql, paramter);
 		}
 		return this.getList(sql);
 	}
 
-	public List<Map<String, Object>> getList(String sql, Object... paramters)
-			throws SQLException, InterruptedException {
+	public List<Map<String, Object>> getList(String sql, Object... paramters) throws SQLException, InterruptedException {
 		ResultSet rs = null;
 		try {
-			long start = System.currentTimeMillis();
-			if (this.readConnection == null)
-				this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
+			long start = System.currentTimeMillis();  
+			if(this.readConnection == null) this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
 			rs = this.execute(sql, this.readConnection, paramters);
 			List<Map<String, Object>> list = resultSetToListMap(rs);
-			// logger.info("excuse sql:" + preparedStatement.toString());
-			// logger.info("excuse sql:" + getQueryString(sql, paramters));
-			System.out.println("使用Statment耗时：" + (System.currentTimeMillis() - start) + " ms");
+			//logger.info("excuse sql:" + preparedStatement.toString());
+			//logger.info("excuse sql:" + getQueryString(sql, paramters));
+			System.out.println("使用Statment耗时：" + (System.currentTimeMillis() - start) + " ms"); 
 			return list;
 		} catch (SQLException e) {
 			logger.severe("error sql:" + sql);
@@ -197,52 +208,65 @@ public class DBQuery extends ConnectionPoolManager {
 		}
 	}
 
-	/**
-	 * 执行返回泛型集合的SQL语句
-	 * 
-	 * @param cls
-	 *            泛型类型
-	 * @param sql
-	 *            查询SQL语句
-	 * @return 泛型集合
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> List<T> getEntityList() throws SQLException {
-		return (List<T>) getEntityList(this.entityClass, this.sql());
-	}
-
-	public <T> List<T> getEntityList(Class<T> entityClassT, String sql) throws SQLException {
-		List<T> list = new ArrayList<T>();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			if (this.readConnection == null)
-				this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
-			ps = (PreparedStatement) this.readConnection.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				T obj = (T) executeResultSet(entityClassT, rs);
-				list.add(obj);
+	private ResultSet execute(String sql, Connection connection,  Object... paramters) throws SQLException {
+		preparedStatement = connection.prepareStatement(sql);//.prepareStatement(sql);
+		if (paramters != null && paramters.length > 0) {
+			for (int i = 0; i < paramters.length; i++) {
+				preparedStatement.setObject(i + 1, paramters[i]);
 			}
-		} catch (Exception e) {
-			logger.severe("error sql:" + sql);
-			throw new SQLException(e);
-		} finally {
-			rs.close();
 		}
-		return list;
+		return preparedStatement.executeQuery();
 	}
-
+	/**
+     * 执行返回泛型集合的SQL语句
+     * 
+     * @param cls
+     *            泛型类型
+     * @param sql
+     *            查询SQL语句
+     * @return 泛型集合
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    @SuppressWarnings("unchecked")
+	public <T> List<T> getEntityList() throws SQLException {
+        return (List<T>) getEntityList(this.entityClass, this.sql());
+    }
+    
+    public <T> List<T> getEntityList(Class<T> entityClassT, String sql) throws SQLException {
+        List<T> list = new ArrayList<T>();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+        	if(this.readConnection == null) this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
+            ps = (PreparedStatement) this.readConnection.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+				T obj = (T) executeResultSet(entityClassT, rs);
+                list.add(obj);
+            }
+        } catch (Exception e) {
+        	logger.severe("error sql:" + sql);
+			throw new SQLException(e);
+        } finally {
+        	rs.close();
+        }
+        return list;
+    }
+    
 	public Object getOne() throws SQLException, InterruptedException {
 		return this.getOne(this.sql(), whereParamters);
 	}
 
+	public Object getOne(String sql) throws SQLException, InterruptedException {
+		Object paramter = null;
+		return this.getOne(sql, paramter);
+	}
+	
 	public Object getOne(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
-		if (paramters != null && paramters.size() > 0) {
+		if(paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
 			return this.getOne(sql, paramter);
 		}
@@ -253,8 +277,7 @@ public class DBQuery extends ConnectionPoolManager {
 		Object result = null;
 		ResultSet rs = null;
 		try {
-			if (this.readConnection == null)
-				this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
+			if(this.readConnection == null) this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
 			rs = this.execute(sql, this.readConnection, paramters);
 			if (rs.next()) {
 				result = rs.getObject(1);
@@ -268,16 +291,16 @@ public class DBQuery extends ConnectionPoolManager {
 		}
 	}
 
-	public DBQuery setUpdateData(HashMap<String, String> updateData) {
+	public DBQuery2 setUpdateData(HashMap<String, String> updateData) {
 		updateMap.putAll(updateData);
 		return this;
 	}
-
+	
 	private String updateSQL() throws SQLException {
 		this.where();
 		StringBuilder updateSQL = new StringBuilder("");
 		if (updateMap != null && updateMap.size() > 0) {
-			updateParamters = new Object[updateMap.size()];
+			updateParamters =  new Object[updateMap.size()];
 			int i = 0;
 			for (String key : updateMap.keySet()) {
 				if (updateSQL.toString().equals("")) {
@@ -299,18 +322,22 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.update(this.updateSQL(), updateParamters);
 	}
 
+	public int update(String sql) throws SQLException, InterruptedException {
+		Object paramter = null;
+		return this.update(sql, paramter);
+	}
+	
 	public int update(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
-		if (paramters != null && paramters.size() > 0) {
+		if(paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
 			return this.update(sql, paramter);
 		}
 		return this.update(sql);
 	}
-
+	
 	public int update(String sql, Object... paramters) throws SQLException, InterruptedException {
 		try {
-			if (this.writeConnection == null)
-				this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
+			if(this.writeConnection == null) this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
 			preparedStatement = (PreparedStatement) this.writeConnection.prepareStatement(sql);
 			if (paramters != null && paramters.length > 0) {
 				int i = 0;
@@ -324,6 +351,8 @@ public class DBQuery extends ConnectionPoolManager {
 					}
 				}
 			}
+			
+			//logger.info("excuse sql:" + getQueryString(sql, paramters));
 			return preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			logger.severe("error sql:" + sql);
@@ -331,53 +360,13 @@ public class DBQuery extends ConnectionPoolManager {
 		} finally {
 		}
 	}
-	
-	/**
-	 * 批量更新数据
-	 * 
-	 * @param sqlList
-	 *            一组sql
-	 * @return
-	 * @throws SQLException
-	 * @throws InterruptedException
-	 */
-	public int[] batchUpdate(List<String> sqlList) throws SQLException, InterruptedException {
-		int[] result = new int[] {};
-		Statement statenent = null;
-		if (this.writeConnection == null)
-			this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
-		try {
-			this.writeConnection.setAutoCommit(false);
-			statenent = this.writeConnection.createStatement();
-			for (String sql : sqlList) {
-				statenent.addBatch(sql);
-			}
-			result = statenent.executeBatch();
-			this.writeConnection.commit();
-		} catch (SQLException e) {
-			try {
-				this.writeConnection.rollback();
-			} catch (SQLException e1) {
-				throw new ExceptionInInitializerError(e1);
-			}
-			throw new ExceptionInInitializerError(e);
-		} finally {
-			statenent.close();
-		}
-		return result;
-	}
-
-	public DBQuery setInsertData(HashMap<String, String> insertData) {
-		insertMap.putAll(insertData);
-		return this;
-	}
 
 	private String insertSQL() throws SQLException {
 		this.where();
 		StringBuilder insertSQL = new StringBuilder("");
 		StringBuilder insertSQLValue = new StringBuilder("");
 		if (insertMap != null && insertMap.size() > 0) {
-			insertParamters = new Object[insertMap.size()];
+			insertParamters =  new Object[insertMap.size()];
 			int i = 0;
 			for (String key : insertMap.keySet()) {
 				if (insertSQL.toString().equals("")) {
@@ -402,22 +391,25 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.insert(this.insertSQL(), insertParamters);
 	}
 
-	public Object insert(String sql, ArrayList<Object> paramters) throws Exception {
-		if (paramters != null && paramters.size() > 0) {
+	public Object insert(String sql) throws SQLException, InterruptedException {
+		Object paramter = null;
+		return this.insert(sql, paramter);
+	}
+
+	public Object insert(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
+		if(paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
 			return this.insert(sql, paramter);
 		}
 		return this.insert(sql);
 	}
-
+	
 	public Object insert(String sql, Object... paramters) throws SQLException, InterruptedException {
 		ResultSet rs = null;
 		Object result = null;
 		try {
-			if (this.writeConnection == null)
-				this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
-			preparedStatement = (PreparedStatement) this.writeConnection.prepareStatement(sql,
-					PreparedStatement.RETURN_GENERATED_KEYS);
+			if(this.writeConnection == null) this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
+			preparedStatement = (PreparedStatement) this.writeConnection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 			if (paramters != null && paramters.length > 0) {
 				for (int i = 0; i < paramters.length; i++) {
 					preparedStatement.setObject(i + 1, paramters[i]);
@@ -471,10 +463,8 @@ public class DBQuery extends ConnectionPoolManager {
 				sqlParamters.deleteCharAt(sqlParamters.length() - 1);
 			}
 			sql.append(") VALUES (").append(sqlParamters).append(")");
-			if (this.writeConnection == null)
-				this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
-			preparedStatement = (PreparedStatement) this.writeConnection.prepareStatement(sql.toString(),
-					PreparedStatement.RETURN_GENERATED_KEYS);
+			if(this.writeConnection == null) this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
+			preparedStatement = (PreparedStatement) this.writeConnection.prepareStatement(sql.toString(), PreparedStatement.RETURN_GENERATED_KEYS);
 			for (int i = 1; i <= valueObj.size(); i++) {
 				preparedStatement.setObject(i, valueObj.get(i - 1));
 			}
@@ -488,53 +478,51 @@ public class DBQuery extends ConnectionPoolManager {
 		return result;
 	}
 
-	private String deleteSQL() throws SQLException {
-		this.where();
-		String sql = "DELETE" + this.table_name + this.where + ";";
-		return sql;
-	}
-	
-	public int delete() throws SQLException, InterruptedException {
-		return this.delete(this.deleteSQL());
-	}
-	
-	public int delete(String sql) throws SQLException, InterruptedException {
-		try {
-			if (this.writeConnection == null)
-				this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
-			preparedStatement = (PreparedStatement) this.writeConnection.prepareStatement(sql);
-			int resultInt = preparedStatement.executeUpdate();
-			logger.info("excuse sql:" + getQueryString(sql));
-			return resultInt;
-		} catch (SQLException e) {
-			logger.severe("error sql:" + sql);
-			throw new SQLException(e);
-		}
-
-	}
-	//=======================================================//
 	// 得到类名，不包含包名
 	private String getClassName(Class<?> className) {
 		String temp = className.getName();
 		return temp.substring(temp.lastIndexOf(".") + 1);
 	}
 
-	private ResultSet execute(String sql, Connection connection, Object... paramters) throws SQLException {
-		preparedStatement = connection.prepareStatement(sql);// .prepareStatement(sql);
-		if (paramters != null && paramters.length > 0) {
-			for (int i = 0; i < paramters.length; i++) {
-				preparedStatement.setObject(i + 1, paramters[i]);
+	/**
+	 * 批量更新数据
+	 * 
+	 * @param sqlList
+	 *            一组sql
+	 * @return
+	 * @throws SQLException
+	 * @throws InterruptedException 
+	 */
+	public int[] batchUpdate(List<String> sqlList) throws SQLException, InterruptedException {
+		int[] result = new int[] {};
+		Statement statenent = null;
+		if(this.writeConnection == null) this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
+		try {
+			this.writeConnection.setAutoCommit(false);
+			statenent = this.writeConnection.createStatement();
+			for (String sql : sqlList) {
+				statenent.addBatch(sql);
 			}
+			result = statenent.executeBatch();
+			this.writeConnection.commit();
+		} catch (SQLException e) {
+			try {
+				this.writeConnection.rollback();
+			} catch (SQLException e1) {
+				throw new ExceptionInInitializerError(e1);
+			}
+			throw new ExceptionInInitializerError(e);
+		} finally {
+			statenent.close();
 		}
-		return preparedStatement.executeQuery();
+		return result;
 	}
 
 	private static List<Map<String, Object>> resultSetToListMap(ResultSet rs) throws SQLException {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		ResultSetMetaData md = null;
 		while (rs.next()) {
-			if (md == null)
-				md = rs.getMetaData();
+			if(md == null) md = rs.getMetaData();
 			Map<String, Object> map = new HashMap<String, Object>();
 			for (int i = 1; i < md.getColumnCount(); i++) {
 				map.put(md.getColumnLabel(i), rs.getObject(i));
@@ -543,41 +531,42 @@ public class DBQuery extends ConnectionPoolManager {
 		}
 		return list;
 	}
-
+	
 	/**
-	 * 将一条记录转成一个对象
-	 * 
-	 * @param cls
-	 *            泛型类型
-	 * @param rs
-	 *            ResultSet对象
-	 * @return 泛型类型对象
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws SQLException
-	 */
-	private static <T> T executeResultSet(Class<T> cls, ResultSet rs)
-			throws InstantiationException, IllegalAccessException, SQLException {
-		T obj = cls.newInstance();
-		ResultSetMetaData rsm = rs.getMetaData();
-		int columnCount = rsm.getColumnCount();
-		// Field[] fields = cls.getFields();
-		Field[] fields = cls.getDeclaredFields();
-		for (int i = 0; i < fields.length; i++) {
-			Field field = fields[i];
-			String fieldName = field.getName();
-			for (int j = 1; j <= columnCount; j++) {
-				String columnName = rsm.getColumnName(j);
-				if (fieldName.equalsIgnoreCase(columnName)) {
-					Object value = rs.getObject(j);
-					field.setAccessible(true);
-					field.set(obj, value);
-					break;
-				}
-			}
-		}
-		return obj;
-	}
+     * 将一条记录转成一个对象
+     * 
+     * @param cls
+     *            泛型类型
+     * @param rs
+     *            ResultSet对象
+     * @return 泛型类型对象
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws SQLException
+     */
+    private static <T> T executeResultSet(Class<T> cls, ResultSet rs)
+            throws InstantiationException, IllegalAccessException, SQLException {
+        T obj = cls.newInstance();
+        ResultSetMetaData rsm = rs.getMetaData();
+        int columnCount = rsm.getColumnCount();
+        // Field[] fields = cls.getFields();
+        Field[] fields = cls.getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            String fieldName = field.getName();
+            for (int j = 1; j <= columnCount; j++) {
+                String columnName = rsm.getColumnName(j);
+                if (fieldName.equalsIgnoreCase(columnName)) {
+                    Object value = rs.getObject(j);
+                    field.setAccessible(true);
+                    field.set(obj, value);
+                    break;
+                }
+            }
+        }
+        return obj;
+    }
+
 
 	/**
 	 * 提交事务并关闭数据库连接
@@ -597,23 +586,76 @@ public class DBQuery extends ConnectionPoolManager {
 		this.writeConnection.rollback();
 	}
 
-	private String getQueryString(String sqlTemplate, Object... parameterValues) {
-		int len = sqlTemplate.length();
-		StringBuffer t = new StringBuffer(len * 2);
-		if (parameterValues != null) {
-			int i = 0, limit = 0, base = 0;
-			while ((limit = sqlTemplate.indexOf('?', limit)) != -1) {
-				t.append(sqlTemplate.substring(base, limit));
-				t.append("'" + parameterValues[i] + "'");
-				i++;
-				limit++;
-				base = limit;
+	/**
+	 * 
+	 * @param c
+	 *            for example Person.class
+	 * @param primaryKeys
+	 *            primaryKeys为主键,参数顺序和表中保持一致 如果id， name 为主键 类名为Person 则
+	 *            getEntity(Person.class,1,"name")
+	 * @return
+	 * @throws InterruptedException 
+	 * @throws SQLException 
+	 */
+	public Object getEntity(Class<?> entityClassT, Object... primaryKeys) throws SQLException, InterruptedException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		DatabaseMetaData dmd = null;
+		Object obj = null;// 要返回的对象
+		String tableName = entityClassT.getSimpleName().toLowerCase();// person 表的名字
+		List<Object> primaryKeyNameList = new ArrayList<Object>();
+		Field[] fields = entityClassT.getFields();// 获取所有的属性
+		StringBuilder sql = new StringBuilder("SELECT * FROM " + tableName + " WHERE ");
+		if(this.readConnection == null) this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
+		try {
+			obj = entityClassT.newInstance();
+			dmd = this.readConnection.getMetaData();
+			rs = dmd.getPrimaryKeys(null, null, tableName);
+			while (rs.next()) {
+				sql.append(rs.getObject(4) + "=?");
+				sql.append(" and ");
+				primaryKeyNameList.add(rs.getObject(4));// 将从表中获取的 主键字段存到 list中，
+														// 主键位于表中第几列=rs.getString(5)
 			}
-			if (base < len) {
-				t.append(sqlTemplate.substring(base));
+			sql.delete(sql.length() - 4, sql.length());
+			ps = (PreparedStatement) this.readConnection.prepareStatement(sql.toString());
+			for (int l = 0; l < primaryKeyNameList.size(); l++) {
+				ps.setObject(l + 1, primaryKeys[l]);
 			}
+			rs = ps.executeQuery();
+			System.out.println(ps.toString().split(":")[1]);
+			if (rs.next()) {
+				for (int k = 0; k < fields.length; k++) {
+					fields[k].set(obj, rs.getObject(k + 1));
+				}
+			}
+			rs.close();
+			ps.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+
 		}
-		return t.toString();
+		return obj;
 	}
+
+	 private String getQueryString(String sqlTemplate, Object... parameterValues) {    
+	        int len = sqlTemplate.length();    
+	        StringBuffer t = new StringBuffer(len * 2);    
+	        if (parameterValues != null) {    
+	            int i = 0, limit = 0, base = 0;    
+	            while ((limit = sqlTemplate.indexOf('?', limit)) != -1) {
+	                t.append(sqlTemplate.substring(base, limit));    
+	                t.append("'"+parameterValues[i]+"'");    
+	                i++;    
+	                limit++;    
+	                base = limit;    
+	            }    
+	            if (base < len) {    
+	                t.append(sqlTemplate.substring(base));    
+	            }    
+	        }    
+	        return t.toString();    
+	    }    
 
 }

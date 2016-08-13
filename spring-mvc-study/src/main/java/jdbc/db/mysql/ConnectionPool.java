@@ -17,9 +17,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.io.PrintWriter;
 
@@ -99,7 +99,7 @@ public class ConnectionPool implements DataSource {
 	}
 
 	public Connection getConnection(String username, String password) throws SQLException {
-		return DriverManager.getConnection(config.getDbDsn(), config.getDbUsername(), config.getDbPassword());
+		return (Connection) DriverManager.getConnection(config.getDbDsn(), config.getDbUsername(), config.getDbPassword());
 	}
 
 	public void threadConnectionStatus() {
@@ -137,7 +137,7 @@ public class ConnectionPool implements DataSource {
 	}
 
 	private Connection createConnection() throws SQLException {
-		return DriverManager.getConnection(config.getDbDsn());
+		return (Connection) DriverManager.getConnection(config.getDbDsn());
 	}
 
 	public PrintWriter getLogWriter() throws SQLException {
