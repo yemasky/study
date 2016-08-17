@@ -345,6 +345,9 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.update(sql);
 	}
 
+	private void setBeathUpdateSql() {
+		
+	}
 	private int update(String sql, Object... paramters) throws SQLException, InterruptedException {
 		try {
 			if (this.writeConnection == null)
