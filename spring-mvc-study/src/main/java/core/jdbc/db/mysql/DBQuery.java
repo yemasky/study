@@ -1,4 +1,4 @@
-package jdbc.db.mysql;
+package core.jdbc.db.mysql;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -43,7 +43,6 @@ public class DBQuery extends ConnectionPoolManager {
 	private boolean isTransaction = false;
 	private boolean isTransactionSuccess = false;
 
-	// LoggableStatement
 	private PreparedStatement preparedStatement = null;
 	private static Map<String, DBQuery> instances = new HashMap<String, DBQuery>();
 
@@ -59,12 +58,12 @@ public class DBQuery extends ConnectionPoolManager {
 		} else {
 			instanceDBQuery = new DBQuery(jdbcDsn);
 		}
-		releaseDBQuery(instanceDBQuery);
+		emptyProperty(instanceDBQuery);
 		instances.put(jdbcDsn, instanceDBQuery);
 		return instanceDBQuery;
 	}
 	
-	private static void releaseDBQuery(DBQuery instance) {
+	private static void emptyProperty(DBQuery instance) {
 		instance.table_name = "";
 		instance.primary_key = "id";
 		instance.field = "*";
@@ -201,7 +200,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.getList(sql, whereParamters);
 	}
 
-	public List<Map<String, Object>> getList(String sql, ArrayList<Object> paramters)
+	private List<Map<String, Object>> getList(String sql, ArrayList<Object> paramters)
 			throws SQLException, InterruptedException {
 		if (paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
@@ -210,14 +209,15 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.getList(sql);
 	}
 
-	public List<Map<String, Object>> getList(String sql, Object... paramters)
+	private List<Map<String, Object>> getList(String sql, Object... paramters)
 			throws SQLException, InterruptedException {
 		ResultSet rs = null;
 		try {
 			long start = System.currentTimeMillis();
 			if (this.readConnection == null)
 				this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
-			rs = this.execute(sql, this.readConnection, paramters);
+			preparedStatement = this.readConnection.prepareStatement(sql);//
+			rs = this.executeForQuery(sql, paramters);
 			List<Map<String, Object>> list = resultSetToListMap(rs);
 			// logger.info("excuse sql:" + preparedStatement.toString());
 			// logger.info("excuse sql:" + getQueryString(sql, paramters));
@@ -247,17 +247,18 @@ public class DBQuery extends ConnectionPoolManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> List<T> getEntityList() throws SQLException {
+		if(this.entityClass == null) throw new SQLException("this.entityClass is null");
 		return (List<T>) getEntityList(this.entityClass, this.sql());
 	}
 
-	public <T> List<T> getEntityList(Class<T> entityClassT, String sql) throws SQLException {
+	private <T> List<T> getEntityList(Class<T> entityClassT, String sql) throws SQLException {
 		List<T> list = new ArrayList<T>();
 		ResultSet rs = null;
 		try {
 			if (this.readConnection == null)
 				this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
-			// ps = this.readConnection.prepareStatement(sql);
-			rs = this.execute(sql, this.readConnection, whereParamters);
+			preparedStatement = this.readConnection.prepareStatement(sql);
+			rs = this.executeForQuery(sql, whereParamters);
 			// rs = ps.executeQuery();
 			while (rs.next()) {
 				T obj = (T) executeResultSet(entityClassT, rs);
@@ -277,7 +278,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.getOne(this.sql(), whereParamters);
 	}
 
-	public Object getOne(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
+	private Object getOne(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
 		if (paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
 			return this.getOne(sql, paramter);
@@ -285,13 +286,14 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.getOne(sql);
 	}
 
-	public Object getOne(String sql, Object... paramters) throws SQLException, InterruptedException {
+	private Object getOne(String sql, Object... paramters) throws SQLException, InterruptedException {
 		Object result = null;
 		ResultSet rs = null;
 		try {
 			if (this.readConnection == null)
 				this.readConnection = this.getConnection(this.jdbcDsn + "." + read);
-			rs = this.execute(sql, this.readConnection, paramters);
+			preparedStatement = this.readConnection.prepareStatement(sql);
+			rs = this.executeForQuery(sql, paramters);
 			if (rs.next()) {
 				result = rs.getObject(1);
 			}
@@ -335,7 +337,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.update(this.updateSQL(), updateParamters);
 	}
 
-	public int update(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
+	private int update(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
 		if (paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
 			return this.update(sql, paramter);
@@ -343,25 +345,16 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.update(sql);
 	}
 
-	public int update(String sql, Object... paramters) throws SQLException, InterruptedException {
+	private int update(String sql, Object... paramters) throws SQLException, InterruptedException {
 		try {
 			if (this.writeConnection == null)
 				this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
 			if (this.isTransaction)
 				this.writeConnection.setAutoCommit(false);
 			preparedStatement = this.writeConnection.prepareStatement(sql);
-			if (paramters != null && paramters.length > 0) {
-				int i = 0;
-				for (; i < paramters.length; i++) {
-					preparedStatement.setObject(i + 1, paramters[i]);
-				}
-				if (whereParamters != null && whereParamters.length > 0) {
-					for (int j = 0; j < whereParamters.length; j++) {
-						preparedStatement.setObject(i + 1, whereParamters[j]);
-						i++;
-					}
-				}
-			}
+			//设值SQL
+			this.resolveUpdateSql(sql, paramters);
+			//执行SQL
 			int result = preparedStatement.executeUpdate();
 			if (this.isTransaction) {
 				this.writeConnection.commit();
@@ -611,8 +604,24 @@ public class DBQuery extends ConnectionPoolManager {
 		return temp.substring(temp.lastIndexOf(".") + 1);
 	}
 
-	private ResultSet execute(String sql, Connection connection, Object... paramters) throws SQLException {
-		preparedStatement = connection.prepareStatement(sql);// .prepareStatement(sql);
+	//分解UPDATE SQL 设置值
+	private void resolveUpdateSql(String sql, Object... paramters) throws SQLException {
+		if (paramters != null && paramters.length > 0) {
+			int i = 0;
+			for (; i < paramters.length; i++) {
+				preparedStatement.setObject(i + 1, paramters[i]);
+			}
+			if (whereParamters != null && whereParamters.length > 0) {
+				for (int j = 0; j < whereParamters.length; j++) {
+					preparedStatement.setObject(i + 1, whereParamters[j]);
+					i++;
+				}
+			}
+		}
+	}
+	
+	//根据ResultSet 取得列表值
+	private ResultSet executeForQuery(String sql, Object... paramters) throws SQLException {
 		if (paramters != null && paramters.length > 0) {
 			for (int i = 0; i < paramters.length; i++) {
 				preparedStatement.setObject(i + 1, paramters[i]);
@@ -621,6 +630,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return preparedStatement.executeQuery();
 	}
 
+	//根据ResultSet 取得列表值
 	private static List<Map<String, Object>> resultSetToListMap(ResultSet rs) throws SQLException {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		ResultSetMetaData md = null;

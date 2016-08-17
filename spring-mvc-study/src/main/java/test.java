@@ -2,6 +2,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.catalina.User;
+
 import jdbc.db.mysql.DBQuery;
 
 /**
@@ -31,7 +33,7 @@ public class test {
 		//
 		String jdbcDsn = "test";
 		HashMap<String, String> whereData = new HashMap<String, String>();
-		whereData.put("uid", "11");
+		whereData.put("uid", "2");
 		//whereData.put("username", "11");
 		List<Map<String, Object>> DDIV = DBQuery.instance(jdbcDsn).table("users").where(whereData).getList();
 		System.out.println(DDIV.size());
@@ -47,6 +49,21 @@ public class test {
 		updateData.put("password", "111111");
 		DBQuery.instance(jdbcDsn).table("users").where(whereData).setUpdateData(updateData).update();
 		
+		DBQuery.instance(jdbcDsn).table("users").where(whereData).setUpdateData(updateData).update();
+		
+		DBQuery.instance(jdbcDsn).table("users").where(whereData).setUpdateData(updateData).update();
+		
+		DDIV = DBQuery.instance(jdbcDsn).table("users").where(whereData).getList();
+		
+		List<Users> ss = DBQuery.instance(jdbcDsn).table(Users.class).where(whereData).getEntityList();
+		System.out.println(ss.get(0).getUsername());
+		
+		Users aaa = new Users();
+		aaa.setPassword("111");
+		aaa.setUsername("233");
+		DBQuery.instance(jdbcDsn).insert(aaa);
+		
+		DBQuery.instance(jdbcDsn).insert(aaa);
 
 	}
 

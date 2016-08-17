@@ -8,7 +8,7 @@
  *   @create-time     2016 {time}
  *   @revision        Id: 1.0    
  ***********************************************************************/
-package jdbc.db.mysql;
+package core.jdbc.db.mysql;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ public class ConnectionPoolManager {
 	private static Hashtable<String, ConnectionPool> pools = new Hashtable<String, ConnectionPool>();// 连接池
 	private static Map<String, HashMap<String, HashMap<String, Config>>> drivers = new HashMap<String, HashMap<String, HashMap<String, Config>>>();// 驱动信息
 	private static long time = 0;
-	private long timeout = 5000;
+	private long timeout = 1000;
 	private static boolean is_init = false;
 	// 当前使用jdbcDsn test.write.001 config
 	private final Map<String, ThreadLocal<String>> threadJdbcDsn = new HashMap<String, ThreadLocal<String>>();

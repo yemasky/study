@@ -8,7 +8,7 @@
  *   @create-time     2016 {time}
  *   @revision        Id: 1.0    
  ***********************************************************************/
-package jdbc.db.mysql;
+package core.jdbc.db.mysql;
 
 import javax.sql.DataSource;
 
@@ -75,7 +75,7 @@ public class ConnectionPool implements DataSource {
 	 */
 	public Connection getConnection() throws SQLException {
 		synchronized (pool.get(config.getConnectionName())) {
-			logger.info("threadConnection.get: " + config.getConnectionName());
+			logger.info("线程" + threadConnection.hashCode() + config.getConnectionName());
 			Connection connection = threadConnection.get(config.getConnectionName()).get();
 			if (connection != null)
 				return connection;
