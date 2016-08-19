@@ -62,8 +62,8 @@ public class DBQuery extends ConnectionPoolManager {
 		instances.put(jdbcDsn, instanceDBQuery);
 		return instanceDBQuery;
 	}
-	
-	private static void emptyProperty(DBQuery instance) {
+
+	public static void emptyProperty(DBQuery instance) {
 		instance.table_name = "";
 		instance.primary_key = "id";
 		instance.field = "*";
@@ -200,7 +200,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.getList(sql, whereParamters);
 	}
 
-	private List<Map<String, Object>> getList(String sql, ArrayList<Object> paramters)
+	public List<Map<String, Object>> getList(String sql, ArrayList<Object> paramters)
 			throws SQLException, InterruptedException {
 		if (paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
@@ -247,7 +247,8 @@ public class DBQuery extends ConnectionPoolManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> List<T> getEntityList() throws SQLException {
-		if(this.entityClass == null) throw new SQLException("this.entityClass is null");
+		if (this.entityClass == null)
+			throw new SQLException("this.entityClass is null");
 		return (List<T>) getEntityList(this.entityClass, this.sql());
 	}
 
@@ -278,6 +279,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.getOne(this.sql(), whereParamters);
 	}
 
+	@SuppressWarnings("unused")
 	private Object getOne(String sql, ArrayList<Object> paramters) throws SQLException, InterruptedException {
 		if (paramters != null && paramters.size() > 0) {
 			Object[] paramter = paramters.toArray();
@@ -333,6 +335,39 @@ public class DBQuery extends ConnectionPoolManager {
 		return sql;
 	}
 
+	public void setBatchUpdateSql() throws SQLException, InterruptedException {
+		if (this.writeConnection == null)
+			this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
+		if (this.isTransaction)
+			this.writeConnection.setAutoCommit(false);
+		String sql = this.updateSQL();
+		preparedStatement = this.writeConnection.prepareStatement(sql);
+		// 设值SQL
+		this.resolveUpdateSql(sql, updateParamters);
+		preparedStatement.addBatch();
+	}
+
+	public int[] executeBatchUpdate() throws SQLException {
+		try {
+			int[] result = preparedStatement.executeBatch();
+			preparedStatement.clearBatch();
+			if (this.isTransaction) {
+				this.writeConnection.commit();
+				this.writeConnection.setAutoCommit(true);
+				this.isTransactionSuccess = true;
+			}
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			if (this.isTransaction) {
+				this.writeConnection.rollback();
+			}
+		} finally {
+
+		}
+		return null;
+	}
+
 	public int update() throws SQLException, InterruptedException {
 		return this.update(this.updateSQL(), updateParamters);
 	}
@@ -345,9 +380,6 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.update(sql);
 	}
 
-	private void setBeathUpdateSql() {
-		
-	}
 	private int update(String sql, Object... paramters) throws SQLException, InterruptedException {
 		try {
 			if (this.writeConnection == null)
@@ -355,9 +387,9 @@ public class DBQuery extends ConnectionPoolManager {
 			if (this.isTransaction)
 				this.writeConnection.setAutoCommit(false);
 			preparedStatement = this.writeConnection.prepareStatement(sql);
-			//设值SQL
+			// 设值SQL
 			this.resolveUpdateSql(sql, paramters);
-			//执行SQL
+			// 执行SQL
 			int result = preparedStatement.executeUpdate();
 			if (this.isTransaction) {
 				this.writeConnection.commit();
@@ -442,6 +474,41 @@ public class DBQuery extends ConnectionPoolManager {
 		return sql;
 	}
 
+	//设置批量插入
+	public void setBatchInsertSql() throws SQLException, InterruptedException {
+		if (this.writeConnection == null)
+			this.writeConnection = this.getConnection(this.jdbcDsn + "." + write);
+		if (this.isTransaction)
+			this.writeConnection.setAutoCommit(false);
+		String sql = this.insertSQL();
+		preparedStatement = this.writeConnection.prepareStatement(sql);
+		// 设值SQL
+		this.resolveUpdateSql(sql, insertParamters);
+		preparedStatement.addBatch();
+	}
+
+	//执行批量插入
+	public int[] executeBatchInsert() throws SQLException {
+		try {
+			int[] result = preparedStatement.executeBatch();
+			preparedStatement.clearBatch();
+			if (this.isTransaction) {
+				this.writeConnection.commit();
+				this.writeConnection.setAutoCommit(true);
+				this.isTransactionSuccess = true;
+			}
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			if (this.isTransaction) {
+				this.writeConnection.rollback();
+			}
+		} finally {
+
+		}
+		return null;
+	}
+	
 	public Object insert() throws SQLException, InterruptedException {
 		return this.insert(this.insertSQL(), insertParamters);
 	}
@@ -454,7 +521,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return this.insert(sql);
 	}
 
-	public Object insert(String sql, Object... paramters) throws SQLException, InterruptedException {
+	private Object insert(String sql, Object... paramters) throws SQLException, InterruptedException {
 		ResultSet rs = null;
 		Object result = null;
 		try {
@@ -600,6 +667,7 @@ public class DBQuery extends ConnectionPoolManager {
 			e.printStackTrace();
 		}
 	}
+
 	// =======================================================//
 	// 得到类名，不包含包名
 	private String getClassName(Class<?> className) {
@@ -607,7 +675,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return temp.substring(temp.lastIndexOf(".") + 1);
 	}
 
-	//分解UPDATE SQL 设置值
+	// 分解UPDATE SQL 设置值
 	private void resolveUpdateSql(String sql, Object... paramters) throws SQLException {
 		if (paramters != null && paramters.length > 0) {
 			int i = 0;
@@ -622,8 +690,8 @@ public class DBQuery extends ConnectionPoolManager {
 			}
 		}
 	}
-	
-	//根据ResultSet 取得列表值
+
+	// 根据ResultSet 取得列表值
 	private ResultSet executeForQuery(String sql, Object... paramters) throws SQLException {
 		if (paramters != null && paramters.length > 0) {
 			for (int i = 0; i < paramters.length; i++) {
@@ -633,7 +701,7 @@ public class DBQuery extends ConnectionPoolManager {
 		return preparedStatement.executeQuery();
 	}
 
-	//根据ResultSet 取得列表值
+	// 根据ResultSet 取得列表值
 	private static List<Map<String, Object>> resultSetToListMap(ResultSet rs) throws SQLException {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		ResultSetMetaData md = null;
