@@ -13,17 +13,17 @@ import com.imooc.model.Goddess;
 
 public class View {
 
-	private static final String CONTEXT="»¶Ó­À´µ½Å®Éñ½ûÇø£º\n" +
-			"ÏÂÃæÊÇÅ®Éñ½ûÇøµÄ¹¦ÄÜÁĞ±í£º\n" +
-			"[MAIN/M]:Ö÷²Ëµ¥\n" +
-			"[QUERY/Q]:²é¿´È«²¿Å®ÉñµÄĞÅÏ¢\n" +
-			"[GET/G]:²é¿´Ä³Î»Å®ÉñµÄÏêÏ¸ĞÅÏ¢\n" +
-			"[ADD/A]:Ìí¼ÓÅ®ÉñĞÅÏ¢\n" +
-			"[UPDATE/U]:¸üĞÂÅ®ÉñĞÅÏ¢\n" +
-			"[DELETE/D]:É¾³ıÅ®ÉñĞÅÏ¢\n" +
-			"[SEARCH/S]:²éÑ¯Å®ÉñĞÅÏ¢(¸ù¾İĞÕÃû¡¢ÊÖ»úºÅÀ´²éÑ¯)\n" +
-			"[EXIT/E]:ÍË³öÅ®Éñ½ûÇø\n" +
-			"[BREAK/B]:ÍË³öµ±Ç°¹¦ÄÜ£¬·µ»ØÖ÷²Ëµ¥";
+	private static final String CONTEXT="æ¬¢è¿æ¥åˆ°å¥³ç¥ç¦åŒºï¼š\n" +
+			"ä¸‹é¢æ˜¯å¥³ç¥ç¦åŒºçš„åŠŸèƒ½åˆ—è¡¨ï¼š\n" +
+			"[MAIN/M]:ä¸»èœå•\n" +
+			"[QUERY/Q]:æŸ¥çœ‹å…¨éƒ¨å¥³ç¥çš„ä¿¡æ¯\n" +
+			"[GET/G]:æŸ¥çœ‹æŸä½å¥³ç¥çš„è¯¦ç»†ä¿¡æ¯\n" +
+			"[ADD/A]:æ·»åŠ å¥³ç¥ä¿¡æ¯\n" +
+			"[UPDATE/U]:æ›´æ–°å¥³ç¥ä¿¡æ¯\n" +
+			"[DELETE/D]:åˆ é™¤å¥³ç¥ä¿¡æ¯\n" +
+			"[SEARCH/S]:æŸ¥è¯¢å¥³ç¥ä¿¡æ¯(æ ¹æ®å§“åã€æ‰‹æœºå·æ¥æŸ¥è¯¢)\n" +
+			"[EXIT/E]:é€€å‡ºå¥³ç¥ç¦åŒº\n" +
+			"[BREAK/B]:é€€å‡ºå½“å‰åŠŸèƒ½ï¼Œè¿”å›ä¸»èœå•";
 
 	
 	private static final String OPERATION_MAIN="MAIN";
@@ -51,7 +51,7 @@ public class View {
 			String in=s.next();
 			if(OPERATION_EXIT.equals(in.toUpperCase())
 					||OPERATION_EXIT.substring(0, 1).equals(in.toUpperCase())){
-				System.out.println("ÄúÒÑ³É¹¦ÍË³öÅ®Éñ½ûÇø");
+				System.out.println("æ‚¨å·²æˆåŠŸé€€å‡ºå¥³ç¥ç¦åŒº");
 				break;
 			}else if(OPERATION_MAIN.equals(in.toUpperCase())
 					||OPERATION_MAIN.substring(0, 1).equals(in.toUpperCase())){
@@ -70,7 +70,7 @@ public class View {
 					||OPERATION_GET.equals(pervious)){
 				pervious=OPERATION_GET;
 				if(1==step){
-					System.out.println("ÇëÊäÈë²éÑ¯µÄÅ®ÉñID£º");
+					System.out.println("è¯·è¾“å…¥æŸ¥è¯¢çš„å¥³ç¥IDï¼š");
 				}else if(step>1){
 					Integer id=null;
 					Goddess g;
@@ -79,15 +79,15 @@ public class View {
 						try {
 							g = action.get(id);
 							if(g==null){
-								System.out.println("²éÑ¯Å®ÉñĞÅÏ¢Ê§°Ü");
+								System.out.println("æŸ¥è¯¢å¥³ç¥ä¿¡æ¯å¤±è´¥");
 							}else{
 								System.out.println(g.toString());
 							}
 						} catch (Exception e) {
-							System.out.println("²éÑ¯Å®ÉñĞÅÏ¢Ê§°Ü");
+							System.out.println("æŸ¥è¯¢å¥³ç¥ä¿¡æ¯å¤±è´¥");
 						}
 					} catch (Exception e) {
-						System.out.println("ÇëÊäÈëÕıÈ·µÄÅ®ÉñID£º");
+						System.out.println("è¯·è¾“å…¥æ­£ç¡®çš„å¥³ç¥IDï¼š");
 					}
 					
 				}
@@ -97,20 +97,20 @@ public class View {
 					||OPERATION_ADD.equals(pervious)){
 				pervious=OPERATION_ADD;
 				if(1==step){
-					System.out.println("ÇëÊäÈëÅ®ÉñµÄĞÅÏ¢[ĞÕÃû]£º");
+					System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ä¿¡æ¯[å§“å]ï¼š");
 				}else if(2==step){
 					go=new Goddess();
 					go.setUser_name(in);
-					System.out.println("ÇëÊäÈëÅ®ÉñµÄĞÅÏ¢[ÄêÁä]£º");
+					System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ä¿¡æ¯[å¹´é¾„]ï¼š");
 				}else if(3==step){
 					Integer age=null;
 					try {
 						age = Integer.valueOf(in);
 						go.setAge(age);
-						System.out.println("ÇëÊäÈëÅ®ÉñµÄĞÅÏ¢[ÉúÈÕ£¬¸ñÊ½:2014-12-12]£º");
+						System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ä¿¡æ¯[ç”Ÿæ—¥ï¼Œæ ¼å¼:2014-12-12]ï¼š");
 					} catch (Exception e) {
 						step=2;
-						System.out.println("ÇëÊäÈëÕıÈ·Å®ÉñµÄĞÅÏ¢[ÄêÁä]£º");
+						System.out.println("è¯·è¾“å…¥æ­£ç¡®å¥³ç¥çš„ä¿¡æ¯[å¹´é¾„]ï¼š");
 					}
 				}else if(4==step){
 					SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd");
@@ -118,22 +118,22 @@ public class View {
 					try {
 						birthday = sf.parse(in);
 						go.setBirthday(birthday);
-						System.out.println("ÇëÊäÈëÅ®ÉñµÄĞÅÏ¢[ÓÊÏä]£º");
+						System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ä¿¡æ¯[é‚®ç®±]ï¼š");
 					} catch (Exception e) {
 						step=3;
-						System.out.println("ÇëÊäÈëÕıÈ·Å®ÉñµÄĞÅÏ¢[ÉúÈÕ]£º");
+						System.out.println("è¯·è¾“å…¥æ­£ç¡®å¥³ç¥çš„ä¿¡æ¯[ç”Ÿæ—¥]ï¼š");
 					}
 				}else if(5==step){
 					go.setEmail(in);
-					System.out.println("ÇëÊäÈëÅ®ÉñµÄĞÅÏ¢[ÊÖ»úºÅ]£º");
+					System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ä¿¡æ¯[æ‰‹æœºå·]ï¼š");
 				}else if(6==step){
 					go.setMobile(in);
 					try {
 						action.add(go);
 					} catch (Exception e) {
-						System.out.println("ĞÂÔöÅ®ÉñĞÅÏ¢Ê§°Ü");
+						System.out.println("æ–°å¢å¥³ç¥ä¿¡æ¯å¤±è´¥");
 					}
-					System.out.println("ĞÂÔöÅ®ÉñĞÅÏ¢³É¹¦");
+					System.out.println("æ–°å¢å¥³ç¥ä¿¡æ¯æˆåŠŸ");
 					step=1;
 					pervious=null;
 				}
@@ -145,7 +145,7 @@ public class View {
 					||OPERATION_UPDATE.equals(pervious)){
 				pervious=OPERATION_UPDATE;
 				if(1==step){
-					System.out.println("ÇëÊäÈëÒªĞŞ¸ÄµÄÅ®ÉñID£º");
+					System.out.println("è¯·è¾“å…¥è¦ä¿®æ”¹çš„å¥³ç¥IDï¼š");
 				}else if(2==step){
 					Integer id=null;
 					try {
@@ -153,23 +153,23 @@ public class View {
 						try {
 							go = action.get(id);
 							if(go==null){
-								System.out.println("²éÑ¯Å®ÉñĞÅÏ¢Ê§°Ü");
+								System.out.println("æŸ¥è¯¢å¥³ç¥ä¿¡æ¯å¤±è´¥");
 								step=1;
 							}
 						} catch (Exception e) {
-							System.out.println("²éÑ¯Å®ÉñĞÅÏ¢Ê§°Ü");
+							System.out.println("æŸ¥è¯¢å¥³ç¥ä¿¡æ¯å¤±è´¥");
 							step=1;
 						}
 					} catch (Exception e) {
-						System.out.println("ÇëÊäÈëÕıÈ·µÄÅ®ÉñID£º");
+						System.out.println("è¯·è¾“å…¥æ­£ç¡®çš„å¥³ç¥IDï¼š");
 						step=1;
 					}
-					System.out.println("ÇëÊäÈëĞÂµÄÅ®ÉñĞÅÏ¢[ĞÕÃû]£¬Èç¹û²»ĞŞ¸Ä¸ÃÖµ£¬ÇëÊäÈë-1£º");
+					System.out.println("è¯·è¾“å…¥æ–°çš„å¥³ç¥ä¿¡æ¯[å§“å]ï¼Œå¦‚æœä¸ä¿®æ”¹è¯¥å€¼ï¼Œè¯·è¾“å…¥-1ï¼š");
 				}else if(3==step){
 					if(-1!=Integer.valueOf(in)){
 						go.setUser_name(in);
 					}
-					System.out.println("ÇëÊäÈëĞÂµÄÅ®ÉñĞÅÏ¢[ÄêÁä]£¬Èç¹û²»ĞŞ¸Ä¸ÃÖµ£¬ÇëÊäÈë-1£º");
+					System.out.println("è¯·è¾“å…¥æ–°çš„å¥³ç¥ä¿¡æ¯[å¹´é¾„]ï¼Œå¦‚æœä¸ä¿®æ”¹è¯¥å€¼ï¼Œè¯·è¾“å…¥-1ï¼š");
 				}else if(4==step){
 					Integer age=null;
 					try {
@@ -177,10 +177,10 @@ public class View {
 						if(-1!=age){
 							go.setAge(age);
 						}
-						System.out.println("ÇëÊäÈëĞÂµÄÅ®ÉñĞÅÏ¢[ÉúÈÕ£¬¸ñÊ½:2014-12-12]£¬Èç¹û²»ĞŞ¸Ä¸ÃÖµ£¬ÇëÊäÈë-1£º");
+						System.out.println("è¯·è¾“å…¥æ–°çš„å¥³ç¥ä¿¡æ¯[ç”Ÿæ—¥ï¼Œæ ¼å¼:2014-12-12]ï¼Œå¦‚æœä¸ä¿®æ”¹è¯¥å€¼ï¼Œè¯·è¾“å…¥-1ï¼š");
 					} catch (Exception e) {
 						step=3;
-						System.out.println("ÇëÊäÈëÕıÈ·Å®ÉñµÄĞÅÏ¢[ÄêÁä]£º");
+						System.out.println("è¯·è¾“å…¥æ­£ç¡®å¥³ç¥çš„ä¿¡æ¯[å¹´é¾„]ï¼š");
 					}
 				}else if(5==step){
 					SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd");
@@ -190,16 +190,16 @@ public class View {
 							birthday = sf.parse(in);
 							go.setBirthday(birthday);
 						}
-						System.out.println("ÇëÊäÈëĞÂµÄÅ®ÉñĞÅÏ¢[ÓÊÏä]£¬Èç¹û²»ĞŞ¸Ä¸ÃÖµ£¬ÇëÊäÈë-1£º");
+						System.out.println("è¯·è¾“å…¥æ–°çš„å¥³ç¥ä¿¡æ¯[é‚®ç®±]ï¼Œå¦‚æœä¸ä¿®æ”¹è¯¥å€¼ï¼Œè¯·è¾“å…¥-1ï¼š");
 					} catch (Exception e) {
 						step=4;
-						System.out.println("ÇëÊäÈëÕıÈ·Å®ÉñµÄĞÅÏ¢[ÉúÈÕ]£º");
+						System.out.println("è¯·è¾“å…¥æ­£ç¡®å¥³ç¥çš„ä¿¡æ¯[ç”Ÿæ—¥]ï¼š");
 					}
 				}else if(6==step){
 					if(-1!=Integer.valueOf(in)){
 						go.setEmail(in);
 					}
-					System.out.println("ÇëÊäÈëĞÂµÄÅ®ÉñĞÅÏ¢[ÊÖ»úºÅ]£¬Èç¹û²»ĞŞ¸Ä¸ÃÖµ£¬ÇëÊäÈë-1£º");
+					System.out.println("è¯·è¾“å…¥æ–°çš„å¥³ç¥ä¿¡æ¯[æ‰‹æœºå·]ï¼Œå¦‚æœä¸ä¿®æ”¹è¯¥å€¼ï¼Œè¯·è¾“å…¥-1ï¼š");
 				}else if(7==step){
 					if(-1!=Integer.valueOf(in)){
 						go.setMobile(in);
@@ -207,9 +207,9 @@ public class View {
 					try {
 						action.edit(go);
 					} catch (Exception e) {
-						System.out.println("¸üĞÂÅ®ÉñĞÅÏ¢Ê§°Ü");
+						System.out.println("æ›´æ–°å¥³ç¥ä¿¡æ¯å¤±è´¥");
 					}
-					System.out.println("¸üĞÂÅ®ÉñĞÅÏ¢³É¹¦");
+					System.out.println("æ›´æ–°å¥³ç¥ä¿¡æ¯æˆåŠŸ");
 					step=1;
 					pervious=null;
 				}
@@ -221,7 +221,7 @@ public class View {
 					||OPERATION_DELETE.equals(pervious)){
 				pervious=OPERATION_DELETE;
 				if(1==step){
-					System.out.println("ÇëÊäÈëÒªÉ¾³ıµÄÅ®ÉñID£º");
+					System.out.println("è¯·è¾“å…¥è¦åˆ é™¤çš„å¥³ç¥IDï¼š");
 				}else if(2==step){
 					Integer id=null;
 					try {
@@ -229,12 +229,12 @@ public class View {
 						try {
 							action.del(id);
 							step=1;
-							System.out.println("É¾³ıÅ®ÉñĞÅÏ¢³É¹¦");
+							System.out.println("åˆ é™¤å¥³ç¥ä¿¡æ¯æˆåŠŸ");
 						} catch (Exception e) {
-							System.out.println("É¾³ıÅ®ÉñĞÅÏ¢Ê§°Ü");
+							System.out.println("åˆ é™¤å¥³ç¥ä¿¡æ¯å¤±è´¥");
 						}
 					} catch (Exception e) {
-						System.out.println("ÇëÊäÈëÕıÈ·µÄÅ®ÉñID£º");
+						System.out.println("è¯·è¾“å…¥æ­£ç¡®çš„å¥³ç¥IDï¼š");
 						step=1;
 					}
 				}
@@ -246,7 +246,7 @@ public class View {
 					||OPERATION_SEARCH.equals(pervious)){
 				pervious=OPERATION_SEARCH;
 				if(1==step){
-					System.out.println("ÇëÊäÈëÒª²éÑ¯µÄÅ®ÉñĞÅÏ¢£¬Ö§³ÖĞÕÃû¡¢ÊÖ»úºÅ²éÑ¯£¬Èç¹ûÁ½¸ö²ÎÊı¶¼ÊäÈëÔòÓÃ¶ººÅ·Ö¸ô[user_name=xx,mobile=xx]£º");
+					System.out.println("è¯·è¾“å…¥è¦æŸ¥è¯¢çš„å¥³ç¥ä¿¡æ¯ï¼Œæ”¯æŒå§“åã€æ‰‹æœºå·æŸ¥è¯¢ï¼Œå¦‚æœä¸¤ä¸ªå‚æ•°éƒ½è¾“å…¥åˆ™ç”¨é€—å·åˆ†éš”[user_name=xx,mobile=xx]ï¼š");
 				}else if(2==step){
 					if(in!=null&&in!=""){
 						List<Map<String, Object>> params=new ArrayList<Map<String,Object>>();
@@ -266,7 +266,7 @@ public class View {
 								System.out.println(goddess.toString());
 							}
 						}else{
-							System.out.println("Ã»ÓĞ²éÑ¯µ½Å®ÉñĞÅÏ¢¡£¡£¡£");
+							System.out.println("æ²¡æœ‰æŸ¥è¯¢åˆ°å¥³ç¥ä¿¡æ¯ã€‚ã€‚ã€‚");
 						}
 						step=1;
 					}

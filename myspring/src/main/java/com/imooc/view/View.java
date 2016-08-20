@@ -11,17 +11,17 @@ import com.imooc.model.Goddess;
 
 public class View {
 
-	private static final String CONTEXT="»¶Ó­À´µ½Å®Éñ½ûÇø£º\n" +
-			"ÏÂÃæÊÇÅ®Éñ½ûÇøµÄ¹¦ÄÜÁĞ±í£º\n" +
-			"[MAIN/M]:Ö÷²Ëµ¥\n" +
-			"[QUERY/Q]:²é¿´È«²¿Å®ÉñµÄĞÅÏ¢\n" +
-			"[GET/G]:²é¿´Ä³Î»Å®ÉñµÄÏêÏ¸ĞÅÏ¢\n" +
-			"[ADD/A]:Ìí¼ÓÅ®ÉñĞÅÏ¢\n" +
-			"[UPDATE/U]:¸üĞÂÅ®ÉñĞÅÏ¢\n" +
-			"[DELETE/D]:É¾³ıÅ®ÉñĞÅÏ¢\n" +
-			"[SEARCH/S]:²éÑ¯Å®ÉñĞÅÏ¢(¸ù¾İĞÕÃû¡¢ÊÖ»úºÅÀ´²éÑ¯)\n" +
-			"[EXIT/E]:ÍË³öÅ®Éñ½ûÇø\n" +
-			"[BREAK/B]:ÍË³öµ±Ç°¹¦ÄÜ£¬·µ»ØÖ÷²Ëµ¥";
+	private static final String CONTEXT="æ¬¢è¿æ¥åˆ°å¥³ç¥ç¦åŒºï¼š\n" +
+			"ä¸‹é¢æ˜¯å¥³ç¥ç¦åŒºçš„åŠŸèƒ½åˆ—è¡¨ï¼š\n" +
+			"[MAIN/M]:ä¸»èœå•\n" +
+			"[QUERY/Q]:æŸ¥çœ‹å…¨éƒ¨å¥³ç¥çš„ä¿¡æ¯\n" +
+			"[GET/G]:æŸ¥çœ‹æŸä½å¥³ç¥çš„è¯¦ç»†ä¿¡æ¯\n" +
+			"[ADD/A]:æ·»åŠ å¥³ç¥ä¿¡æ¯\n" +
+			"[UPDATE/U]:æ›´æ–°å¥³ç¥ä¿¡æ¯\n" +
+			"[DELETE/D]:åˆ é™¤å¥³ç¥ä¿¡æ¯\n" +
+			"[SEARCH/S]:æŸ¥è¯¢å¥³ç¥ä¿¡æ¯(æ ¹æ®å§“åã€æ‰‹æœºå·æ¥æŸ¥è¯¢)\n" +
+			"[EXIT/E]:é€€å‡ºå¥³ç¥ç¦åŒº\n" +
+			"[BREAK/B]:é€€å‡ºå½“å‰åŠŸèƒ½ï¼Œè¿”å›ä¸»èœå•";
 
 	private static final String OPERATION_MAIN="MAIN";
 	private static final String OPERATION_QUERY="QUERY";
@@ -36,7 +36,7 @@ public class View {
 	public static void main(String[] args) {
 		
 		System.out.println(CONTEXT);
-		//ÔõÃ´±£³Ö³ÌĞòÒ»Ö±ÔËĞĞ
+		//æ€ä¹ˆä¿æŒç¨‹åºä¸€ç›´è¿è¡Œ
 		
 		Scanner scan=new Scanner(System.in);
 		Goddess goddess=new Goddess();
@@ -47,14 +47,14 @@ public class View {
 			String in=scan.next().toString();
 			if(OPERATION_EXIT.equals(in.toUpperCase())
 					||OPERATION_EXIT.substring(0, 1).equals(in.toUpperCase())){
-				System.out.println("ÄúÒÑ³É¹¦ÍË³öÅ®Éñ½ûÇø¡£");
+				System.out.println("æ‚¨å·²æˆåŠŸé€€å‡ºå¥³ç¥ç¦åŒºã€‚");
 				break;
 			}else if(OPERATION_QUERY.equals(in.toUpperCase())
 					||OPERATION_QUERY.substring(0, 1).equals(in.toUpperCase())){
 				try {
 					List<Goddess> list=action.query();
 					for (Goddess go : list) {
-						System.out.println(go.getId()+",ĞÕÃû£º"+go.getUser_name());
+						System.out.println(go.getId()+",å§“åï¼š"+go.getUser_name());
 					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -66,47 +66,47 @@ public class View {
 					||OPERATION_ADD.substring(0, 1).equals(in.toUpperCase())
 					||OPERATION_ADD.equals(prenious)){
 				prenious=OPERATION_ADD;
-				//ĞÂÔöÅ®Éñ
+				//æ–°å¢å¥³ç¥
 				
 				if(1==step){
-					System.out.println("ÇëÊäÈëÅ®ÉñµÄ£ÛĞÕÃû£İ");
+					System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ï¼»å§“åï¼½");
 				}else if(2==step){
 					goddess.setUser_name(in);
-					System.out.println("ÇëÊäÈëÅ®ÉñµÄ£ÛÄêÁä£İ");
+					System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ï¼»å¹´é¾„ï¼½");
 				}else if(3==step){
 					goddess.setAge(Integer.valueOf(in));
-					System.out.println("ÇëÊäÈëÅ®ÉñµÄ£ÛÉúÈÕ£İ£¬¸ñÊ½Èç£ºyyyy-MM-dd");
+					System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ï¼»ç”Ÿæ—¥ï¼½ï¼Œæ ¼å¼å¦‚ï¼šyyyy-MM-dd");
 				}else if(4==step){
 					SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd");
 					Date birthday=null;
 					try {
 						birthday = sf.parse(in);
 						goddess.setBirthday(birthday);
-						System.out.println("ÇëÊäÈëÅ®ÉñµÄ£ÛÓÊÏä£İ");
+						System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ï¼»é‚®ç®±ï¼½");
 					} catch (ParseException e) {
 						e.printStackTrace();
-						System.out.println("ÄúÊäÈëµÄ¸ñÊ½ÓĞÎó£¬ÇëÖØĞÂÊäÈë");
+						System.out.println("æ‚¨è¾“å…¥çš„æ ¼å¼æœ‰è¯¯ï¼Œè¯·é‡æ–°è¾“å…¥");
 						step=3;
 					}
 				}else if(5==step){
 					goddess.setEmail(in);
-					System.out.println("ÇëÊäÈëÅ®ÉñµÄ£ÛÊÖ»úºÅ£İ");
+					System.out.println("è¯·è¾“å…¥å¥³ç¥çš„ï¼»æ‰‹æœºå·ï¼½");
 				}else if(6==step){
 					goddess.setMobile(in);
 					
 					try {
 						action.add(goddess);
-						System.out.println("ĞÂÔöÅ®Éñ³É¹¦");
+						System.out.println("æ–°å¢å¥³ç¥æˆåŠŸ");
 					} catch (Exception e) {
 						e.printStackTrace();
-						System.out.println("ĞÂÔöÅ®ÉñÊ§°Ü");
+						System.out.println("æ–°å¢å¥³ç¥å¤±è´¥");
 					}
 				}
 				if(OPERATION_ADD.equals(prenious)){
 					step++;					
 				}
 			}else{
-				System.out.println("ÄúÊäÈëµÄÖµÎª:"+in);				
+				System.out.println("æ‚¨è¾“å…¥çš„å€¼ä¸º:"+in);				
 			}
 			
 		}

@@ -14,9 +14,9 @@ public class DBUtil {
 	
 	static {
 		try {
-			//1.加载驱动程序
+			//1.鍔犺浇椹卞姩绋嬪簭
 			Class.forName("com.mysql.jdbc.Driver");
-			//2.获得数据库的连接
+			//2.鑾峰緱鏁版嵁搴撶殑杩炴帴
 			conn=DriverManager.getConnection(URL, USER, PASSWORD);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();

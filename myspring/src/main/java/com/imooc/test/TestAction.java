@@ -13,11 +13,11 @@ public class TestAction {
 
 	public static void main(String[] args) throws Exception {
 		GoddessAction action=new GoddessAction();
-		/*查询*/
+		/*鏌ヨ*/
 		/**/
 		Goddess g=new Goddess();
 		
-		g.setUser_name("小青");
+		g.setUser_name("灏忛潚");
 		g.setSex(1);
 		g.setAge(25);
 		g.setBirthday(new Date());
@@ -37,7 +37,7 @@ public class TestAction {
 		
 		map.put("name", "user_name");
 		map.put("rela", "=");
-		map.put("value", "'小美'");
+		map.put("value", "'灏忕編'");
 		
 		params.add(map);
 		
