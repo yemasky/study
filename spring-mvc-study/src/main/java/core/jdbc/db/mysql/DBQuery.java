@@ -759,7 +759,8 @@ public class DBQuery extends ConnectionPoolManager {
 			int i = 0, limit = 0, base = 0;
 			while ((limit = sqlTemplate.indexOf('?', limit)) != -1) {
 				t.append(sqlTemplate.substring(base, limit));
-				t.append("'" + parameterValues[i] + "'");
+				//t.append("'" + parameterValues[i] + "'");
+				t.append(String.format("%s", parameterValues[i]));
 				i++;
 				limit++;
 				base = limit;
