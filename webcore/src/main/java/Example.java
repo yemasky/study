@@ -21,7 +21,7 @@ import core.jdbc.mysql.DBQuery;
  * @author admin
  *
  */
-public class test {
+public class Example {
 
 	/**
 	 * @param args
