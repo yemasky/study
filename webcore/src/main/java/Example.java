@@ -2,16 +2,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bxg.dual.student.web.model.ExampleUser;
-import com.bxg.dual.student.web.model.ExampleUser2;
+import com.bxg.dual.student.model.ExampleUser;
+import com.bxg.dual.student.model.ExampleUser2;
 
 import core.jdbc.mysql.DBQuery;
-
-
-
-/**
- * 
- */
 
 /**
  * @author admin
@@ -29,7 +23,6 @@ public class Example {
 		HashMap<String, Object> whereData = new HashMap<String, Object>();
 		whereData.put("uid", "2");
 		
-
 		List<Map<String, Object>> DDIV = DBQuery.instance(jdbcDsn).table("ExampleUser").where(whereData).getList();
 		System.out.println(DDIV.size());
 		if(DDIV.size() > 0) System.out.println(DDIV.get(0).get("uid"));
@@ -69,8 +62,6 @@ public class Example {
 		
 		//LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 	    //StatusPrinter.print(lc);
-		
-
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.bxg.dual.student.web.model;
+package com.bxg.dual.student.model;
 
 public class ExampleUser2 {
 	private String uid;
