@@ -31,10 +31,10 @@ public class ExampleController extends AbstractController {
 	
 	@RequestMapping(value = "/user/{userid}")
 	@ResponseBody
-	public ExampleUser queryUser(@PathVariable("userid") String userID, ModelMap model) {
+	public ExampleUser queryUser(@PathVariable("userid") int userID, ModelMap model) {
 		ExampleUser u = new ExampleUser();
-		u.setUserId(userID);
-		u.setUserName("zhaoyang");
+		u.setUid(userID);
+		u.setUsername("zhaoyang");
 		model.addAttribute("User", u);
 		return u;
 	}

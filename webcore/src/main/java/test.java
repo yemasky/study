@@ -4,6 +4,9 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import com.bxg.dual.student.web.model.ExampleUser;
+import com.bxg.dual.student.web.model.ExampleUser2;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
 import core.jdbc.mysql.DBQuery;
@@ -38,37 +41,40 @@ public class test {
 		String jdbcDsn = "test";
 		HashMap<String, Object> whereData = new HashMap<String, Object>();
 		whereData.put("uid", "2");
-		whereData.put("username", "222");
+		//whereData.put("username", "222");
 		//whereData.put("username", "11");
-		List<Map<String, Object>> DDIV = DBQuery.instance(jdbcDsn).table("users").where(whereData).getList();
+		List<Map<String, Object>> DDIV = DBQuery.instance(jdbcDsn).table("ExampleUser").where(whereData).getList();
 		System.out.println(DDIV.size());
 		if(DDIV.size() > 0) System.out.println(DDIV.get(0).get("uid"));
+		
+		ExampleUser user = (ExampleUser) DBQuery.instance(jdbcDsn).table(ExampleUser.class).where(whereData).getEntity();
+		if(user != null)System.out.println(user.getUid());
 		
 		HashMap<String, String> insertData = new HashMap<String, String>();
 		insertData.put("username", "1122");
 		insertData.put("password", "111111");
-		DBQuery.instance(jdbcDsn).table("users").setInsertData(insertData).insert();
+		DBQuery.instance(jdbcDsn).table("ExampleUser").setInsertData(insertData).insert();
 		
 		HashMap<String, String> updateData = new HashMap<String, String>();
 		updateData.put("username", "11223333");
 		updateData.put("password", "111111");
-		DBQuery.instance(jdbcDsn).table("users").where(whereData).setUpdateData(updateData).update();
+		DBQuery.instance(jdbcDsn).table("ExampleUser").where(whereData).setUpdateData(updateData).update();
 		
-		DBQuery.instance(jdbcDsn).table("users").where(whereData).setUpdateData(updateData).update();
+		DBQuery.instance(jdbcDsn).table("ExampleUser").where(whereData).setUpdateData(updateData).update();
 		updateData.put("username", "11223333'");
-		DBQuery.instance(jdbcDsn).table("users").where(whereData).setUpdateData(updateData).update();
+		DBQuery.instance(jdbcDsn).table("ExampleUser").where(whereData).setUpdateData(updateData).update();
 		
-		DDIV = DBQuery.instance(jdbcDsn).table("users").where(whereData).getList();
+		DDIV = DBQuery.instance(jdbcDsn).table("ExampleUser").where(whereData).getList();
 		
-		List<Users> ss = DBQuery.instance(jdbcDsn).table(Users.class).where(whereData).getEntityList();
+		List<ExampleUser> ss = DBQuery.instance(jdbcDsn).table(ExampleUser.class).where(whereData).getEntityList();
 		if(ss.size() > 0) System.out.println(ss.get(0).getUsername());
 		
-		Users aaa = new Users();
+		ExampleUser aaa = new ExampleUser();
 		aaa.setPassword("111");
 		aaa.setUsername("233");
 		DBQuery.instance(jdbcDsn).insert(aaa);
 		
-		Users2 aaa2 = new Users2();
+		ExampleUser2 aaa2 = new ExampleUser2();
 		aaa2.setUid(core.util.Encrypt.getRandomUUID());
 		aaa2.setPassword("111");
 		aaa2.setUsername("2323");

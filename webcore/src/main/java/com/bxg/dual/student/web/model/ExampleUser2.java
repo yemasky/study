@@ -1,15 +1,15 @@
 package com.bxg.dual.student.web.model;
 
-public class ExampleUser {
-	private int uid;
+public class ExampleUser2 {
+	private String uid;
 	private String username;
 	private String password;
 
-	public int getUid() {
+	public String getUid() {
 		return uid;
 	}
 
-	public void setUid(int uid) {
+	public void setUid(String uid) {
 		this.uid = uid;
 	}
 

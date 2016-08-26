@@ -13,6 +13,10 @@ public abstract class AbstractController {
 	public abstract void check(HttpServletRequest request, HttpServletResponse response);
 
 	public abstract void service(HttpServletRequest request, HttpServletResponse response);
+	
+	public void checkLogin(HttpServletRequest request, HttpServletResponse response){
+		
+	}
 
 	@ModelAttribute
 	public void excuse(HttpServletRequest request, HttpServletResponse response) {

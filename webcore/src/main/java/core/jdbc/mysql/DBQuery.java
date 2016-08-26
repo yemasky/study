@@ -350,6 +350,12 @@ public class DBQuery {
 			throw new SQLException("this.entityClass is null");
 		return (List<T>) getEntityList(this.entityClass, this.sql());
 	}
+	
+	public <T> T getEntity() throws SQLException {
+		List<T> entityList = this.getEntityList();
+		if(entityList.size() > 0) return entityList.get(0);
+		return null;
+	}
 
 	private <T> List<T> getEntityList(Class<T> entityClassT, String sql) throws SQLException {
 		List<T> list = new ArrayList<T>();
