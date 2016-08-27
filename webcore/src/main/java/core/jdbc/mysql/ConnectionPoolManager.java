@@ -56,7 +56,7 @@ public class ConnectionPoolManager {
 				success = false;
 			}
 			if(!success) {
-				throw new SQLException("连接出错.");
+				throw new SQLException("数据库连接出错，请检查数据库连接.");
 			}
 		}
 		instances.put("instances", instance);
