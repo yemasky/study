@@ -27,7 +27,7 @@ public class Example {
 		System.out.println(DDIV.size());
 		if(DDIV.size() > 0) System.out.println(DDIV.get(0).get("uid"));
 		
-		ExampleUser user = (ExampleUser) DBQuery.instance(jdbcDsn).table(ExampleUser.class).where(whereData).getEntity();
+		ExampleUser user = DBQuery.instance(jdbcDsn).table(ExampleUser.class).where(whereData).getEntity();
 		if(user != null)System.out.println(user.getUid());
 		
 		HashMap<String, String> insertData = new HashMap<String, String>();

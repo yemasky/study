@@ -265,7 +265,7 @@ public class DBQuery {
 					whereSQL.append(" AND " + fieldkey + " IN( ? ) ");
 				} else if (key.equals(whereRelation.LIKE)) {
 					whereSQL.append(" AND " + fieldkey + " LIKE('%?%') ");
-				}else {
+				} else {
 					whereSQL.append(" AND " + fieldkey + " " + key + " ? ");
 				}
 			}
@@ -298,8 +298,7 @@ public class DBQuery {
 		return this.getList(sql);
 	}
 
-	private List<Map<String, Object>> getList(String sql, Object... paramters)
-			throws SQLException {
+	private List<Map<String, Object>> getList(String sql, Object... paramters) throws SQLException {
 		if (this.cacheTime > 0) {
 			String key = Encrypt.md5Lower(sql + paramters.toString() + this.jdbcDsn);
 			List<Map<String, Object>> listCache = DBCache.instance().get(key);
@@ -350,10 +349,11 @@ public class DBQuery {
 			throw new SQLException("this.entityClass is null");
 		return (List<T>) getEntityList(this.entityClass, this.sql());
 	}
-	
+
 	public <T> T getEntity() throws SQLException {
 		List<T> entityList = this.getEntityList();
-		if(entityList.size() > 0) return entityList.get(0);
+		if (entityList.size() > 0)
+			return entityList.get(0);
 		return null;
 	}
 
@@ -377,7 +377,7 @@ public class DBQuery {
 		} finally {
 			rs.close();
 		}
-		return list;
+		return (List<T>) list;
 	}
 
 	public Object getOne() throws SQLException, InterruptedException {
