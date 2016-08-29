@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 public abstract class AbstractController {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected HttpServletRequest request;
+	protected HttpServletResponse response;
 	
 	public abstract void check(HttpServletRequest request, HttpServletResponse response);
 
@@ -19,8 +21,10 @@ public abstract class AbstractController {
 	}
 
 	@ModelAttribute
-	public void excuse(HttpServletRequest request, HttpServletResponse response) {
-		this.check(request, response);
-		this.service(request, response);
+	public void excuse(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+		this.request = httpRequest;
+		this.response = httpResponse;
+		this.check(this.request, this.response);
+		this.service(this.request, this.response);
 	}
 }
