@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.bxg.dual.api.UsercenterApi;
+import com.web.api.UsercenterApi;
 
 @Controller
 public class UserLoginController extends AbstractController {

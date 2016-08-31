@@ -1,4 +1,4 @@
-package com.bxg.dual.api;
+package com.web.api;
 
 import java.sql.SQLException;
 import java.util.List;

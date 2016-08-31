@@ -1,4 +1,4 @@
-package com.bxg.dual.api;
+package com.web.api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
