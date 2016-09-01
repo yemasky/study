@@ -2,8 +2,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bxg.dual.student.model.ExampleUser;
-import com.bxg.dual.student.model.ExampleUser2;
+import com.web.model.ExampleUser;
+import com.web.model.ExampleUser2;
 
 import core.jdbc.mysql.DBQuery;
 

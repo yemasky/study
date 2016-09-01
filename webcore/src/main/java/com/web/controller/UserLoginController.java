@@ -1,4 +1,4 @@
-package com.bxg.dual.student.web.controller;
+package com.web.controller;
 
 import java.sql.SQLException;
 

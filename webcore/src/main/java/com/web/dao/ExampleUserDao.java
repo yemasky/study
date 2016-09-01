@@ -1,4 +1,4 @@
-package com.bxg.dual.student.dao;
+package com.web.dao;
 
 public class ExampleUserDao {
 

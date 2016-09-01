@@ -1,4 +1,4 @@
-package com.bxg.dual.student.web.controller;
+package com.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

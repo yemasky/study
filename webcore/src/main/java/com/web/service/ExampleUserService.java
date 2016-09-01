@@ -1,4 +1,4 @@
-package com.bxg.dual.student.web.service;
+package com.web.service;
 
 public abstract class ExampleUserService {
 

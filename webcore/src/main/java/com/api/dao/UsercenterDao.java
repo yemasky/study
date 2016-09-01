@@ -1,4 +1,4 @@
-package com.bxg.dual.api.dao;
+package com.api.dao;
 
 import java.sql.SQLException;
 import java.util.HashMap;
