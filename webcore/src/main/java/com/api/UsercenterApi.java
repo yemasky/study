@@ -1,4 +1,4 @@
-package com.web.api;
+package com.api;
 
 import java.sql.SQLException;
 import java.util.List;
