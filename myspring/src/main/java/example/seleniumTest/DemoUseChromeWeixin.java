@@ -49,7 +49,7 @@ public class DemoUseChromeWeixin {
 		// 创建一个WebDriver实例
 		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		ChromeOptions options = new ChromeOptions();
-		// options.addArguments("start-maximized");
+		options.addArguments("start-maximized");//最大化
 
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);

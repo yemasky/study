@@ -63,7 +63,7 @@ public class Write {
 				for (Iterator<Entry<String, Object>> propertyIterator = mapHead.entrySet().iterator(); propertyIterator
 						.hasNext();) {
 					Entry<String, Object> propertyEntry = propertyIterator.next();
-					System.out.println(row.get(propertyEntry.getKey()));
+					//System.out.println(row.get(propertyEntry.getKey()));
 					//csvFileOutputStream.write((String) BeanUtils.getProperty(row, (String) propertyEntry.getKey()));
 					csvFileOutputStream.write((String) row.get(propertyEntry.getKey()));
 					if (propertyIterator.hasNext()) {
