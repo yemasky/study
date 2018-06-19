@@ -2,10 +2,10 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
         http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
-	<display-name>Student Web Application</display-name>
+	<display-name>OTAService Web Application</display-name>
 	<context-param>
 		<param-name>webAppRootKey</param-name>
-		<param-value>dual.student</param-value>
+		<param-value>OTA.Service</param-value>
 	</context-param>
 
 	<context-param>

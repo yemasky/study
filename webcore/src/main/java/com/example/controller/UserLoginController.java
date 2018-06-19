@@ -1,4 +1,4 @@
-package com.web.controller;
+package com.example.controller;
 
 import java.sql.SQLException;
 
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.api.UsercenterApi;
+import com.base.controller.AbstractController;
 
 @Controller
 public class UserLoginController extends AbstractController {

@@ -51,7 +51,7 @@ public class DBQuery {
 	private static Map<String, DBQuery> instances = new HashMap<String, DBQuery>();
 
 	public DBQuery(String jdbcDsn) throws SQLException {
-		super();
+		//super();
 		this.jdbcDsn = jdbcDsn;
 	}
 
@@ -171,6 +171,8 @@ public class DBQuery {
 			break;
 		case LIKE:
 			break;
+		case MATCH:
+			break;
 		default:
 			throw new SQLException("没有输入合适的where条件.");
 		}
@@ -233,6 +235,9 @@ public class DBQuery {
 				case LIKE:
 					relation = whereRelation.LIKE;
 					break;
+				case MATCH:
+					relation = whereRelation.MATCH;
+					break;
 				default:
 					throw new SQLException("没有输入合适的where条件.");
 				}
@@ -257,6 +262,8 @@ public class DBQuery {
 					whereSQL.append(fieldkey + " IN( ? ) ");
 				} else if (key.equals(whereRelation.LIKE)) {
 					whereSQL.append(fieldkey + " LIKE('%?%') ");
+				} else if (key.equals(whereRelation.MATCH)) {
+					whereSQL.append("MATCH (" + fieldkey + ") AGAINST (?) ");
 				} else {
 					whereSQL.append(fieldkey + " " + key + " ? ");
 				}
@@ -265,6 +272,8 @@ public class DBQuery {
 					whereSQL.append(" AND " + fieldkey + " IN( ? ) ");
 				} else if (key.equals(whereRelation.LIKE)) {
 					whereSQL.append(" AND " + fieldkey + " LIKE('%?%') ");
+				} else if (key.equals(whereRelation.MATCH)) {
+					whereSQL.append(" AND MATCH (" + fieldkey + ") AGAINST (?) ");
 				} else {
 					whereSQL.append(" AND " + fieldkey + " " + key + " ? ");
 				}
@@ -983,6 +992,11 @@ class whereRelation {
 	 * like
 	 */
 	public static final String LIKE = "LIKE";
+	
+	/**
+	 * MATCH
+	 */
+	public static final String MATCH = "MATCH";
 }
 
 enum whereCriteria {
@@ -1024,5 +1038,9 @@ enum whereCriteria {
 	/**
 	 * like
 	 */
-	LIKE;
+	LIKE,
+	/**
+	 * MATCH
+	 */
+	MATCH;
 }

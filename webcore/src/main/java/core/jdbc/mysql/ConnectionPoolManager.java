@@ -1,6 +1,6 @@
 /***********************************************************************  
  *  
- *   @package：jdbc.db.mysql,@class-name：ConnectionPoolManager.java  
+ *   @package：core.jdbc.mysql,@class-name：ConnectionPoolManager.java  
  *   
  *   受到法律的保护，任何公司或个人，未经授权不得擅自拷贝。   
  *   @copyright       Copyright:   2016-2018     
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+//import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -197,7 +198,7 @@ public class ConnectionPoolManager {
 		while (it.hasNext()) {
 			key = (String) it.next();
 			value = properties.getProperty(key);
-			//logger.info("loading config: key->" + key + ", value->" + value);
+			logger.info("loading config: key->" + key + ", value->" + value);
 			String[] keyArray = key.split("\\.");
 			String[] valueArray = value.substring(value.indexOf("?") + 1).split("&");
 			if (keyArray.length > 3 && valueArray.length > 0) {
@@ -253,7 +254,7 @@ public class ConnectionPoolManager {
 			for(String excuteName : drivers.get(driverName).keySet()) {
 				for(String pollingName : drivers.get(driverName).get(excuteName).keySet()) {
 					Config config = drivers.get(driverName).get(excuteName).get(pollingName);
-					this.createPools(config);
+					this.createPools(config);//创建连接池
 				}
 			}
 		}

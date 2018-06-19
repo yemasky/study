@@ -1,6 +1,6 @@
 /***********************************************************************  
  *  
- *   @package：jdbc.db.mysql,@class-name：ConnectionPool.java  
+ *   @package：core.jdbc.mysql,@class-name：ConnectionPool.java  
  *   
  *   受到法律的保护，任何公司或个人，未经授权不得擅自拷贝。   
  *   @copyright       Copyright:   2016-2018     
@@ -12,10 +12,12 @@ package core.jdbc.mysql;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Connection;
@@ -29,7 +31,7 @@ import java.io.PrintWriter;
  *
  */
 public class ConnectionPool implements DataSource {
-	private final Logger logger = Logger.getLogger("jdbc.db.mysql.ConnectionPool");
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final String dirverClassName = "com.mysql.jdbc.Driver";
 	private Config config = null;
 	// 连接池
@@ -61,7 +63,7 @@ public class ConnectionPool implements DataSource {
 			Connection connection = null;
 			for (int i = 0; i < config.getMinConnection(); i++) {
 				connection = createConnection();
-				pool.get(config.getConnectionName()).addLast(connection);
+				if(connection != null) pool.get(config.getConnectionName()).addLast(connection);
 			}
 		}
 	}
@@ -135,8 +137,17 @@ public class ConnectionPool implements DataSource {
 		connection.close();
 	}
 
-	private Connection createConnection() throws SQLException {
-		return (Connection) DriverManager.getConnection(config.getDbDsn());
+	private Connection createConnection() {
+		Connection thisConnection = null;
+		try {
+			DriverManager.setLoginTimeout(3);
+			thisConnection = DriverManager.getConnection(config.getDbDsn());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			logger.error("数据库连接失败：" + config.getDbDsn(), e);
+			e.printStackTrace();
+		}
+		return thisConnection;
 	}
 
 	public PrintWriter getLogWriter() throws SQLException {
@@ -162,7 +173,7 @@ public class ConnectionPool implements DataSource {
 		return false;
 	}
 
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+	public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		// TODO Auto-generated method stub
 		throw new SQLFeatureNotSupportedException();
 	}

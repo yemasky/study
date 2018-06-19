@@ -1,5 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/2002/xmlspec/dtd/2.10/xmlspec.dtd">
 <configuration debug="true">
-	<property name="USER_HOME" value="./logs/" />
+	<property name="USER_HOME" value="E:/workspace/otaService/logs/" />
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d %contextName [%t] %level %logger{36} - %msg%n</pattern>
@@ -7,7 +9,7 @@
 	</appender>
 
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-		<file>${USER_HOME}/dual.student.log</file>
+		<file>${USER_HOME}com.web.log</file>
 		<encoder>
 			<pattern>%d %-5level %logger{35} [%file:%line] - %msg %n</pattern>
 		</encoder>
