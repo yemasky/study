@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/2002/xmlspec/dtd/2.10/xmlspec.dtd">
+<configuration debug="true">
+	<property name="USER_HOME" value="E:/logs/mp_enterprise/" />
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d %contextName [%t] %level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<timestamp key="log_date" datePattern="yyyyMMdd"/>
+	<appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<discriminator>
+	      <key>APP_NAME</key>
+	      <defaultValue>web_app</defaultValue>
+	    </discriminator>	
+	    <sift>
+			<appender name="FILE-${APP_NAME}" class="ch.qos.logback.core.FileAppender">
+				<file>${USER_HOME}com.${APP_NAME}.${log_date}.log</file>
+				<append>false</append>
+				<layout class="ch.qos.logback.classic.PatternLayout">
+					<pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
+				</layout>
+				<!-- <encoder><pattern>%d %-5level %logger{35} [%file:%line] - %msg %n</pattern></encoder> -->
+			</appender>
+		</sift>
+	</appender>
+
+	<root level="debug">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="SIFT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>
