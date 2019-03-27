@@ -1,7 +1,9 @@
 package com.base.controller;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,12 +12,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
+import core.util.Cookies;
+
 public abstract class AbstractController {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected static XmlMapper xml = new XmlMapper();
 	protected static ObjectMapper mapper = new ObjectMapper();
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
+	protected static HttpSession httpSession;
 
 	public abstract void beforeCheck(HttpServletRequest request, HttpServletResponse response);
 
@@ -31,7 +36,17 @@ public abstract class AbstractController {
 	public void excuseController(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 		this.request = httpRequest;
 		this.response = httpResponse;
+		//为每个用户产生唯一session
+		httpSession = this.request.getSession(true);
 		this.beforeCheck(this.request, this.response);
 	}
-
+	
+	public Cookie getCookie(String name) {
+		return Cookies.getCookie(request, name);
+	}
+	
+	public void setCookie(String name, String value) {
+		Cookies.setCookie(response, name, value);
+	}
+	
 }

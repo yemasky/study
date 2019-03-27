@@ -59,9 +59,9 @@ public class Cookies {
 	 * @param response
 	 * @param name
 	 * @param value
-	 * @param maxValue
+	 * @param maxAge
 	 */
-	public static void setCookie(HttpServletResponse response, String name, String value, int maxValue) {
+	public static void setCookie(HttpServletResponse response, String name, String value, int maxAge) {
 		if (null == name) {
 			return;
 		}
@@ -70,8 +70,8 @@ public class Cookies {
 		}
 		Cookie cookie = new Cookie(name, value);
 		cookie.setPath("/");
-		if (maxValue != 0) {
-			cookie.setMaxAge(maxValue);
+		if (maxAge != 0) {
+			cookie.setMaxAge(maxAge);
 		} else {
 			cookie.setMaxAge(COOKIE_MAX_AGE);
 		}

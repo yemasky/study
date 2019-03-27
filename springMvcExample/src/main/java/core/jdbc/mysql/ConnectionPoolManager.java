@@ -133,6 +133,13 @@ public class ConnectionPoolManager {
 		return connection;
 	}
 
+	//释放连接
+	public void freeConnection(String jdbcDsn, Connection connection) throws SQLException {
+		Config config = this.getConfigByDsn(jdbcDsn);
+		String connectionName = config.getConnectionName();
+		ConnectionPool pool = pools.get(connectionName);// 从名字中获取连接池
+		pool.freeConnection(connection);
+	}
 	/**
 	 * 加载数据库驱动
 	 * 

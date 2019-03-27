@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import com.base.controller.Base;
+
 import core.util.DBCache;
 import core.util.Encrypt;
 
@@ -32,12 +34,12 @@ public class DBQuery {
 	private Class<?> entityClass = null;
 	private String read = "read";
 	private final String write = "write";
-	private Connection readConnection = null;
-	private Connection writeConnection = null;
 	private String jdbcDsn = "test";
 	private boolean isTransaction = false;
 	private boolean isTransactionSuccess = false;
 	private int cacheTime = 0;
+	// 当前使用connection
+	private Map<String, ThreadLocal<Connection>> threadConnection = new HashMap<String, ThreadLocal<Connection>>();
 	private static Map<String, DBQuery> instances = new HashMap<String, DBQuery>();
 	
 	public DBQuery(String jdbcDsn) throws SQLException {
@@ -133,8 +135,7 @@ public class DBQuery {
 		ResultSet rs = null;
 		try {
 			long start = System.currentTimeMillis();
-			this.thisReadConnection();
-			PreparedStatement preparedStatement = this.readConnection.prepareStatement(sql);//
+			PreparedStatement preparedStatement = this.thisReadConnection().prepareStatement(sql);//
 			rs = this.executeForQuery(preparedStatement, paramters);
 			List<Map<String, Object>> list = resultSetToListMap(rs);
 			logger.info("查询耗时：" + (System.currentTimeMillis() - start) + " ms");
@@ -186,8 +187,7 @@ public class DBQuery {
 		ResultSet rs = null;
 		try {
 			list = new ArrayList<T>();
-			this.thisReadConnection();
-			PreparedStatement preparedStatement = this.readConnection.prepareStatement(sql);
+			PreparedStatement preparedStatement = this.thisReadConnection().prepareStatement(sql);
 			logger.debug(sql);
 			rs = this.executeForQuery(preparedStatement, whereRelation.getWhereParamters());
 			ResultSetMetaData rsm = rs.getMetaData();
@@ -225,8 +225,7 @@ public class DBQuery {
 		Object result = null;
 		ResultSet rs = null;
 		try {
-			this.thisReadConnection();
-			PreparedStatement preparedStatement = this.readConnection.prepareStatement(sql);
+			PreparedStatement preparedStatement = this.thisReadConnection().prepareStatement(sql);
 			rs = this.executeForQuery(preparedStatement, whereRelation.getWhereParamters());
 			if (rs.next()) {
 				result = rs.getObject(1);
@@ -255,8 +254,7 @@ public class DBQuery {
 		}
 		String sql = "UPDATE " + this.table_name + " SET " + updateSQL.toString().substring(2) + whereRelation.getWhere();
 		try {
-			this.thisWriteConnection();
-			PreparedStatement preparedStatement = this.writeConnection.prepareStatement(sql);
+			PreparedStatement preparedStatement = this.thisWriteConnection().prepareStatement(sql);
 			logger.info("update sql:" + sql);
 			Object[] paramters = null;
 			int i = 0;
@@ -292,8 +290,7 @@ public class DBQuery {
 	public int delete(WhereRelation whereRelation) throws SQLException, InterruptedException {
 		String sql = "DELETE FROM " + this.table_name + whereRelation.getWhere();
 		try {
-			this.thisWriteConnection();
-			PreparedStatement preparedStatement = this.writeConnection.prepareStatement(sql);
+			PreparedStatement preparedStatement = this.thisWriteConnection().prepareStatement(sql);
 			Object[] paramters = whereRelation.getWhereParamters();
 			if (paramters != null && paramters.length > 0) {
 				for (int i = 0; i < paramters.length; i++) {
@@ -321,7 +318,7 @@ public class DBQuery {
 		int[] result = new int[] {};
 		Statement statement = null;
 		try {
-			statement = this.writeConnection.createStatement();
+			statement = this.thisWriteConnection().createStatement();
 			for (String sql : sqlList) {
 				statement.addBatch(sql);
 			}
@@ -375,8 +372,7 @@ public class DBQuery {
 		ResultSet rs = null;
 		Object result = null;
 		try {
-			this.thisWriteConnection();
-			PreparedStatement preparedStatement = this.writeConnection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+			PreparedStatement preparedStatement = this.thisWriteConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 			if (paramters != null && paramters.length > 0) {
 				for (int i = 0; i < paramters.length; i++) {
 					preparedStatement.setObject(i + 1, paramters[i]);
@@ -429,8 +425,7 @@ public class DBQuery {
 				sqlParamters.deleteCharAt(sqlParamters.length() - 1);
 			}
 			sql.append(") VALUES (").append(sqlParamters).append(")");
-			this.thisWriteConnection();
-			PreparedStatement preparedStatement = this.writeConnection.prepareStatement(sql.toString(),
+			PreparedStatement preparedStatement = this.thisWriteConnection().prepareStatement(sql.toString(),
 					PreparedStatement.RETURN_GENERATED_KEYS);
 			for (int i = 1; i <= valueObj.size(); i++) {
 				preparedStatement.setObject(i, valueObj.get(i - 1));
@@ -517,22 +512,48 @@ public class DBQuery {
 	}
 
 	private Connection thisWriteConnection() throws SQLException {
-		if (this.writeConnection == null || this.writeConnection.isClosed() || !this.writeConnection.isValid(1)) {
-			this.writeConnection = ConnectionPoolManager.instance().getConnection(this.jdbcDsn + "." + this.write);
-			System.out.println("get.writeConnection isClose:" + this.writeConnection.isClosed());
-			
+		String key = this.jdbcDsn + "." + this.write;
+		String threadKey = new Base().getSessionId()+"."+key;
+		Connection connection = null;
+		//取出当前线程的连接
+		if(threadConnection.containsKey(threadKey)) {
+			connection = threadConnection.get(threadKey).get();
+			if(connection != null && connection.isValid(1)) {
+				return connection;
+			}
 		}
-		System.out.println("this.writeConnection isClose:" + this.writeConnection.isClosed());
-		return this.writeConnection;
+		threadConnection.put(threadKey, new ThreadLocal<Connection>());
+		connection =  ConnectionPoolManager.instance().getConnection(key);
+		threadConnection.get(threadKey).set(connection);
+		return connection;
 	}
 	
-	private Connection thisReadConnection() throws SQLException {
-		if (this.readConnection == null || this.readConnection.isClosed() || !this.readConnection.isValid(1)) {
-			this.readConnection = ConnectionPoolManager.instance().getConnection(this.jdbcDsn + "." + this.read);
-			logger.debug("get.readConnection isClose:" + this.readConnection.isClosed());
+	private Connection thisReadConnection() throws SQLException {		
+		String key = this.jdbcDsn + "." + this.read;
+		String threadKey = new Base().getSessionId()+"."+key;
+		Connection connection = null;
+		//取出当前线程的连接
+		if(threadConnection.containsKey(threadKey)) {
+			connection = threadConnection.get(threadKey).get();
+			if(connection != null && connection.isValid(1)) {
+				return connection;
+			}
 		}
-		logger.debug("this.readConnection isClose:" + this.readConnection.isClosed() + ";isValid:" + this.readConnection.isValid(1));
-		return this.readConnection;
+		threadConnection.put(threadKey, new ThreadLocal<Connection>());
+		connection =  ConnectionPoolManager.instance().getConnection(key);
+		threadConnection.get(threadKey).set(connection);
+		return connection;
+	}
+	
+	//释放连接
+	public void freeConnection() throws SQLException {
+		String key = this.jdbcDsn + "." + this.read;
+		String threadKey = new Base().getSessionId()+"."+key;
+		Connection connection = null;
+		if(threadConnection.containsKey(threadKey)) connection = threadConnection.get(threadKey).get();
+		if(connection.isValid(1)) {
+			ConnectionPoolManager.instance().freeConnection(key, connection);
+		}
 	}
 	
 	public boolean isTransaction() {
@@ -541,11 +562,11 @@ public class DBQuery {
 
 	public void setTransaction(boolean isTransaction) throws SQLException {
 		this.isTransaction = isTransaction;
-		if(isTransaction) this.writeConnection.setAutoCommit(false);//开始事务
+		if(isTransaction) this.thisWriteConnection().setAutoCommit(false);//开始事务
 	}
 	
 	public void commit() throws SQLException {
-		this.writeConnection.commit();
+		this.thisWriteConnection().commit();
 	}
 	
 	/**
@@ -554,14 +575,11 @@ public class DBQuery {
 	 * @throws SQLException
 	 */
 	public void rollback() throws SQLException {
-		this.writeConnection.rollback();
+		this.thisWriteConnection().rollback();
 	}
 	
 	public void closeConnection() throws SQLException {
-		if (this.writeConnection == null || this.writeConnection.isClosed()) {
-			return;
-		}
-		this.writeConnection.close();
+		this.thisWriteConnection().close();
 		logger.debug("close connection:"+this.jdbcDsn);
 	}
 	

@@ -151,7 +151,13 @@
 			<artifactId>jedis</artifactId>
 			<version>2.9.0</version>
 		</dependency>
-		
+		<!-- http://rocketmq.apache.org/docs/simple-example/ -->
+		<dependency>
+	        <groupId>org.apache.rocketmq</groupId>
+	        <artifactId>rocketmq-client</artifactId>
+	        <version>4.3.0</version>
+	    </dependency>
+	    
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
