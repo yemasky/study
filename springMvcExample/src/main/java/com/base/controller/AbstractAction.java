@@ -20,7 +20,6 @@ public abstract class AbstractAction {
 	protected HttpServletResponse response;
 	protected Success successType = new Success();
 
-
 	public abstract void check(HttpServletRequest request, HttpServletResponse response);
 
 	public abstract void service(HttpServletRequest request, HttpServletResponse response);

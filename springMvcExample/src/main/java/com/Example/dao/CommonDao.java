@@ -26,4 +26,12 @@ public class CommonDao {
 	public void freeConnection() throws SQLException {
 		DBQuery.instance(Config.test).freeConnection();
 	}
+	
+	public void commit() throws SQLException {
+		DBQuery.instance(Config.test).commit();
+	}
+	
+	public void rollback() throws SQLException {
+		DBQuery.instance(Config.test).rollback();
+	}
 }

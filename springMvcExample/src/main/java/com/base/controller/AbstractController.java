@@ -24,7 +24,7 @@ public abstract class AbstractController {
 
 	public abstract void beforeCheck(HttpServletRequest request, HttpServletResponse response);
 
-	public abstract void afterCheck(HttpServletRequest request, HttpServletResponse response);
+	public abstract void release(HttpServletRequest request, HttpServletResponse response);
 
 	public abstract String defaultAction(HttpServletRequest request, HttpServletResponse response);
 

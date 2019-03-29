@@ -4,11 +4,12 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
+import com.Example.dao.CommonDao;
 import com.Example.dao.ExamplelDao;
 import com.Example.model.Entity.Test;
 import com.Example.service.ExampleService;
 
-public class ExampleServiceImpl implements ExampleService {
+public class ExampleServiceImpl extends CommonDao implements ExampleService {
 
 	@Override
 	public Test geTest(int id) throws SQLException {

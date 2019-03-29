@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,7 +40,10 @@ public class DBQuery {
 	private boolean isTransactionSuccess = false;
 	private int cacheTime = 0;
 	// 当前使用connection
-	private Map<String, ThreadLocal<Connection>> threadConnection = new HashMap<String, ThreadLocal<Connection>>();
+	private Map<String, ThreadLocal<Connection>> threadConnection = null;
+	private Connection writeConnection = null;
+	// 连接池
+	private static Map<String, LinkedList<Connection>> poolConnection = new HashMap<String, LinkedList<Connection>>();
 	private static Map<String, DBQuery> instances = new HashMap<String, DBQuery>();
 	
 	public DBQuery(String jdbcDsn) throws SQLException {
@@ -64,6 +68,7 @@ public class DBQuery {
 		this.field = "*";
 		this.entityClass = null;
 		this.cacheTime = 0;
+		if(this.threadConnection == null) this.threadConnection = new HashMap<String, ThreadLocal<Connection>>();
 		return this;
 	}
 
@@ -513,9 +518,27 @@ public class DBQuery {
 
 	private Connection thisWriteConnection() throws SQLException {
 		String key = this.jdbcDsn + "." + this.write;
-		String threadKey = new Base().getSessionId()+"."+key;
+		String threadKey = key;//new Base().getSessionId()+"."+
 		Connection connection = null;
+		/*if (poolConnection.get(key).size() > 0) {
+			connection = poolConnection.get(key).removeFirst();
+			boolean isValid = connection.isValid(1);
+			logger.info("isValid:" + isValid);
+			if(isValid) {
+				return connection;
+			}
+		} else {
+			return ConnectionPoolManager.instance().getConnection(key);
+		}*/
+		
+		if(this.writeConnection == null || !this.writeConnection.isValid(1)) {
+			this.writeConnection = ConnectionPoolManager.instance().getConnection(key);
+		}
+		if(this.writeConnection.isValid(1)) {
+			return writeConnection;
+		}
 		//取出当前线程的连接
+		System.out.println("取出当前线程的连接:"+threadConnection.hashCode());
 		if(threadConnection.containsKey(threadKey)) {
 			connection = threadConnection.get(threadKey).get();
 			if(connection != null && connection.isValid(1)) {
@@ -528,9 +551,9 @@ public class DBQuery {
 		return connection;
 	}
 	
-	private Connection thisReadConnection() throws SQLException {		
+	private Connection thisReadConnection() throws SQLException {
 		String key = this.jdbcDsn + "." + this.read;
-		String threadKey = new Base().getSessionId()+"."+key;
+		String threadKey = key;//new Base().getSessionId()+"."+
 		Connection connection = null;
 		//取出当前线程的连接
 		if(threadConnection.containsKey(threadKey)) {
@@ -547,12 +570,21 @@ public class DBQuery {
 	
 	//释放连接
 	public void freeConnection() throws SQLException {
-		String key = this.jdbcDsn + "." + this.read;
-		String threadKey = new Base().getSessionId()+"."+key;
-		Connection connection = null;
-		if(threadConnection.containsKey(threadKey)) connection = threadConnection.get(threadKey).get();
-		if(connection.isValid(1)) {
-			ConnectionPoolManager.instance().freeConnection(key, connection);
+		String keyRead = this.jdbcDsn + "." + this.read;
+		String keyWrite = this.jdbcDsn + "." + this.write;
+		String threadKey = new Base().getSessionId()+"."+keyRead;
+		this.freeConnectionPool(threadKey, keyRead);
+		threadKey = new Base().getSessionId()+"."+keyWrite;
+		this.freeConnectionPool(threadKey, keyWrite);
+	}
+	
+	public void freeConnectionPool(String threadKey, String dsnKey) throws SQLException {
+		if(threadConnection.containsKey(threadKey)) {
+			Connection connection = threadConnection.get(threadKey).get();
+			if(connection.isValid(1)) {
+				ConnectionPoolManager.instance().freeConnection(dsnKey, connection);
+			}
+			threadConnection.remove(threadKey);
 		}
 	}
 	

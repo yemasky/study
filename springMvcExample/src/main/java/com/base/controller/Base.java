@@ -12,7 +12,7 @@ public class Base extends AbstractController {
 	}
 
 	@Override
-	public void afterCheck(HttpServletRequest request, HttpServletResponse response) {
+	public void release(HttpServletRequest request, HttpServletResponse response) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -24,9 +24,7 @@ public class Base extends AbstractController {
 	}
 	
 	public String getSessionId() {
-		String aaa = Math.random()+"";
-		//httpSession.getId()
-		System.out.println(aaa);
-		return aaa;
+		System.out.println(httpSession.getId());
+		return httpSession.getId();
 	}
 }

@@ -1,4 +1,4 @@
-package com.Example.controller.action;
+package com.Example.controller.home;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -25,8 +25,7 @@ public class IndexAction extends AbstractAction {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		// TODO Auto-generated method stub
-		String method = request.getParameter("method");
-		if(method == null) method = "";
+		String method = (String) request.getAttribute("method");
 		//
 		switch (method) {
 		case "login":

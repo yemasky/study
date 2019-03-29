@@ -112,7 +112,7 @@ public class ConnectionPool implements DataSource {
 				}
 			}
 			//如果使用达到最大连接返回null
-			if (getUsedPool() == config.getMaxConnection()) {
+			if (getUsedPool() >= config.getMaxConnection()) {
 				return null;
 			}
 			logger.info("新连接: " + config.getConnectionName());

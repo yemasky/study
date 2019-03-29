@@ -29,32 +29,39 @@ public class ExampleController extends AbstractController {
 
 	}
 
-
 	@Override
-	public void afterCheck(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		
+	public void release(HttpServletRequest request, HttpServletResponse response) {
+			
 	}
 
 	@Override
+	@RequestMapping(value = "/**")
 	public String defaultAction(HttpServletRequest request, HttpServletResponse response) {
 		// TODO Auto-generated method stub
-		return null;
+		return "404";
 	}
 
-	@RequestMapping(value = "/test/{action}")
+	@RequestMapping(value = "/run/{module}/{method}")
 	@ResponseBody
-	public Success example(@PathVariable("action") String action) {
+	public Success exampleRun(@PathVariable("module") String module, @PathVariable("method") String method) {
 		try {
 			//String action = request.getParameter("action");
-			if(action == null || action.isEmpty()) action = "index";
+			String action = request.getParameter("action");
+			if (action == null || action.isEmpty())
+				action = "index";
 			action = Alphabetic.instance().ucfirst(action) + "Action"; 
-			Class<?> controllerClass = Class.forName("com.Example.controller.action."+action);
+			if (module == null || module.isEmpty()) {
+				module = "";
+			} else {
+				module = module.toLowerCase() + ".";
+			}
+			request.setAttribute("method", method);
+			Class<?> controllerClass = Class.forName("com.Example.controller."+module+action);
 			Object controllerAction = controllerClass.newInstance();
 
 			Method excute = controllerClass.getMethod("excute", HttpServletRequest.class, HttpServletResponse.class);
 			Object tempObj = excute.invoke(controllerAction, request, response);
-		
+			this.release(request, response);
 			return (Success) tempObj;
 		} catch (Exception e) {
 			MDC.put("APP_NAME", "web_error");

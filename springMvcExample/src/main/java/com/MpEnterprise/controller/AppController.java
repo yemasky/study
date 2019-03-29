@@ -28,7 +28,7 @@ public class AppController extends AbstractController {
 	}
 
 	@Override
-	public void afterCheck(HttpServletRequest request, HttpServletResponse response) {
+	public void release(HttpServletRequest request, HttpServletResponse response) {
 		// TODO Auto-generated method stub
 
 	}
@@ -62,7 +62,7 @@ public class AppController extends AbstractController {
 
 			return (Success) tempObj;
 		} catch (Exception e) {
-			MDC.put("APP_NAME", "web_error");
+			MDC.put("APP_NAME", "web_example_error");
 			logger.error("系统错误", e);
 		}
 		Success successType = new Success();

@@ -108,7 +108,7 @@ public class ConnectionPoolManager {
 		if (connection != null) {
 			logger.info("得到 pool connection.");
 		} else {
-			if (config.getMaxConnection() == pool.getUsedPool()) {
+			if (config.getMaxConnection() >= pool.getUsedPool()) {
 				logger.warning("连接已满,等待0.5秒");
 				if (time == 0)
 					time = System.currentTimeMillis();
