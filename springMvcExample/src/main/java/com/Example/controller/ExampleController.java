@@ -31,7 +31,12 @@ public class ExampleController extends AbstractController {
 
 	@Override
 	public void release(HttpServletRequest request, HttpServletResponse response) {
-			
+		/*try {
+			CommonDao.instance().freeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 	}
 
 	@Override
@@ -64,6 +69,7 @@ public class ExampleController extends AbstractController {
 			this.release(request, response);
 			return (Success) tempObj;
 		} catch (Exception e) {
+			this.release(request, response);
 			MDC.put("APP_NAME", "web_error");
 			logger.error("系统错误", e);
 		}

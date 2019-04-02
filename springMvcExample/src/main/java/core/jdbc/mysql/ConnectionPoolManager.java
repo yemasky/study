@@ -105,7 +105,7 @@ public class ConnectionPoolManager {
 			throw new SQLException("没有取到连接池: " + connectionName);
 		}
 		Connection connection = pool.getConnection();// 从选定的连接池中获得连接
-		if (connection != null) {
+		if (connection != null && connection.isValid(1)) {
 			logger.info("得到 pool connection.");
 		} else {
 			if (config.getMaxConnection() >= pool.getUsedPool()) {
@@ -228,16 +228,6 @@ public class ConnectionPoolManager {
 		}
 		logger.info("创建连接池完毕.");
 		is_init = true;
-	}
-
-	public void releaseAllConnection(String jdbcDsn) throws SQLException {
-		Config config = this.getConfigByDsn(jdbcDsn);
-		String connectionName = config.getConnectionName();
-		ConnectionPool pool = pools.get(connectionName);// 从名字中获取连接池
-		if(pool == null) {
-			throw new SQLException("没有取到连接池: " + connectionName);
-		}
-		pool.releaseAllConnection();
 	}
 	
 	public long getTimeout() {

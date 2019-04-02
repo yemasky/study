@@ -15,15 +15,5 @@ public class CommonDao {
 		return instanceDao;
 	}
 	
-	public void closeTestConnection() throws SQLException {
-		DBQuery.instance(Config.test).closeConnection();
-	}
 	
-	public void closeAllConnection() throws SQLException {
-		DBQuery.instance(Config.test).closeAllConnection();
-	}
-	
-	public void freeConnection() throws SQLException {
-		DBQuery.instance(Config.test).freeConnection();
-	}
 }

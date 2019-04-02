@@ -13,27 +13,28 @@ public class ExampleServiceImpl implements ExampleService {
 	@Override
 	public Test geTest(int id) throws SQLException {
 		// TODO Auto-generated method stub
-		return ExamplelDao.instance().geTest(id);
+		return null;
 	}
 
 	@Override
 	public List<Test> geTest(int[] id) throws SQLException {
 		// TODO Auto-generated method stub
-		return ExamplelDao.instance().geTest(id);
+		return null;
 	}
 
 	@Override
-	public long saveTest(Test test) throws SQLException, Exception {
+	public long saveTest(Test test) throws Exception {
 		// TODO Auto-generated method stub
-		return ExamplelDao.instance().saveTest(test);
+		return 0;
 	}
 
 	@Override
-	public long saveTest(HashMap<String, Object> insertData) throws SQLException {
+	public long saveTest(HashMap<String, Object> insertData) throws Exception {
 		// TODO Auto-generated method stub
-		return ExamplelDao.instance().saveTest(insertData);
+		return 0;
 	}
 
+	
 	
 	
 }

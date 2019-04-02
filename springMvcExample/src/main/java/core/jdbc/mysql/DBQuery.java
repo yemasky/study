@@ -12,7 +12,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,12 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import com.base.controller.Base;
-
 import core.util.DBCache;
 import core.util.Encrypt;
 
-public class DBQuery {
+public abstract class DBQuery {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	private String table_name = "";
 	private Object primary_key = "id";
@@ -39,28 +36,19 @@ public class DBQuery {
 	private boolean isTransaction = false;
 	private boolean isTransactionSuccess = false;
 	private int cacheTime = 0;
+	protected String client_key;
 	// 当前使用connection
-	private Map<String, ThreadLocal<Connection>> threadConnection = null;
 	private Connection writeConnection = null;
-	// 连接池
-	private static Map<String, LinkedList<Connection>> poolConnection = new HashMap<String, LinkedList<Connection>>();
-	private static Map<String, DBQuery> instances = new HashMap<String, DBQuery>();
+	private Connection readConnection = null;
 	
 	public DBQuery(String jdbcDsn) throws SQLException {
 		this.jdbcDsn = jdbcDsn;
+		ConnectionPoolManager.instance();
 	}
 	
-	public static DBQuery instance(String jdbcDsn) throws SQLException {
-		DBQuery instanceDBQuery = null;
-		if (instances.containsKey(jdbcDsn)) {
-			instanceDBQuery = instances.get(jdbcDsn);
-		} else {
-			ConnectionPoolManager.instance();
-			instanceDBQuery = new DBQuery(jdbcDsn);
-			instances.put(jdbcDsn, instanceDBQuery);
-		}
-		instanceDBQuery.emptyProperty();
-		return instanceDBQuery;
+	protected DBQuery setDsn(String jdbcDsn) {
+		this.jdbcDsn = jdbcDsn;
+		return this;
 	}
 
 	public DBQuery emptyProperty() {
@@ -68,7 +56,6 @@ public class DBQuery {
 		this.field = "*";
 		this.entityClass = null;
 		this.cacheTime = 0;
-		if(this.threadConnection == null) this.threadConnection = new HashMap<String, ThreadLocal<Connection>>();
 		return this;
 	}
 
@@ -77,6 +64,22 @@ public class DBQuery {
 		return this;
 	}
 
+	public Connection getWriteConnection() {
+		return this.writeConnection;
+	}
+	
+	public Connection getReadConnection() {
+		return this.readConnection;
+	}
+	
+	public Connection setWriteConnection(Connection writeConnection) {
+		return this.writeConnection = writeConnection;
+	}
+	
+	public Connection setReadConnection(Connection readConnection) {
+		return this.readConnection = readConnection;
+	}
+	
 	public DBQuery table(String table_name) {
 		this.table_name = table_name;
 		return this;
@@ -518,87 +521,44 @@ public class DBQuery {
 
 	private Connection thisWriteConnection() throws SQLException {
 		String key = this.jdbcDsn + "." + this.write;
-		String threadKey = key;//new Base().getSessionId()+"."+
-		Connection connection = null;
-		/*if (poolConnection.get(key).size() > 0) {
-			connection = poolConnection.get(key).removeFirst();
-			boolean isValid = connection.isValid(1);
-			logger.info("isValid:" + isValid);
-			if(isValid) {
-				return connection;
-			}
-		} else {
-			return ConnectionPoolManager.instance().getConnection(key);
-		}*/
-		
 		if(this.writeConnection == null || !this.writeConnection.isValid(1)) {
 			this.writeConnection = ConnectionPoolManager.instance().getConnection(key);
 		}
-		if(this.writeConnection.isValid(1)) {
-			return writeConnection;
-		}
-		//取出当前线程的连接
-		System.out.println("取出当前线程的连接:"+threadConnection.hashCode());
-		if(threadConnection.containsKey(threadKey)) {
-			connection = threadConnection.get(threadKey).get();
-			if(connection != null && connection.isValid(1)) {
-				return connection;
-			}
-		}
-		threadConnection.put(threadKey, new ThreadLocal<Connection>());
-		connection =  ConnectionPoolManager.instance().getConnection(key);
-		threadConnection.get(threadKey).set(connection);
-		return connection;
+		return writeConnection;
 	}
 	
 	private Connection thisReadConnection() throws SQLException {
 		String key = this.jdbcDsn + "." + this.read;
-		String threadKey = key;//new Base().getSessionId()+"."+
-		Connection connection = null;
-		//取出当前线程的连接
-		if(threadConnection.containsKey(threadKey)) {
-			connection = threadConnection.get(threadKey).get();
-			if(connection != null && connection.isValid(1)) {
-				return connection;
-			}
+		if(this.readConnection == null || !this.readConnection.isValid(1)) {
+			this.readConnection = ConnectionPoolManager.instance().getConnection(key);
 		}
-		threadConnection.put(threadKey, new ThreadLocal<Connection>());
-		connection =  ConnectionPoolManager.instance().getConnection(key);
-		threadConnection.get(threadKey).set(connection);
-		return connection;
+		return readConnection;
 	}
 	
 	//释放连接
 	public void freeConnection() throws SQLException {
-		String keyRead = this.jdbcDsn + "." + this.read;
-		String keyWrite = this.jdbcDsn + "." + this.write;
-		String threadKey = new Base().getSessionId()+"."+keyRead;
-		this.freeConnectionPool(threadKey, keyRead);
-		threadKey = new Base().getSessionId()+"."+keyWrite;
-		this.freeConnectionPool(threadKey, keyWrite);
+		if(this.readConnection != null && this.readConnection.isValid(1)) 
+			ConnectionPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.read, this.readConnection);
+		if(this.writeConnection != null && this.writeConnection.isValid(1)) 
+			ConnectionPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.write, this.writeConnection);
 	}
 	
-	public void freeConnectionPool(String threadKey, String dsnKey) throws SQLException {
-		if(threadConnection.containsKey(threadKey)) {
-			Connection connection = threadConnection.get(threadKey).get();
-			if(connection.isValid(1)) {
-				ConnectionPoolManager.instance().freeConnection(dsnKey, connection);
-			}
-			threadConnection.remove(threadKey);
-		}
+	public void freeConnection(String jdbcDsn, Connection connection) throws SQLException {
+		if(connection.isValid(1)) 
+			ConnectionPoolManager.instance().freeConnection(jdbcDsn, connection);
 	}
 	
-	public boolean isTransaction() {
+	protected boolean isTransaction() {
 		return isTransaction;
 	}
 
-	public void setTransaction(boolean isTransaction) throws SQLException {
+	protected void setTransaction(boolean isTransaction) throws SQLException {
 		this.isTransaction = isTransaction;
-		if(isTransaction) this.thisWriteConnection().setAutoCommit(false);//开始事务
+		if(isTransaction) this.writeConnection.setAutoCommit(false);//开始事务
 	}
 	
 	public void commit() throws SQLException {
-		this.thisWriteConnection().commit();
+		this.writeConnection.commit();
 	}
 	
 	/**
@@ -607,23 +567,14 @@ public class DBQuery {
 	 * @throws SQLException
 	 */
 	public void rollback() throws SQLException {
-		this.thisWriteConnection().rollback();
+		this.writeConnection.rollback();
 	}
-	
-	public void closeConnection() throws SQLException {
-		this.thisWriteConnection().close();
-		logger.debug("close connection:"+this.jdbcDsn);
-	}
-	
-	public void closeAllConnection() throws SQLException {
-		ConnectionPoolManager.instance().releaseAllConnection(this.jdbcDsn);
-	}
-	
-	public boolean isTransactionSuccess() {
+			
+	protected boolean isTransactionSuccess() {
 		return isTransactionSuccess;
 	}
 
-	public void setTransactionSuccess(boolean isTransactionSuccess) {
+	protected void setTransactionSuccess(boolean isTransactionSuccess) {
 		this.isTransactionSuccess = isTransactionSuccess;
 	}
 

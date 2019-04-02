@@ -1,6 +1,5 @@
 package com.Example.controller.home;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -23,9 +22,10 @@ public class IndexAction extends AbstractAction {
 	}
 
 	@Override
-	public void service(HttpServletRequest request, HttpServletResponse response) {
+	public void service(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// TODO Auto-generated method stub
 		String method = (String) request.getAttribute("method");
+		if(method == null) method = "";
 		//
 		switch (method) {
 		case "login":
@@ -50,7 +50,7 @@ public class IndexAction extends AbstractAction {
 		this.successType.setErrorCode(ErrorCode.__T_LOGIN);
 	}
 
-	public void doTest(HttpServletRequest request, HttpServletResponse response) {
+	public void doTest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ExampleServiceImpl exampleService = new ExampleServiceImpl();
 		SimpleDateFormat toDay = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		String ssString = toDay.format(System.currentTimeMillis());
@@ -59,27 +59,16 @@ public class IndexAction extends AbstractAction {
 		insertData.put("title", "你好");
 		insertData.put("description", "描述");
 		insertData.put("add_datetime", ssString);
-		try {
-			exampleService.saveTest(insertData);
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		exampleService.saveTest(insertData);
 		
 		Timestamp add_datetime = new Timestamp(System.currentTimeMillis());
 		Test test = new Test();
 		test.setTitle("你好");
 		test.setDescription("描述2");		
 		test.setAdd_datetime(add_datetime);
-		try {
-			exampleService.saveTest(test);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		exampleService.saveTest(test);
+		
+		exampleService.freeConnection();
 		
 		this.successType.setErrorCode(ErrorCode.__T_SUCCESS);
 	}

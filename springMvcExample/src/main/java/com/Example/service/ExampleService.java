@@ -11,7 +11,7 @@ public interface ExampleService {
 	
 	public List<Test> geTest(int[] id) throws SQLException;
 	
-	public long saveTest(Test test) throws SQLException, Exception; 
+	public long saveTest(Test test) throws Exception; 
 
-	public long saveTest(HashMap<String, Object> insertData) throws SQLException; 
+	public long saveTest(HashMap<String, Object> insertData) throws Exception; 
 }

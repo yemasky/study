@@ -8,22 +8,21 @@ import java.util.Map;
 import com.Example.config.Config;
 import com.Example.model.Entity.Test;
 
-import core.jdbc.mysql.DBQuery;
 import core.jdbc.mysql.WhereRelation;
 import core.jdbc.mysql.whereCriteria;
 
-public class ExamplelDao {
-	
-	public static ExamplelDao instance() {
-		return new ExamplelDao();
+public class ExamplelDao extends CommonDao {
+	public ExamplelDao(String jdbcDsn) throws SQLException {
+		super(jdbcDsn);
+		// TODO Auto-generated constructor stub
 	}
-	
+
 	public Test geTest(int id) throws SQLException {
 		HashMap<String, Object> whereSQL = new HashMap<String, Object>();
 		whereSQL.put("id", id);
 		WhereRelation whereRelation = new WhereRelation();
 		whereRelation.where(whereCriteria.EQ, whereSQL);
-		Test test = DBQuery.instance(Config.test).table(Test.class).getEntity(whereRelation);
+		Test test = this.setDsn(Config.test).table(Test.class).getEntity(whereRelation);
 		return test;
 	}
 	
@@ -32,16 +31,16 @@ public class ExamplelDao {
 		whereSQL.put("id", id);
 		WhereRelation whereRelation = new WhereRelation();
 		whereRelation.where(whereCriteria.IN, whereSQL);
-		List<Test> test = DBQuery.instance(Config.test).table(Test.class).getEntityList(whereRelation);
+		List<Test> test = this.setDsn(Config.test).table(Test.class).getEntityList(whereRelation);
 		return test;
 	}
 	
-	public long saveTest(Test test) throws SQLException, Exception {
-		return (long) DBQuery.instance(Config.test).insertIdEntity(test);
+	public long saveTest(Test test) throws Exception {
+		return (long) this.setDsn(Config.test).insertIdEntity(test);
 	}
 	
-	public long saveTest(HashMap<String, Object> insertData) throws SQLException {
-		return (long) DBQuery.instance(Config.test).table("test").insertIdEntity(insertData);
+	public long saveTest(HashMap<String, Object> insertData) throws Exception {
+		return (long) this.setDsn(Config.test).table("test").insertIdEntity(insertData);
 	}
 	
 	//

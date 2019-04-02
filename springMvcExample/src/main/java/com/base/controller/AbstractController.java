@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import core.util.Cookies;
+import core.util.Encrypt;
 
 public abstract class AbstractController {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -20,7 +21,9 @@ public abstract class AbstractController {
 	protected static ObjectMapper mapper = new ObjectMapper();
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
-	protected static HttpSession httpSession;
+	protected HttpSession httpSession;
+	protected final String CLIENT_KEY = "client_key";
+	protected final String SESSION_KEY = "session_key";
 
 	public abstract void beforeCheck(HttpServletRequest request, HttpServletResponse response);
 
@@ -38,6 +41,8 @@ public abstract class AbstractController {
 		this.response = httpResponse;
 		//为每个用户产生唯一session
 		httpSession = this.request.getSession(true);
+		httpRequest.setAttribute(CLIENT_KEY, Encrypt.md5Lower(Encrypt.getRandomUUID() + System.currentTimeMillis() + Math.random()));
+		httpRequest.setAttribute(SESSION_KEY, httpSession);
 		this.beforeCheck(this.request, this.response);
 	}
 	
@@ -49,4 +54,7 @@ public abstract class AbstractController {
 		Cookies.setCookie(response, name, value);
 	}
 	
+	public String getSessionId() {
+		return httpSession.getId();
+	}
 }

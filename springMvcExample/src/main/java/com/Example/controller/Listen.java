@@ -12,13 +12,13 @@ public class Listen implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("ServletContext对象创建");
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("ServletContext对象销毁");
 	}
 
 }

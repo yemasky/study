@@ -22,9 +22,4 @@ public class Base extends AbstractController {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	public String getSessionId() {
-		System.out.println(httpSession.getId());
-		return httpSession.getId();
-	}
 }
