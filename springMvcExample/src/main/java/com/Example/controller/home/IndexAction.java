@@ -13,7 +13,8 @@ import com.base.controller.AbstractAction;
 import com.base.type.ErrorCode;
 
 public class IndexAction extends AbstractAction {
-
+	ExampleServiceImpl exampleService;
+	
 	@Override
 	public void check(HttpServletRequest request, HttpServletResponse response) {
 		// TODO Auto-generated method stub
@@ -41,8 +42,10 @@ public class IndexAction extends AbstractAction {
 	}
 
 	@Override
-	public void release(HttpServletRequest request, HttpServletResponse response) {
+	public void release(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// TODO Auto-generated method stub
+		exampleService.rollback();
+		exampleService.setTransaction(false);
 		
 	}
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -51,7 +54,7 @@ public class IndexAction extends AbstractAction {
 	}
 
 	public void doTest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ExampleServiceImpl exampleService = new ExampleServiceImpl();
+		exampleService = new ExampleServiceImpl();
 		SimpleDateFormat toDay = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		String ssString = toDay.format(System.currentTimeMillis());
 		System.out.println(ssString);

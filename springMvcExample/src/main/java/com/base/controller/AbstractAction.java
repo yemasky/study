@@ -27,7 +27,7 @@ public abstract class AbstractAction {
 
 	public abstract void service(HttpServletRequest request, HttpServletResponse response) throws Exception;
 	// 资源回收 事務回滾
-	public abstract void release(HttpServletRequest request, HttpServletResponse response);
+	public abstract void release(HttpServletRequest request, HttpServletResponse response) throws Exception;
 	
 	public Success doDefault(HttpServletRequest request, HttpServletResponse response) {
 		return successType;
@@ -42,7 +42,13 @@ public abstract class AbstractAction {
 		} catch (Exception e) {
 			successType.setSuccess(false);
 			successType.setErrorCode(ErrorCode.__F_SYS);
-			this.release(request, response);
+			try {
+				this.release(request, response);
+			} catch (Exception ex) {
+				// TODO Auto-generated catch block
+				MDC.put("APP_NAME", "web_error");
+				logger.error(successType.getMessage(), ex);
+			}
 			// TODO Auto-generated catch block
 			MDC.put("APP_NAME", "web_error");
 			logger.error(successType.getMessage(), e);
