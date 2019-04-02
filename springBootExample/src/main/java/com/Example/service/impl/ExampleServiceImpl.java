@@ -18,7 +18,7 @@ public class ExampleServiceImpl extends BaseService implements ExampleService  {
 	}
 	
 	@Override
-	public Test geTest(int id) throws SQLException {
+	public Test geTest(BigInteger id) throws SQLException {
 		// TODO Auto-generated method stub
 		return ((ExamplelDao) this.instanceDao.get(Config.test)).geTest(id);
 	}

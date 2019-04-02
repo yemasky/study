@@ -19,6 +19,7 @@ import com.base.type.Success;
 import core.util.Alphabetic;
 
 @RestController
+@RequestMapping("/example")
 public class ExampleController extends AbstractController {
 
 	@Override
@@ -29,7 +30,6 @@ public class ExampleController extends AbstractController {
 
 	@Override
 	public void release(HttpServletRequest request, HttpServletResponse response) {
-		System.gc();
 	}
 
 	@Override

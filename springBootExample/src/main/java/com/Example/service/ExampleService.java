@@ -8,7 +8,7 @@ import java.util.List;
 import com.Example.model.Entity.Test;
 
 public interface ExampleService {
-	public Test geTest(int id) throws SQLException;
+	public Test geTest(BigInteger id) throws SQLException;
 	
 	public List<Test> geTest(int[] id) throws SQLException;
 	

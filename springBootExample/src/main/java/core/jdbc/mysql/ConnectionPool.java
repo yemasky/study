@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ConnectionPool implements DataSource {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final String dirverClassName = "com.mysql.jdbc.Driver";
+	private final String dirverClassName = "com.mysql.cj.jdbc.Driver";//com.mysql.jdbc.Driver
 	private Config config = null;
 	// 连接池
 	private static Map<String, LinkedList<Connection>> pool = new HashMap<String, LinkedList<Connection>>();
@@ -117,10 +117,13 @@ public class ConnectionPool implements DataSource {
 			/*pConn = new PooledConnection(connection);
 			pConn.setBusy(true);
 			pool.get(config.getConnectionName()).addElement(pConn);*/
-			setUsedPool(getUsedPool()+1);
-			System.out.println("新连接:"+connection.hashCode());
-			// 把当前的连接放到当前的线程
+			// 新连接
 			// 使用的连接++
+			if(connection != null && connection.isValid(1)) {
+				setUsedPool(getUsedPool()+1);
+				System.out.println("新连接:"+connection.hashCode());
+				return connection;
+			}
 
 			return connection;
 		}

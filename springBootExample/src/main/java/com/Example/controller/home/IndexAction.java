@@ -1,5 +1,6 @@
 package com.Example.controller.home;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -44,10 +45,16 @@ public class IndexAction extends AbstractAction {
 	@Override
 	public void release(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// TODO Auto-generated method stub
+		exampleService.freeConnection();
+	}
+
+	@Override
+	public void rollback(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
 		exampleService.rollback();
 		exampleService.setTransaction(false);
-		
 	}
+	
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) {
 		
 		this.successType.setErrorCode(ErrorCode.__T_LOGIN);
@@ -60,9 +67,9 @@ public class IndexAction extends AbstractAction {
 		System.out.println(ssString);
 		HashMap<String, Object> insertData = new HashMap<>();
 		insertData.put("title", "你好");
-		insertData.put("description", "描述");
+		insertData.put("description", "描述"+Math.random());
 		insertData.put("add_datetime", ssString);
-		exampleService.saveTest(insertData);
+		BigInteger id = exampleService.saveTest(insertData);
 		
 		exampleService.setTransaction(true);
 		Timestamp add_datetime = new Timestamp(System.currentTimeMillis());
@@ -73,10 +80,12 @@ public class IndexAction extends AbstractAction {
 		exampleService.saveTest(test);
 		exampleService.rollback();
 		exampleService.setTransaction(false);
-		
-		//exampleService.freeConnection();
+		//
+		test = exampleService.geTest(id);
+		this.successType.setData(test);
 		
 		this.successType.setErrorCode(ErrorCode.__T_SUCCESS);
 	}
+
 	
 }

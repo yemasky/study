@@ -39,7 +39,11 @@
 		    <artifactId>mongo-java-driver</artifactId>
 		    <version>3.10.1</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
-	    
+	    <dependency>
+    		<groupId>com.google.code.findbugs</groupId>
+	    	<artifactId>annotations</artifactId>
+	    	<version>3.0.1</version>
+		</dependency>
     </dependencies>
 
     <properties>

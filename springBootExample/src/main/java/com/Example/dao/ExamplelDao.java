@@ -18,7 +18,7 @@ public class ExamplelDao extends CommonDao {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Test geTest(int id) throws SQLException {
+	public Test geTest(BigInteger id) throws SQLException {
 		HashMap<String, Object> whereSQL = new HashMap<String, Object>();
 		whereSQL.put("id", id);
 		WhereRelation whereRelation = new WhereRelation();
