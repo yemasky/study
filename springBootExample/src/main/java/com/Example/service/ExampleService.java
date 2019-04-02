@@ -1,5 +1,6 @@
 package com.Example.service;
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,7 @@ public interface ExampleService {
 	
 	public List<Test> geTest(int[] id) throws SQLException;
 	
-	public long saveTest(Test test) throws Exception; 
+	public BigInteger saveTest(Test test) throws Exception; 
 
-	public long saveTest(HashMap<String, Object> insertData) throws Exception; 
+	public BigInteger saveTest(HashMap<String, Object> insertData) throws Exception; 
 }

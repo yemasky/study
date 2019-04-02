@@ -131,7 +131,7 @@ public class ConnectionPool implements DataSource {
 		DriverManager.setLoginTimeout(1);
 		try {
 			logger.info("创建mySql连接:" + config.getConnectionName());
-			return DriverManager.getConnection(config.getDbDsn());
+			return DriverManager.getConnection(config.getDbDsn()+"&serverTimezone=UTC");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			logger.error("error createConnection:" + config.getDbDsn() + ":" + config.getConnectionName(), e);

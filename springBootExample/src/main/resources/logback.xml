@@ -28,6 +28,5 @@
 	<root level="debug">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="SIFT" />
-		<appender-ref ref="FILE" />
 	</root>
 </configuration>

@@ -13,7 +13,7 @@ import core.jdbc.mongodb.MongoDbQuery;
 
 class MongoDbQueryTest {
 
-	@Test
+	/*@Test
 	void test() {
 		try {
 			String id = "5c789be27a00128f64ae2a15";
@@ -55,5 +55,5 @@ class MongoDbQueryTest {
 			e.printStackTrace();
 		}
 	}
-
+*/
 }

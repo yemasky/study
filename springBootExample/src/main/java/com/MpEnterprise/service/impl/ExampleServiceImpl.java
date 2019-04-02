@@ -1,10 +1,10 @@
 package com.MpEnterprise.service.impl;
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-import com.Example.dao.ExamplelDao;
 import com.Example.model.Entity.Test;
 import com.Example.service.ExampleService;
 
@@ -23,15 +23,15 @@ public class ExampleServiceImpl implements ExampleService {
 	}
 
 	@Override
-	public long saveTest(Test test) throws Exception {
+	public BigInteger saveTest(Test test) throws Exception {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 	@Override
-	public long saveTest(HashMap<String, Object> insertData) throws Exception {
+	public BigInteger saveTest(HashMap<String, Object> insertData) throws Exception {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 	

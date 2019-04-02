@@ -63,7 +63,7 @@ public class AppController extends AbstractController {
 			return (Success) tempObj;
 		} catch (Exception e) {
 			MDC.put("APP_NAME", "web_example_error");
-			logger.error("系统错误", e);
+			//logger.error("系统错误", e);
 		}
 		Success successType = new Success();
 		successType.setSuccess(false);

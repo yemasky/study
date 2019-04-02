@@ -4,15 +4,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/*import org.slf4j.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;*/
+import org.slf4j.MDC;
 
 import com.base.type.ErrorCode;
 import com.base.type.Success;
 
 public abstract class AbstractAction {
-	//protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected Success successType = new Success();
 	protected final String CLIENT_KEY = "client_key";
 	protected final String SESSION_KEY = "session_key";
@@ -42,12 +42,12 @@ public abstract class AbstractAction {
 				this.release(request, response);
 			} catch (Exception ex) {
 				// TODO Auto-generated catch block
-				//MDC.put("APP_NAME", "web_error");
-				//logger.error(successType.getMessage(), ex);
+				MDC.put("APP_NAME", "web_error");
+				logger.error(successType.getMessage(), ex);
 			}
 			// TODO Auto-generated catch block
-			//MDC.put("APP_NAME", "web_error");
-			//logger.error(successType.getMessage(), e);
+			MDC.put("APP_NAME", "web_error");
+			logger.error(successType.getMessage(), e);
 		}
 		
 		return successType;

@@ -6,10 +6,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.MDC;
-import org.springframework.stereotype.Controller;
+import org.springframework.boot.SpringApplication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.base.controller.AbstractController;
 import com.base.type.ErrorCode;
@@ -17,10 +18,7 @@ import com.base.type.Success;
 
 import core.util.Alphabetic;
 
-//import com.Example.controller.action.*;
-
-@Controller
-@RequestMapping("/example")
+@RestController
 public class ExampleController extends AbstractController {
 
 	@Override
@@ -40,7 +38,11 @@ public class ExampleController extends AbstractController {
 		// TODO Auto-generated method stub
 		return "404";
 	}
-
+	
+	public static void main(String[] args) {
+		SpringApplication.run(ExampleController.class, args);
+	}
+	
 	@RequestMapping(value = "/run/{module}/{method}")
 	@ResponseBody
 	public Success exampleRun(@PathVariable("module") String module, @PathVariable("method") String method) {

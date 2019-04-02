@@ -5,16 +5,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/*import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;*/
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import core.util.Cookies;
 import core.util.Encrypt;
 
-@SpringBootApplication
-@RestController
-public abstract class Application  {
-	//protected Logger logger = LoggerFactory.getLogger(this.getClass());
+public abstract class AbstractController {
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
 	protected HttpSession httpSession;
@@ -26,9 +25,12 @@ public abstract class Application  {
 	public abstract void release(HttpServletRequest request, HttpServletResponse response);
 
 	public abstract String defaultAction(HttpServletRequest request, HttpServletResponse response);
-
 	
+	public AbstractController() {
+	
+	}
 
+	@ModelAttribute
 	public void excuseController(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 		this.request = httpRequest;
 		this.response = httpResponse;

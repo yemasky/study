@@ -1,5 +1,6 @@
 package com.Example.service.impl;
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -29,13 +30,13 @@ public class ExampleServiceImpl extends BaseService implements ExampleService  {
 	}
 
 	@Override
-	public long saveTest(Test test) throws Exception {
+	public BigInteger saveTest(Test test) throws Exception {
 		// TODO Auto-generated method stub
 		return ((ExamplelDao) this.instanceDao.get(Config.test)).saveTest(test);
 	}
 
 	@Override
-	public long saveTest(HashMap<String, Object> insertData) throws Exception {
+	public BigInteger saveTest(HashMap<String, Object> insertData) throws Exception {
 		// TODO Auto-generated method stub
 		return ((ExamplelDao) this.instanceDao.get(Config.test)).saveTest(insertData);
 	}
