@@ -15,11 +15,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.sql.DataSource;
 
@@ -79,7 +77,7 @@ public class ConnectionPool implements DataSource {
 		synchronized (pool.get(config.getConnectionName())) {
 			// 当前线程
 			Connection connection = null;
-			PooledConnection pConn = null;
+			//PooledConnection pConn = null;
 			// 从pool取得连接
 			if (pool.get(config.getConnectionName()).size() > 0) {
 				connection = pool.get(config.getConnectionName()).removeFirst();

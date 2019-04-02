@@ -61,14 +61,17 @@ public class IndexAction extends AbstractAction {
 		insertData.put("add_datetime", ssString);
 		exampleService.saveTest(insertData);
 		
+		exampleService.setTransaction(true);
 		Timestamp add_datetime = new Timestamp(System.currentTimeMillis());
 		Test test = new Test();
 		test.setTitle("你好");
-		test.setDescription("描述2");		
+		test.setDescription("描述2");
 		test.setAdd_datetime(add_datetime);
 		exampleService.saveTest(test);
+		exampleService.rollback();
+		exampleService.setTransaction(false);
 		
-		exampleService.freeConnection();
+		//exampleService.freeConnection();
 		
 		this.successType.setErrorCode(ErrorCode.__T_SUCCESS);
 	}

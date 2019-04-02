@@ -31,12 +31,7 @@ public class ExampleController extends AbstractController {
 
 	@Override
 	public void release(HttpServletRequest request, HttpServletResponse response) {
-		/*try {
-			CommonDao.instance().freeConnection();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		System.gc();
 	}
 
 	@Override

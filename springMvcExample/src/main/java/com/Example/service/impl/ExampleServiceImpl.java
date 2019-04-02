@@ -46,6 +46,27 @@ public class ExampleServiceImpl extends BaseService implements ExampleService  {
 		((ExamplelDao) this.instanceDao.get(Config.test)).freeConnection();
 	}
 
-	
-	
+	@Override
+	public void setTransaction(boolean isTransaction) throws SQLException {
+		// TODO Auto-generated method stub
+		((ExamplelDao) this.instanceDao.get(Config.test)).setTransaction(isTransaction);
+	}
+
+	@Override
+	public void commit() throws SQLException {
+		// TODO Auto-generated method stub
+		((ExamplelDao) this.instanceDao.get(Config.test)).commit();
+	}
+
+	@Override
+	public void rollback() throws SQLException {
+		// TODO Auto-generated method stub
+		((ExamplelDao) this.instanceDao.get(Config.test)).rollback();
+	}
+
+	@Override
+	protected void finalize() throws SQLException   {
+		// TODO Auto-generated method stub
+		((ExamplelDao) this.instanceDao.get(Config.test)).freeConnection();
+	}
 }

@@ -552,9 +552,13 @@ public abstract class DBQuery {
 		return isTransaction;
 	}
 
-	protected void setTransaction(boolean isTransaction) throws SQLException {
+	public void setTransaction(boolean isTransaction) throws SQLException {
 		this.isTransaction = isTransaction;
-		if(isTransaction) this.writeConnection.setAutoCommit(false);//开始事务
+		if(isTransaction) {
+			this.writeConnection.setAutoCommit(false);//开始事务
+		} else {
+			this.writeConnection.setAutoCommit(true);//删除事务
+		}
 	}
 	
 	public void commit() throws SQLException {
