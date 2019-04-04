@@ -1,0 +1,17 @@
+server:
+  port: 8903
+ 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+      
+spring:
+  application:
+    name: service-feign-Curcuit-Breaker
+    
+feign:
+  hystrix:
+    enabled: true
+    
+   
