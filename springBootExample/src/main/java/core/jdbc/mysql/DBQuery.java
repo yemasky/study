@@ -26,7 +26,6 @@ import core.util.Encrypt;
 public abstract class DBQuery {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	private String table_name = "";
-	private Object primary_key = "id";
 	private String field = "*";
 	private String insertType = "INTO";
 	private Class<?> entityClass = null;
@@ -36,7 +35,6 @@ public abstract class DBQuery {
 	private boolean isTransaction = false;
 	private boolean isTransactionSuccess = false;
 	private int cacheTime = 0;
-	protected String client_key;
 	// 当前使用connection
 	private Connection writeConnection = null;
 	private Connection readConnection = null;
@@ -52,7 +50,6 @@ public abstract class DBQuery {
 	}
 
 	public DBQuery emptyProperty() {
-		this.primary_key = "id";
 		this.field = "*";
 		this.entityClass = null;
 		this.cacheTime = 0;
@@ -100,19 +97,6 @@ public abstract class DBQuery {
 		return this;
 	}
 
-	public DBQuery primaryKey(String primary_key) {
-		this.setPrimary_key(primary_key);
-		return this;
-	}
-
-	public void setPrimary_key(String primary_key) {
-		this.primary_key = primary_key;
-	}
-
-	public Object getPrimary_key() {
-		return this.primary_key;
-	}
-	
 	public DBQuery setField(String field) {
 		this.field = field;
 		return this;

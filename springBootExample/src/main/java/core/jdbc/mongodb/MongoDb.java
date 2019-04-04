@@ -240,7 +240,6 @@ public class MongoDb {
 			logger.error("mongo_error:" + e);
 		}
 		return false;
-
 	}
 
 	public boolean delete(String table, BasicDBObject basicDBObject) throws Exception {
