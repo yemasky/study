@@ -1,0 +1,23 @@
+用Spring Boot创建一个服务类EurekaServerApplication，需要一个注解@EnableEurekaServer加在springboot工程的启动类上
+@EnableEurekaServer
+@SpringBootApplication
+public class EurekaServerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}
+
+eureka server的配置文件application.yml，其中registerWithEureka：false和fetchRegistry：false表明自己是一个eureka server
+
+server:
+   port: 8761
+
+eureka:
+   instance:
+       hostname: localhost
+   client:
+       registerWithEureka: false
+       fetchRegistry: false
+       serviceUrl:
+           defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/

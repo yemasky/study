@@ -1,0 +1,1 @@
+本例由于配置了eureka服务中心，所以这个config server作为一个eureka client注册到了 eureka server中， 可以从http://localhost:8761看到我们启动的config server, 如果不需要注册到服务中心， 也可把这个配置去掉
