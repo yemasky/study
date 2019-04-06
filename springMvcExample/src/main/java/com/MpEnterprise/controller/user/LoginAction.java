@@ -37,6 +37,12 @@ public class LoginAction extends AbstractAction {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void rollback(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	public Success doDefault(HttpServletRequest request, HttpServletResponse response) {
 		return successType;

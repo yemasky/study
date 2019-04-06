@@ -10,13 +10,9 @@ import org.slf4j.MDC;
 
 import com.base.type.ErrorCode;
 import com.base.type.Success;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 public abstract class AbstractAction {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	protected static XmlMapper xml = new XmlMapper();
-	protected static ObjectMapper mapper = new ObjectMapper();
 	protected Success successType = new Success();
 	protected final String CLIENT_KEY = "client_key";
 	protected final String SESSION_KEY = "session_key";
@@ -26,8 +22,10 @@ public abstract class AbstractAction {
 	public abstract void check(HttpServletRequest request, HttpServletResponse response);
 
 	public abstract void service(HttpServletRequest request, HttpServletResponse response) throws Exception;
-	// 资源回收 事務回滾
+	// 资源回收
 	public abstract void release(HttpServletRequest request, HttpServletResponse response) throws Exception;
+	// 事務回滾
+	public abstract void rollback(HttpServletRequest request, HttpServletResponse response) throws Exception;
 	
 	public Success doDefault(HttpServletRequest request, HttpServletResponse response) {
 		return successType;
@@ -39,11 +37,12 @@ public abstract class AbstractAction {
 			this.httpSession = (HttpSession) request.getAttribute(SESSION_KEY);
 			this.check(request, response);
 			this.service(request, response);
+			this.release(request, response);
 		} catch (Exception e) {
 			successType.setSuccess(false);
 			successType.setErrorCode(ErrorCode.__F_SYS);
 			try {
-				this.release(request, response);
+				this.rollback(request, response);
 			} catch (Exception ex) {
 				// TODO Auto-generated catch block
 				MDC.put("APP_NAME", "web_error");

@@ -37,10 +37,17 @@ public class IndexAction extends AbstractAction {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void rollback(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) {
 		this.successType.setErrorCode(ErrorCode.__T_LOGIN);
 	}
+
 
 	
 }

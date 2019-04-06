@@ -15,9 +15,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedList;
+//import java.util.LinkedList;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.sql.DataSource;
 
@@ -35,8 +37,8 @@ public class ConnectionPool implements DataSource {
 	private final String dirverClassName = "com.mysql.jdbc.Driver";
 	private Config config = null;
 	// 连接池
-	private static Map<String, LinkedList<Connection>> pool = new HashMap<String, LinkedList<Connection>>();
-	//private static Map<String, Vector<PooledConnection>> pool = new HashMap<>(); // 存放连接池中数据库连接的向量 
+	//private static Map<String, LinkedList<Connection>> pool = new HashMap<String, LinkedList<Connection>>();
+	private static Map<String, Vector<PooledConnection>> pool = new HashMap<>(); // 存放连接池中数据库连接的向量 
 	private static Map<String, Integer> usedPool = new HashMap<String, Integer>();
 
 	public ConnectionPool(Config config) throws SQLException {
@@ -51,16 +53,16 @@ public class ConnectionPool implements DataSource {
 
 	public void init() throws SQLException {
 		if (pool.get(config.getConnectionName()) == null) {
-			pool.put(config.getConnectionName(), new LinkedList<Connection>());
-			//pool.put(config.getConnectionName(), new Vector<PooledConnection>());
+			//pool.put(config.getConnectionName(), new LinkedList<Connection>());
+			pool.put(config.getConnectionName(), new Vector<PooledConnection>());
 			usedPool.put(config.getConnectionName(), 0);
 		}
 		if (pool.get(config.getConnectionName()).size() == 0 && usedPool.get(config.getConnectionName()) == 0) {
 			// 把连接放进连接池
 			for (int i = 0; i < config.getMinConnection(); i++) {
 				Connection connection = this.createConnection();
-				pool.get(config.getConnectionName()).add(connection);
-				//pool.get(config.getConnectionName()).addElement(new PooledConnection(connection));
+				//pool.get(config.getConnectionName()).add(connection);
+				pool.get(config.getConnectionName()).addElement(new PooledConnection(connection));
 			}
 		}
 	}
@@ -77,11 +79,11 @@ public class ConnectionPool implements DataSource {
 		synchronized (pool.get(config.getConnectionName())) {
 			// 当前线程
 			Connection connection = null;
-			//PooledConnection pConn = null;
+			PooledConnection pConn = null;
 			// 从pool取得连接
 			if (pool.get(config.getConnectionName()).size() > 0) {
-				connection = pool.get(config.getConnectionName()).removeFirst();
-				/*// 获得连接池向量中所有的对象
+				//connection = pool.get(config.getConnectionName()).removeFirst();
+				// 获得连接池向量中所有的对象
 				Enumeration<PooledConnection> enumerate = pool.get(config.getConnectionName()).elements();
 				// 遍历所有的对象，看是否有可用的连接
 				while (enumerate.hasMoreElements()) {
@@ -97,7 +99,7 @@ public class ConnectionPool implements DataSource {
 							pool.get(config.getConnectionName()).removeElement(pConn);
 						}
 					}
-				}*/
+				}
 				
 				//connection = connectionLinked.getKey();
 				//pool.get(config.getConnectionName()).remove(connection);
@@ -109,20 +111,22 @@ public class ConnectionPool implements DataSource {
 				
 			}
 			// 如果使用达到最大连接返回null
-			if (getUsedPool() >= config.getMaxConnection()) {
+			if (pool.get(config.getConnectionName()).size() >= config.getMaxConnection()) {
 				return null;
 			}
 			// 否则创建连接并加到连接池
 			connection = this.createConnection();
-			/*pConn = new PooledConnection(connection);
+			pConn = new PooledConnection(connection);
 			pConn.setBusy(true);
-			pool.get(config.getConnectionName()).addElement(pConn);*/
-			setUsedPool(getUsedPool()+1);
-			System.out.println("新连接:"+connection.hashCode());
+			pool.get(config.getConnectionName()).addElement(pConn);
+			if(connection != null) {
+				setUsedPool(getUsedPool()+1);
+				System.out.println("新连接:"+connection.hashCode());
+				return connection;
+			}
 			// 把当前的连接放到当前的线程
 			// 使用的连接++
-
-			return connection;
+			return null;			
 		}
 	}
 
@@ -154,14 +158,14 @@ public class ConnectionPool implements DataSource {
 		int j = 0;
 		int maxI = size > 100 ? 100 : size;
 		for (int i = 0; i < maxI; i++) {
-			Connection connection = pool.get(config.getConnectionName()).get(i);
-			//PooledConnection pConn = findUsedPooledConnection();
-			//boolean isValid = pConn.getConnection().isValid(1);
+			//Connection connection = pool.get(config.getConnectionName()).get(i);
+			PooledConnection pConn = findUsedPooledConnection();
+			Connection connection = pConn.getConnection();
 			if (!connection.isValid(1)) {
 				j++;
-				//pConn.getConnection().close();
-				pool.get(config.getConnectionName()).remove(i);
-				//pool.get(config.getConnectionName()).removeElement(pConn);
+				pConn.getConnection().close();
+				pool.get(config.getConnectionName()).removeElement(pConn);
+				//pool.get(config.getConnectionName()).remove(i);
 				if (getUsedPool() > 0)
 					setUsedPool(getUsedPool()-1);
 				if(j == inSize) break;
@@ -169,7 +173,7 @@ public class ConnectionPool implements DataSource {
 		}
 	}
 
-	/*private PooledConnection findUsedPooledConnection() throws SQLException {
+	private PooledConnection findUsedPooledConnection() throws SQLException {
 		Connection conn = null;
 		PooledConnection pConn = null;
 		// 获得连接池向量中所有的对象
@@ -185,15 +189,15 @@ public class ConnectionPool implements DataSource {
 			}
 		}
 		return pConn;// 返回找到到的可用连接
-	}*/
+	}
 	// 释放连接
-	public void freeConnection(Connection connection) throws SQLException {
+	public synchronized void freeConnection(Connection connection) throws SQLException {
 		System.out.println("准备释放连接:"+connection.hashCode());
-		pool.get(config.getConnectionName()).add(connection);
+		//pool.get(config.getConnectionName()).add(connection);
 		if (getUsedPool() > 0)
 			setUsedPool(getUsedPool()-1);
 		logger.info("释放连接 ："+connection.hashCode()+",已使用连接数:" + getUsedPool() + "; 剩余连接：" + pool.get(config.getConnectionName()).size());
-		/*PooledConnection pConn = null;
+		PooledConnection pConn = null;
 		// 获得连接池向量中所有的对象
 		Enumeration<PooledConnection> enumerate = pool.get(config.getConnectionName()).elements();
 		// 遍历所有的对象，看是否有可用的连接
@@ -210,7 +214,7 @@ public class ConnectionPool implements DataSource {
 				
 			}
 		}
-		enumerate = pool.get(config.getConnectionName()).elements();
+		/*enumerate = pool.get(config.getConnectionName()).elements();
 		while (enumerate.hasMoreElements()) {
 			pConn = (PooledConnection) enumerate.nextElement();
 			System.out.println(pConn.getConnection().hashCode() + "" + pConn.isBusy());

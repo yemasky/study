@@ -13,7 +13,7 @@ import com.base.controller.AbstractAction;
 import com.base.type.ErrorCode;
 
 public class IndexAction extends AbstractAction {
-	ExampleServiceImpl exampleService;
+	private ExampleServiceImpl exampleService;
 	
 	@Override
 	public void check(HttpServletRequest request, HttpServletResponse response) {
@@ -44,10 +44,16 @@ public class IndexAction extends AbstractAction {
 	@Override
 	public void release(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// TODO Auto-generated method stub
+		if(exampleService != null) exampleService.freeConnection();
+	}
+
+	@Override
+	public void rollback(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// TODO Auto-generated method stub
 		exampleService.rollback();
 		exampleService.setTransaction(false);
-		
 	}
+	
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) {
 		
 		this.successType.setErrorCode(ErrorCode.__T_LOGIN);
@@ -78,5 +84,6 @@ public class IndexAction extends AbstractAction {
 		
 		this.successType.setErrorCode(ErrorCode.__T_SUCCESS);
 	}
+
 	
 }
