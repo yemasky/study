@@ -64,10 +64,19 @@ public class ExampleServiceImpl extends BaseService implements ExampleService {
 		// TODO Auto-generated method stub
 		examplelDao.rollback();
 	}
+	
+	@Override
+	public void rollbackAndFreeConnection() throws SQLException {
+		// TODO Auto-generated method stub
+		examplelDao.rollback();
+		examplelDao.setTransaction(false);
+		examplelDao.freeConnection();		
+	}
 
 	@Override
 	protected void finalize() throws SQLException {
 		// TODO Auto-generated method stub
 		examplelDao.freeConnection();
 	}
+
 }

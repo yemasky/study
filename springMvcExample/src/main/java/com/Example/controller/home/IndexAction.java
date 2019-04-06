@@ -50,8 +50,7 @@ public class IndexAction extends AbstractAction {
 	@Override
 	public void rollback(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// TODO Auto-generated method stub
-		exampleService.rollback();
-		exampleService.setTransaction(false);
+		exampleService.rollbackAndFreeConnection();
 	}
 	
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) {

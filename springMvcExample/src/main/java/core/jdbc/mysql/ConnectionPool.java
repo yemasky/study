@@ -39,7 +39,6 @@ public class ConnectionPool implements DataSource {
 	// 连接池
 	//private static Map<String, LinkedList<Connection>> pool = new HashMap<String, LinkedList<Connection>>();
 	private static Map<String, Vector<PooledConnection>> pool = new HashMap<>(); // 存放连接池中数据库连接的向量 
-	private static Map<String, Integer> usedPool = new HashMap<String, Integer>();
 
 	public ConnectionPool(Config config) throws SQLException {
 		try {
@@ -55,9 +54,8 @@ public class ConnectionPool implements DataSource {
 		if (pool.get(config.getConnectionName()) == null) {
 			//pool.put(config.getConnectionName(), new LinkedList<Connection>());
 			pool.put(config.getConnectionName(), new Vector<PooledConnection>());
-			usedPool.put(config.getConnectionName(), 0);
 		}
-		if (pool.get(config.getConnectionName()).size() == 0 && usedPool.get(config.getConnectionName()) == 0) {
+		if (pool.get(config.getConnectionName()).size() == 0) {
 			// 把连接放进连接池
 			for (int i = 0; i < config.getMinConnection(); i++) {
 				Connection connection = this.createConnection();
@@ -104,7 +102,6 @@ public class ConnectionPool implements DataSource {
 				//connection = connectionLinked.getKey();
 				//pool.get(config.getConnectionName()).remove(connection);
 				if(connection != null && connection.isValid(1)) {
-					setUsedPool(getUsedPool()+1);
 					System.out.println("得到连接:"+connection.hashCode());
 					return connection;
 				}
@@ -120,7 +117,6 @@ public class ConnectionPool implements DataSource {
 			pConn.setBusy(true);
 			pool.get(config.getConnectionName()).addElement(pConn);
 			if(connection != null) {
-				setUsedPool(getUsedPool()+1);
 				System.out.println("新连接:"+connection.hashCode());
 				return connection;
 			}
@@ -166,8 +162,6 @@ public class ConnectionPool implements DataSource {
 				pConn.getConnection().close();
 				pool.get(config.getConnectionName()).removeElement(pConn);
 				//pool.get(config.getConnectionName()).remove(i);
-				if (getUsedPool() > 0)
-					setUsedPool(getUsedPool()-1);
 				if(j == inSize) break;
 			}
 		}
@@ -191,12 +185,8 @@ public class ConnectionPool implements DataSource {
 		return pConn;// 返回找到到的可用连接
 	}
 	// 释放连接
-	public synchronized void freeConnection(Connection connection) throws SQLException {
-		System.out.println("准备释放连接:"+connection.hashCode());
+	public void freeConnection(Connection connection) throws SQLException {
 		//pool.get(config.getConnectionName()).add(connection);
-		if (getUsedPool() > 0)
-			setUsedPool(getUsedPool()-1);
-		logger.info("释放连接 ："+connection.hashCode()+",已使用连接数:" + getUsedPool() + "; 剩余连接：" + pool.get(config.getConnectionName()).size());
 		PooledConnection pConn = null;
 		// 获得连接池向量中所有的对象
 		Enumeration<PooledConnection> enumerate = pool.get(config.getConnectionName()).elements();
@@ -207,11 +197,9 @@ public class ConnectionPool implements DataSource {
 			if (connection == pConn.getConnection()) {
 				// 找到了 , 设置此连接为空闲状态
 				pConn.setBusy(false);
-				//break;
-				if (getUsedPool() > 0)
-					setUsedPool(getUsedPool()-1);
-				logger.info("释放连接 ："+connection.hashCode()+",已使用连接数:" + getUsedPool() + "; 剩余连接：" + pool.get(config.getConnectionName()).size());
-				
+				//
+				logger.info("释放连接 ："+connection.hashCode()+"; 连接：" + pool.get(config.getConnectionName()).size());
+				break;
 			}
 		}
 		/*enumerate = pool.get(config.getConnectionName()).elements();
@@ -224,14 +212,6 @@ public class ConnectionPool implements DataSource {
 
 	public void closeConnection(Connection connection) throws SQLException {
 		connection.close();
-	}
-
-	public int getUsedPool() {
-		return usedPool.get(config.getConnectionName());
-	}
-
-	public void setUsedPool(int num) {
-		usedPool.put(config.getConnectionName(), num);
 	}
 
 	public Config getConfig() {

@@ -33,8 +33,6 @@ public abstract class DBQuery {
 	private String read = "read";
 	private final String write = "write";
 	private String jdbcDsn = "test";
-	private boolean isTransaction = false;
-	private boolean isTransactionSuccess = false;
 	private int cacheTime = 0;
 	protected String client_key;
 	// 当前使用connection
@@ -547,13 +545,8 @@ public abstract class DBQuery {
 		if(connection.isValid(1)) 
 			ConnectionPoolManager.instance().freeConnection(jdbcDsn, connection);
 	}
-	
-	protected boolean isTransaction() {
-		return isTransaction;
-	}
 
 	public void setTransaction(boolean isTransaction) throws SQLException {
-		this.isTransaction = isTransaction;
 		if(isTransaction) {
 			this.writeConnection.setAutoCommit(false);//开始事务
 		} else {
@@ -572,14 +565,6 @@ public abstract class DBQuery {
 	 */
 	public void rollback() throws SQLException {
 		this.writeConnection.rollback();
-	}
-			
-	protected boolean isTransactionSuccess() {
-		return isTransactionSuccess;
-	}
-
-	protected void setTransactionSuccess(boolean isTransactionSuccess) {
-		this.isTransactionSuccess = isTransactionSuccess;
 	}
 
 }

@@ -27,15 +27,15 @@ import java.util.logging.Logger;
 
 /**
  * @author CooC
- * @email  yemasky@msn.com
- * @QQ     6796707
+ * @email yemasky@msn.com
+ * @QQ 6796707
  *
  */
 public class ConnectionPoolManager {
 	private final Logger logger = Logger.getLogger("core.jdbc.mysql.ConnectionPoolManager");
 	private static Hashtable<String, ConnectionPool> pools = new Hashtable<String, ConnectionPool>();// 连接池
 	private Map<String, HashMap<String, HashMap<String, Config>>> drivers = new HashMap<String, HashMap<String, HashMap<String, Config>>>();// 驱动信息
-	private static long time = 0;
+	private long time = 0;
 	private long timeout = 5000;
 	private static boolean is_init = false;
 	// 当前使用jdbcDsn test.write.001 config
@@ -52,7 +52,7 @@ public class ConnectionPoolManager {
 		this.init();
 	}
 
-	//分解dsn
+	// 分解dsn
 	public Config getConfigByDsn(String jdbcDsn) throws SQLException {
 		String[] keyArray = jdbcDsn.split("\\.");
 		Config config = null;
@@ -70,8 +70,8 @@ public class ConnectionPoolManager {
 				String randomKey = keys[random.nextInt(keys.length)];
 				config = drivers.get(keyArray[0]).get(keyArray[1]).get(randomKey);
 			}
-		} 
-		if(config == null){
+		}
+		if (config == null) {
 			throw new SQLException("没有从drivers取到config.");
 		}
 		return config;
@@ -88,7 +88,7 @@ public class ConnectionPoolManager {
 		pool.init();
 		pools.put(config.getConnectionName(), pool);
 	}
-	
+
 	/**
 	 * 得到一个连接根据连接池的名字name
 	 * 
@@ -101,52 +101,49 @@ public class ConnectionPoolManager {
 		Config config = this.getConfigByDsn(jdbcDsn);
 		String connectionName = config.getConnectionName();
 		ConnectionPool pool = pools.get(connectionName);// 从名字中获取连接池
-		if(pool == null) {
+		if (pool == null) {
 			throw new SQLException("没有取到连接池: " + connectionName);
 		}
 		Connection connection = pool.getConnection();// 从选定的连接池中获得连接
-		if (connection != null && connection.isValid(1)) {
+		if (connection != null) {
 			logger.info("得到 pool connection.");
 		} else {
-			if (config.getMaxConnection() >= pool.getUsedPool()) {
-				logger.warning("连接已满,等待0.5秒");
-				if (time == 0)
-					time = System.currentTimeMillis();
-				try {
-					pool.clearLostedConnect();
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					throw new SQLException("线程睡眠出错");
-				}
-				if ((System.currentTimeMillis() - time) >= timeout) {// 超时5秒
-					time = 0;
-					logger.warning("没有取到连接.连接已满.超时5秒");
-					//throw new SQLException("没有取到连接.连接已满.超时5秒");
-				}
-				return this.getConnection(jdbcDsn);
-			} else {
-				throw new SQLException("没有取到连接.连接异常.");
+			logger.warning("连接已满,等待0.5秒");
+			if (time == 0)
+				time = System.currentTimeMillis();
+			try {
+				pool.clearLostedConnect();
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				throw new SQLException("线程睡眠出错");
 			}
+			if ((System.currentTimeMillis() - time) >= timeout) {// 超时5秒
+				time = 0;
+				logger.warning("没有取到连接.连接已满.超时5秒");
+				// throw new SQLException("没有取到连接.连接已满.超时5秒");
+			}
+			return this.getConnection(jdbcDsn);
 		}
 
 		return connection;
 	}
 
-	//释放连接
+	// 释放连接
 	public void freeConnection(String jdbcDsn, Connection connection) throws SQLException {
 		Config config = this.getConfigByDsn(jdbcDsn);
 		String connectionName = config.getConnectionName();
 		ConnectionPool pool = pools.get(connectionName);// 从名字中获取连接池
 		pool.freeConnection(connection);
 	}
+
 	/**
 	 * 加载数据库驱动
 	 * 
 	 * @throws IOException
 	 */
 	private Map<String, HashMap<String, HashMap<String, Config>>> loadDrivers() throws IOException {
-		//logger.info("开始加载数据库驱动."); // 加载驱动程序
+		// logger.info("开始加载数据库驱动."); // 加载驱动程序
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("config/jdbc.mysql.properties");
 		Properties properties = new Properties();
 		properties.load(inputStream);
@@ -207,7 +204,7 @@ public class ConnectionPoolManager {
 	 * @throws IOException
 	 */
 	public void init() throws SQLException {
-		if(is_init) {
+		if (is_init) {
 			return;
 		}
 		try {
@@ -216,20 +213,20 @@ public class ConnectionPoolManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.log(Level.SEVERE, "读取数据库配置文件出错！", e);
-			System.exit(0);//退出运行
+			System.exit(0);// 退出运行
 		}
-		for(String driverName : drivers.keySet()) {
-			for(String excuteName : drivers.get(driverName).keySet()) {
-				for(String pollingName : drivers.get(driverName).get(excuteName).keySet()) {
+		for (String driverName : drivers.keySet()) {
+			for (String excuteName : drivers.get(driverName).keySet()) {
+				for (String pollingName : drivers.get(driverName).get(excuteName).keySet()) {
 					Config config = drivers.get(driverName).get(excuteName).get(pollingName);
-					this.createPools(config);//创建连接池
+					this.createPools(config);// 创建连接池
 				}
 			}
 		}
 		logger.info("创建连接池完毕.");
 		is_init = true;
 	}
-	
+
 	public long getTimeout() {
 		return timeout;
 	}
