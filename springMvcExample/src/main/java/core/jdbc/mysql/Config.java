@@ -21,7 +21,7 @@ public class Config {
 	private String dbDsn = "jdbc:mysql://127.0.0.1:3306/test?user=root&password=root&useSSL=false"; // 数据库url
 	private String dbUsername = "root"; // 用户名
 	private String dbPassword = "root"; // 密码
-	private int maxConnection = 300; // 最大连接数
+	private int maxConnection = 100; // 最大连接数
 	private int minConnection = 1; // 最小连接数
 
 	public Config() {

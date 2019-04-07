@@ -31,24 +31,24 @@ import java.util.logging.Logger;
  * @QQ 6796707
  *
  */
-public class ConnectionPoolManager {
-	private final Logger logger = Logger.getLogger("core.jdbc.mysql.ConnectionPoolManager");
-	private static Hashtable<String, ConnectionPool> pools = new Hashtable<String, ConnectionPool>();// 连接池
+public class DbcpPoolManager {
+	private final Logger logger = Logger.getLogger("core.jdbc.mysql.DbcpPoolManager");
+	private static Hashtable<String, DbcpPool> dbcpPool = new Hashtable<String, DbcpPool>();// 连接池
 	private Map<String, HashMap<String, HashMap<String, Config>>> drivers = new HashMap<String, HashMap<String, HashMap<String, Config>>>();// 驱动信息
 	private long time = 0;
 	private long timeout = 5000;
 	private static boolean is_init = false;
 	// 当前使用jdbcDsn test.write.001 config
-	private static ConnectionPoolManager instances = null;
+	private static DbcpPoolManager instances = null;
 
-	public static ConnectionPoolManager instance() throws SQLException {
+	public static DbcpPoolManager instance() throws SQLException {
 		if (instances == null) {
-			instances = new ConnectionPoolManager();
+			instances = new DbcpPoolManager();
 		}
 		return instances;
 	}
 
-	public ConnectionPoolManager() throws SQLException {
+	public DbcpPoolManager() throws SQLException {
 		this.init();
 	}
 
@@ -84,9 +84,9 @@ public class ConnectionPoolManager {
 	 * @throws SQLException
 	 */
 	public void createPools(Config config) throws SQLException {
-		ConnectionPool pool = new ConnectionPool(config);
+		DbcpPool pool = new DbcpPool(config);
 		pool.init();
-		pools.put(config.getConnectionName(), pool);
+		dbcpPool.put(config.getConnectionName(), pool);
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class ConnectionPoolManager {
 	public Connection getConnection(String jdbcDsn) throws SQLException {
 		Config config = this.getConfigByDsn(jdbcDsn);
 		String connectionName = config.getConnectionName();
-		ConnectionPool pool = pools.get(connectionName);// 从名字中获取连接池
+		DbcpPool pool = dbcpPool.get(connectionName);// 从名字中获取连接池
 		if (pool == null) {
 			throw new SQLException("没有取到连接池: " + connectionName);
 		}
@@ -112,7 +112,6 @@ public class ConnectionPoolManager {
 			if (time == 0)
 				time = System.currentTimeMillis();
 			try {
-				pool.clearLostedConnect();
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -133,8 +132,8 @@ public class ConnectionPoolManager {
 	public void freeConnection(String jdbcDsn, Connection connection) throws SQLException {
 		Config config = this.getConfigByDsn(jdbcDsn);
 		String connectionName = config.getConnectionName();
-		ConnectionPool pool = pools.get(connectionName);// 从名字中获取连接池
-		pool.freeConnection(connection);
+		DbcpPool pool = dbcpPool.get(connectionName);// 从名字中获取连接池
+		pool.close(connection);
 	}
 
 	/**

@@ -41,7 +41,6 @@ public abstract class DBQuery {
 	
 	public DBQuery(String jdbcDsn) throws SQLException {
 		this.jdbcDsn = jdbcDsn;
-		ConnectionPoolManager.instance();
 	}
 	
 	protected DBQuery setDsn(String jdbcDsn) {
@@ -520,7 +519,8 @@ public abstract class DBQuery {
 	private Connection thisWriteConnection() throws SQLException {
 		String key = this.jdbcDsn + "." + this.write;
 		if(this.writeConnection == null || !this.writeConnection.isValid(1)) {
-			this.writeConnection = ConnectionPoolManager.instance().getConnection(key);
+			this.writeConnection = DbcpPoolManager.instance().getConnection(key);
+			//this.writeConnection = DbcpConnection.getConnection();
 		}
 		return writeConnection;
 	}
@@ -528,22 +528,23 @@ public abstract class DBQuery {
 	private Connection thisReadConnection() throws SQLException {
 		String key = this.jdbcDsn + "." + this.read;
 		if(this.readConnection == null || !this.readConnection.isValid(1)) {
-			this.readConnection = ConnectionPoolManager.instance().getConnection(key);
+			this.readConnection = DbcpPoolManager.instance().getConnection(key);
 		}
 		return readConnection;
 	}
 	
 	//释放连接
 	public void freeConnection() throws SQLException {
-		if(this.readConnection != null && this.readConnection.isValid(1)) 
-			ConnectionPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.read, this.readConnection);
-		if(this.writeConnection != null && this.writeConnection.isValid(1)) 
-			ConnectionPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.write, this.writeConnection);
-	}
-	
-	public void freeConnection(String jdbcDsn, Connection connection) throws SQLException {
-		if(connection.isValid(1)) 
-			ConnectionPoolManager.instance().freeConnection(jdbcDsn, connection);
+		if(this.readConnection != null) {
+			//DbcpConnection.close(this.readConnection);
+			DbcpPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.read, this.readConnection);
+		}
+			
+		if(this.writeConnection != null) {
+			//DbcpConnection.close(this.writeConnection);
+			DbcpPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.write, this.writeConnection);
+		}
+			
 	}
 
 	public void setTransaction(boolean isTransaction) throws SQLException {
