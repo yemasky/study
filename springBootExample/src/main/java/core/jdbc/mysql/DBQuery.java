@@ -26,22 +26,21 @@ import core.util.Encrypt;
 public abstract class DBQuery {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	private String table_name = "";
+	private Object primary_key = "id";
 	private String field = "*";
 	private String insertType = "INTO";
 	private Class<?> entityClass = null;
 	private String read = "read";
 	private final String write = "write";
 	private String jdbcDsn = "test";
-	private boolean isTransaction = false;
-	private boolean isTransactionSuccess = false;
 	private int cacheTime = 0;
+	protected String client_key;
 	// 当前使用connection
 	private Connection writeConnection = null;
 	private Connection readConnection = null;
 	
 	public DBQuery(String jdbcDsn) throws SQLException {
 		this.jdbcDsn = jdbcDsn;
-		ConnectionPoolManager.instance();
 	}
 	
 	protected DBQuery setDsn(String jdbcDsn) {
@@ -50,6 +49,7 @@ public abstract class DBQuery {
 	}
 
 	public DBQuery emptyProperty() {
+		this.primary_key = "id";
 		this.field = "*";
 		this.entityClass = null;
 		this.cacheTime = 0;
@@ -97,6 +97,19 @@ public abstract class DBQuery {
 		return this;
 	}
 
+	public DBQuery primaryKey(String primary_key) {
+		this.setPrimary_key(primary_key);
+		return this;
+	}
+
+	public void setPrimary_key(String primary_key) {
+		this.primary_key = primary_key;
+	}
+
+	public Object getPrimary_key() {
+		return this.primary_key;
+	}
+	
 	public DBQuery setField(String field) {
 		this.field = field;
 		return this;
@@ -506,7 +519,8 @@ public abstract class DBQuery {
 	private Connection thisWriteConnection() throws SQLException {
 		String key = this.jdbcDsn + "." + this.write;
 		if(this.writeConnection == null || !this.writeConnection.isValid(1)) {
-			this.writeConnection = ConnectionPoolManager.instance().getConnection(key);
+			this.writeConnection = DbcpPoolManager.instance().getConnection(key);
+			//this.writeConnection = DbcpConnection.getConnection();
 		}
 		return writeConnection;
 	}
@@ -514,30 +528,26 @@ public abstract class DBQuery {
 	private Connection thisReadConnection() throws SQLException {
 		String key = this.jdbcDsn + "." + this.read;
 		if(this.readConnection == null || !this.readConnection.isValid(1)) {
-			this.readConnection = ConnectionPoolManager.instance().getConnection(key);
+			this.readConnection = DbcpPoolManager.instance().getConnection(key);
 		}
 		return readConnection;
 	}
 	
 	//释放连接
 	public void freeConnection() throws SQLException {
-		if(this.readConnection != null && this.readConnection.isValid(1)) 
-			ConnectionPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.read, this.readConnection);
-		if(this.writeConnection != null && this.writeConnection.isValid(1)) 
-			ConnectionPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.write, this.writeConnection);
-	}
-	
-	public void freeConnection(String jdbcDsn, Connection connection) throws SQLException {
-		if(connection.isValid(1)) 
-			ConnectionPoolManager.instance().freeConnection(jdbcDsn, connection);
-	}
-	
-	protected boolean isTransaction() {
-		return isTransaction;
+		if(this.readConnection != null) {
+			//DbcpConnection.close(this.readConnection);
+			DbcpPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.read, this.readConnection);
+		}
+			
+		if(this.writeConnection != null) {
+			//DbcpConnection.close(this.writeConnection);
+			DbcpPoolManager.instance().freeConnection(this.jdbcDsn + "." + this.write, this.writeConnection);
+		}
+			
 	}
 
 	public void setTransaction(boolean isTransaction) throws SQLException {
-		this.isTransaction = isTransaction;
 		if(isTransaction) {
 			this.writeConnection.setAutoCommit(false);//开始事务
 		} else {
@@ -556,14 +566,6 @@ public abstract class DBQuery {
 	 */
 	public void rollback() throws SQLException {
 		this.writeConnection.rollback();
-	}
-			
-	protected boolean isTransactionSuccess() {
-		return isTransactionSuccess;
-	}
-
-	protected void setTransactionSuccess(boolean isTransactionSuccess) {
-		this.isTransactionSuccess = isTransactionSuccess;
 	}
 
 }
