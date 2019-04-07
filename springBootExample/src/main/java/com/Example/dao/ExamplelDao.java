@@ -1,6 +1,5 @@
 package com.Example.dao;
 
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +17,7 @@ public class ExamplelDao extends CommonDao {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Test geTest(BigInteger id) throws SQLException {
+	public Test geTest(int id) throws SQLException {
 		HashMap<String, Object> whereSQL = new HashMap<String, Object>();
 		whereSQL.put("id", id);
 		WhereRelation whereRelation = new WhereRelation();
@@ -36,12 +35,12 @@ public class ExamplelDao extends CommonDao {
 		return test;
 	}
 	
-	public BigInteger saveTest(Test test) throws Exception {
-		return (BigInteger) this.setDsn(Config.test).insertIdEntity(test);
+	public long saveTest(Test test) throws Exception {
+		return (long) this.setDsn(Config.test).insertIdEntity(test);
 	}
 	
-	public BigInteger saveTest(HashMap<String, Object> insertData) throws Exception {
-		return (BigInteger) this.setDsn(Config.test).table("test").insertIdEntity(insertData);
+	public long saveTest(HashMap<String, Object> insertData) throws Exception {
+		return (long) this.setDsn(Config.test).table("test").insertIdEntity(insertData);
 	}
 	
 	//

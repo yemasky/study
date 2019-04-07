@@ -9,11 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
 import core.util.Cookies;
 import core.util.Encrypt;
 
 public abstract class AbstractController {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected static XmlMapper xml = new XmlMapper();
+	protected static ObjectMapper mapper = new ObjectMapper();
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
 	protected HttpSession httpSession;
@@ -25,7 +30,7 @@ public abstract class AbstractController {
 	public abstract void release(HttpServletRequest request, HttpServletResponse response);
 
 	public abstract String defaultAction(HttpServletRequest request, HttpServletResponse response);
-	
+
 	public AbstractController() {
 	
 	}

@@ -1,6 +1,5 @@
 package com.Example.controller.home;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -14,7 +13,7 @@ import com.base.controller.AbstractAction;
 import com.base.type.ErrorCode;
 
 public class IndexAction extends AbstractAction {
-	ExampleServiceImpl exampleService;
+	private ExampleServiceImpl exampleService;
 	
 	@Override
 	public void check(HttpServletRequest request, HttpServletResponse response) {
@@ -45,14 +44,13 @@ public class IndexAction extends AbstractAction {
 	@Override
 	public void release(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// TODO Auto-generated method stub
-		exampleService.freeConnection();
+		if(exampleService != null) exampleService.freeConnection();
 	}
 
 	@Override
 	public void rollback(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// TODO Auto-generated method stub
-		exampleService.rollback();
-		exampleService.setTransaction(false);
+		exampleService.rollbackAndFreeConnection();
 	}
 	
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -67,9 +65,9 @@ public class IndexAction extends AbstractAction {
 		System.out.println(ssString);
 		HashMap<String, Object> insertData = new HashMap<>();
 		insertData.put("title", "你好");
-		insertData.put("description", "描述"+Math.random());
+		insertData.put("description", "描述");
 		insertData.put("add_datetime", ssString);
-		BigInteger id = exampleService.saveTest(insertData);
+		exampleService.saveTest(insertData);
 		
 		exampleService.setTransaction(true);
 		Timestamp add_datetime = new Timestamp(System.currentTimeMillis());
@@ -80,9 +78,8 @@ public class IndexAction extends AbstractAction {
 		exampleService.saveTest(test);
 		exampleService.rollback();
 		exampleService.setTransaction(false);
-		//
-		test = exampleService.geTest(id);
-		this.successType.setData(test);
+		
+		//exampleService.freeConnection();
 		
 		this.successType.setErrorCode(ErrorCode.__T_SUCCESS);
 	}
