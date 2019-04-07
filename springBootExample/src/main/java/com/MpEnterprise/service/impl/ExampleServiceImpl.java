@@ -11,7 +11,7 @@ import com.Example.service.ExampleService;
 public class ExampleServiceImpl implements ExampleService {
 
 	@Override
-	public Test geTest(BigInteger id) throws SQLException {
+	public Test geTest(int id) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -34,7 +34,5 @@ public class ExampleServiceImpl implements ExampleService {
 		return null;
 	}
 
-	
-	
 	
 }

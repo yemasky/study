@@ -1,5 +1,6 @@
 package com.Example.dao;
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -35,12 +36,12 @@ public class ExamplelDao extends CommonDao {
 		return test;
 	}
 	
-	public long saveTest(Test test) throws Exception {
-		return (long) this.setDsn(Config.test).insertIdEntity(test);
+	public BigInteger saveTest(Test test) throws Exception {
+		return (BigInteger) this.setDsn(Config.test).insertIdEntity(test);
 	}
 	
-	public long saveTest(HashMap<String, Object> insertData) throws Exception {
-		return (long) this.setDsn(Config.test).table("test").insertIdEntity(insertData);
+	public BigInteger saveTest(HashMap<String, Object> insertData) throws Exception {
+		return (BigInteger) this.setDsn(Config.test).table("test").insertIdEntity(insertData);
 	}
 	
 	//

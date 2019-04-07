@@ -6,10 +6,9 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-//import org.apache.commons.dbcp2.BasicDataSourceFactory;
 
 public class DbcpPool {
-	private final String dirverClassName = "com.mysql.jdbc.Driver";
+	private final String dirverClassName = "com.mysql.cj.jdbc.Driver";
 	private Config config = null;
 	/**
 	 * 数据库连接池（dbcp连接池）对象引用
@@ -38,7 +37,7 @@ public class DbcpPool {
 		dataSource.setDriverClassName(dirverClassName);
 		dataSource.setUsername(config.getDbUsername());
 		dataSource.setPassword(config.getDbPassword());
-		dataSource.setUrl(config.getDbDsn());
+		dataSource.setUrl(config.getDbDsn()+"&serverTimezone=GMT");
 		dataSource.setInitialSize(config.getMinConnection());
 		dataSource.setMaxTotal(config.getMaxConnection());
 		dataSource.setMaxIdle(100);
