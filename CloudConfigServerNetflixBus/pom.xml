@@ -4,13 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>springCloudDemo</groupId>
-	<artifactId>CloudServiceFeign</artifactId>
+	<artifactId>CloudConfigServerNetflixBus</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>CloudServiceFeign</name>
+	<name>CloudConfigServer</name>
 	<url>http://maven.apache.org</url>
-	<description>Demo Spring Server Ribbon</description>
+	<description>Demo SpringCloud Config Server</description>
 	<!-- parent -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -32,32 +32,33 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!--eureka server -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-eureka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-feign</artifactId>
+			<artifactId>spring-cloud-starter-eureka-server</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
 		</dependency>
-		<!-- 使用Apache HttpClient替换Feign原生httpclient -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.netflix.feign</groupId>
-			<artifactId>feign-httpclient</artifactId>
-			<version>8.15.1</version>
-		</dependency>
+		<!-- spring boot test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<!-- 整合消息队列Rabbitmq -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bus-amqp</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -92,4 +93,5 @@
 			</snapshots>
 		</repository>
 	</repositories>
+
 </project>

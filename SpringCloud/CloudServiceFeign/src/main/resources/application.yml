@@ -10,3 +10,8 @@ spring:
   application:
     name: service-feign
    
+ #换成httpclient访问方式
+ feign:
+   httpclient:
+     enabled: true
+     

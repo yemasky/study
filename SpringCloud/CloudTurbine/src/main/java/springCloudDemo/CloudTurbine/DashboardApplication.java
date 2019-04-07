@@ -15,6 +15,7 @@ import org.springframework.cloud.netflix.turbine.EnableTurbine;
 @EnableTurbine
 public class DashboardApplication {
 
+	//断路器指标数据监控Hystrix Dashboard 和 Turbine
     public static void main(String[] args) {
         SpringApplication.run(DashboardApplication.class, args);
     }
