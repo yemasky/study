@@ -1,0 +1,18 @@
+server:
+    port: 8888
+
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:8761/eureka/
+
+spring:
+    cloud:
+        config:
+            server:
+                git:
+                    uri: https://gitee.com/chrywhy/test
+                    searchPaths: spring-cloud/helloworldConfig
+    application:
+        name: config-server
+        
