@@ -13,7 +13,7 @@ public class DbcpPool {
 	/**
 	 * 数据库连接池（dbcp连接池）对象引用
 	 */
-	private static DataSource dbcpDataSource;
+	private DataSource dbcpDataSource;
 
 	public DbcpPool(Config config) throws SQLException {
 		try {
