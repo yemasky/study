@@ -1,0 +1,82 @@
+<div class="aside box-shadow h-10x" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <form name="thisForm" class="form-validation" id="thisForm" ng-submit="saveData()">
+      <input type="hidden" name="item_type" value="item">
+      <div class="aside-body h-8x scrollable">
+        <div class="tab-container ng-scope ng-valid ng-dirty">
+            <ul class="nav nav-tabs" ng-init="activeTab=1">
+                <li ng-class="{active:activeTab==1}" ng-click="activeTab=1">
+                    <a ng-bind-html="action"></a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div ng-show="activeTab==1">
+                    <div class="form-inline m-h-n clearfix">
+                      <div class="col-sm-2 w-sm">
+                      	    <label>选择酒店</label>
+                            <button type="button" class="btn btn-default" ng-model="param.channel_id" data-html="1" data-toggle="true" bs-options="channel.channel_id as channel.channel_name for channel in thisChannel" bs-select placeholder="<i class='icon fa fa-building text-lt'></i> 选择酒店">
+                  Action <span class="caret"></span>
+                            </button>
+                      </div>  
+                    </div>
+                    <div class="form-inline m-h-n clearfix">
+                      <div class="col-sm-2 w-sm">
+                      	<label>客源市场</label>
+                        <div class="form-group" ng-include="'/app/customerMarket.html'"></div>
+                      </div>
+                      <div class="col-sm-2 w-sm">
+                      	    <label>客房价格类型</label>
+                            <button type="button" class="btn btn-default w-sm text-left clearfix m-b" ng-model="param.price_system_id" data-html="1" data-toggle="true" bs-options="priceSystem.price_system_id as priceSystem.price_system_name for priceSystem in marketPriceSystem[market_id]" bs-select placeholder="选择客房价格类型" ng-change="selectPriceSystem(param.price_system_id)">
+                  Action <span class="caret"></span>
+                            </button>
+                      </div>  
+                    </div>
+                    
+                    <div class="form-inline m-h-n clearfix">
+                        <div class="col-sm-2 w-sm">
+                            <label for="commision_type">佣金类型</label>
+                            <button type="button" class="btn btn-default w-sm text-left clearfix m-b" ng-model="param.commision_type" data-html="1" data-toggle="true" bs-options="commisionType.commision_value as commisionType.commision_name for commisionType in commisionTypeList" bs-select placeholder="选择佣金类型" ng-change="selectPriceSystem(param.price_system_id)" required>
+                      Action <span class="caret"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-inline m-h-n clearfix">
+                        <div class="col-sm-2 w-sm">
+                            <label for="commision_form">佣金形式</label>
+                            <button type="button" class="btn btn-default w-sm text-left clearfix m-b" ng-model="param.commision_form" data-html="1" data-toggle="true" bs-options="commisionForm.commision_value as commisionForm.commision_name for commisionForm in commisionFormList" bs-select placeholder="选择佣金形式" ng-change="selectPriceSystem(param.price_system_id)" required>
+                      Action <span class="caret"></span>
+                            </button>
+                        </div>
+                        <div class="col-sm-2 w-sm" ng-if="param.commision_form!='manually'">
+                            <label for="commision_form_value">数值</label>
+                            <input class="form-control" type="text" value="" name="commision_form_value" ng-model="param.commision_form_value">
+                        </div>
+                        <div class="col-sm-2 w-sm">
+                            <span ng-if="param.commision_form=='percent'">%</span>
+                            <span ng-if="param.commision_form=='night'">元</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="radio-inline"> <input type="radio" value="1" id="valid1" ng-model="param.valid" name="valid" checked> 有效</label>
+                        <label class="radio-inline"> <input type="radio" value="0" id="valid0" ng-model="param.valid" name="valid"> 无效</label>
+                        <input type="hidden" value="" name="market_id" ng-model="param.market_id">
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer panel-footer">
+      	<input type="hidden" name="item_id" value="" ng-model="param.item_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

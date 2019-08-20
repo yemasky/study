@@ -1,0 +1,492 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="app-content-inner" ng-controller="RoomStatusController">
+  <div class="box">
+    <div class="col-md-10">
+      <div class="box b-r">
+        <div class="p p-v-sm b-b">
+          <button type="button" class="btn btn-default icon fa fa-building text-lt m-r" ng-model="param.channel_id" data-html="1" data-toggle="true" bs-options="channel.channel_id as channel.channel_name for channel in thisChannel" bs-select placeholder="{{defaultHotel}}" ng-change="selectChannel(param.channel_id)">
+              Action <span class="caret"></span>
+          </button>
+          <div class="btn-group">
+            <span class="btn btn-xs btn-rounded bg-info">空净</span>
+            <span class="btn btn-xs bg-inverse">住净</span>
+            <span class="btn btn-xs bg-danger">住脏</span>
+            <span class="btn btn-xs bg-warning">维修</span>
+            <span class="btn btn-xs btn-rounded bg-dark">空脏</span>
+          </div>
+          <div class="btn-group pull-right"><button type="button" class="btn btn-xs btn-default">营业日 {{getBusinessDay()}}</button></div>
+          
+        </div>
+        <div class="box-row">
+          <div class="box-cell">
+            <div class="box-inner">
+              <!-- detail -->
+              <div class="p b-b tab-container ">
+                <ul class="nav nav-tabs" ui-nav ng-init="activeTab=1">
+                    <li ng-class="{active:activeTab==1}" ng-click="activeTab=1">
+                        <a>客房房态</a>
+                    </li>
+                    <li ng-class="{active:activeTab==2}" ng-click="activeTab=2">
+                        <a>预抵<span class="badge bg-info badge-xs m-l-xs" ng-bind-html="bookAta">0</span></a>
+                    </li>
+                    <li ng-class="{active:activeTab==3}" ng-click="activeTab=3;nightAuditor(-2,'');">
+                        <a>夜审</a>
+                    </li>
+                    <li ng-class="{active:activeTab==4}" ng-click="activeTab=4;roomForcasting(false);">
+                        <a>远期房态</a>
+                    </li>
+                 </ul>
+                 <div class="tab-content text-nowrap"><!--<img class="img-responsive w-thumb-xs" ng-src="{{_resource}}images/room.png">-->
+                    <div ng-show="activeTab==1">
+                        <div class="form-group clearfix">
+                            <div class="buliding m-b" ng-repeat="(buliding_key, buliding) in roomList">
+                                <div class="m-b-xs"><i class="fa fa-building text-xs"> {{buliding_key}}楼栋</i></div>
+                                <div class="floor clearfix" ng-repeat="(floor_key, floor) in buliding">
+                                    <span class="badge badge-xs bg-success pos-rlt m-r-xs">{{floor_key}}楼层</span>
+                                    <div class="list-group no-radius">
+                                        <div class="list-group-item col-sm-2 no-padding m-r-xs" ng-repeat="(i, room) in floor">
+                                          <!--<span class="pull-left w-thumb-xs m-r b-b-2x"><i class="ui-icon ti-user {{bookRoomStatus[room.item_id].className}}"></i></span>-->
+                                          <div class="clear p-xs">
+                                            <span class="font-bold block"><!--layout name-->{{layoutList[layoutRoom[room.item_id].item_category_id].item_name}}<span class="pull-right small fas fa-coins" ng-class="room.roomAccount>0?'text-success-dk':room.roomAccount<0?'text-danger-dk':''" ng-if="room.roomAccount!=0"> {{room.roomAccount}}</span></span>
+                                            <div>{{room.item_name}}
+                                                <label class="pull-right" ng-bind-html="bookRoomStatus[room.item_id].roomStatus" ng-click="roomStatusBook(bookRoomStatus[room.item_id].detail_id, room)"></label>
+                                            </div>
+                                          </div>
+                                            <button type="button" class="btn btn-default no-border no-margin p-xs w-full m-t-n" data-animation="am-flip-x" data-template-url="/app/manage_room.html" data-placement="bottom-right" bs-dropdown="dropdown" ng-click="setRoomStatus(room)">
+                                            <span class="pull-left text-muted"><i class="fa fa-address-card" aria-hidden="true"></i>
+                                                <span class="small" data-title="订单：{{bookRoomStatus[room.item_id].booking_number}}<br>预抵：{{bookRoomStatus[room.item_id].check_in}}　　<br>预离：{{bookRoomStatus[room.item_id].check_out}}　　" data-placement="right" data-animation="am-flip-x" data-html="true" bs-tooltip="tooltip" ng-if="roomLiveIn[room.item_id]">
+                                                    <span ng-repeat="(live_id, liveIn) in roomLiveIn[room.item_id]">{{liveIn.member_name}} </span>
+                                                </span>
+                                            </span>
+                                            <span class="pull-right text-muted"><i class="fas fa-caret-square-down"></i></span></button>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-show="activeTab==2">
+                        <div class="form-group m-h-n clearfix">
+                            <ul class="nav nav-tabs" ng-init="activeAtaTab=1">
+                                <li ng-class="{active:activeAtaTab==0}"><a>　</a></li>
+                                <li ng-class="{active:activeAtaTab==1}" ng-click="activeAtaTab=1">
+                                    <a>预抵<span class="badge bg-info badge-xs m-l-xs" ng-bind-html="bookAta">0</span></a>
+                                </li>
+                                <li ng-class="{active:activeAtaTab==2}" ng-click="activeAtaTab=2">
+                                    <a>预离<span class="badge badge-xs" ng-bind="dueOut">0</span></a>
+                                </li>
+                                <li ng-class="{active:activeAtaTab==3}" ng-click="activeAtaTab=3">
+                                    <a>所有订单</a>
+                                </li>
+                            </ul>
+							<div class="p-md" ng-show="activeAtaTab==1">
+							  <div class="table-responsive">
+								<div class="form-inline form-group">
+								<table class="table table-bordered table-striped bg-white table-hover">
+								  <thead>
+									<tr>
+								      <th>订单号</th>
+									  <th translate="module.channel.market_name">客源市场</th>
+									  <th>房型</th>
+                                      <th>价格类型</th>
+									  <th>房号</th>
+									  <th>预订人</th>
+									  <th>电话/email</th>
+									  <th>预抵</th>
+									  <th>预离</th>
+									  <th></th>
+									</tr>
+								  </thead>
+								  <tbody><!-- bookingDetail -->
+									<tr ng-repeat="(i, detail) in bookingDetailRoom" ng-if="detail.booking_detail_status==0&&detail.check_in==getBusinessDay()">
+								      <td>{{detail.booking_number}}</td>
+									  <td class="text-nowrap">{{detail.market_name}}</td>
+									  <td><span>{{detail.item_category_name}}</span></td>
+                                      <td><span>{{detail.price_system_name}}</span></td>
+									  <td>{{detail.item_name==''?'未排房':detail.item_name}}</td>
+									  <td>{{bookList[detail.booking_number].member_name}}</td>
+									  <td>{{bookList[detail.booking_number].member_mobile==''?bookList[detail.booking_number].member_email:bookList[detail.booking_number].member_mobile}}</td>
+									  <td>{{detail.check_in | limitTo:10}}</td>
+									  <td>{{detail.check_out | limitTo:10}}</td>
+									  <td>
+                                          <a class="btn btn-xs btn-rounded btn-stroke btn-primary" ng-click="editRoomBook(detail, 1)">
+                                            <span>{{detail.item_name==''?'排房':'入住'}}</span>
+                                          </a>
+                                      </td>
+									</tr>
+								  </tbody>
+								</table>
+							    </div>
+							  </div>
+                            </div>
+                            <div class="p-md" ng-show="activeAtaTab==2">
+                               <div class="table-responsive">
+								<div class="form-inline form-group">
+								<table class="table table-bordered table-striped bg-white table-hover">
+								  <thead>
+									<tr>
+								      <th>订单号</th>
+									  <th translate="module.channel.market_name">客源市场</th>
+									  <th>房型</th>
+                                      <th>价格类型</th>
+									  <th>房号</th>
+									  <th>预订人</th>
+									  <th>电话/email</th>
+									  <th>预抵</th>
+									  <th>预离</th>
+									  <th></th>
+									</tr>
+								  </thead>
+								  <tbody><!-- bookingDetail -->
+									<tr ng-repeat="(item_id, detail) in check_outRoom">
+								      <td>{{detail.booking_number}}</td>
+									  <td class="text-nowrap">{{detail.market_name}}</td>
+									  <td><span>{{detail.item_category_name}}</span></td>
+                                      <td><span>{{detail.price_system_name}}</span></td>
+									  <td>{{detail.item_name==''?'未排房':detail.item_name}}</td>
+									  <td>{{bookList[detail.booking_number].member_name}}</td>
+									  <td>{{bookList[detail.booking_number].member_mobile==''?bookList[detail.booking_number].member_email:bookList[detail.booking_number].member_mobile}}</td>
+									  <td>{{detail.check_in | limitTo:10}}</td>
+									  <td>{{detail.check_out | limitTo:10}}</td>
+									  <td>
+                                          <a class="btn btn-xs btn-rounded btn-stroke btn-primary" ng-click="editRoomBook(detail, 1)">
+                                            <span>离店</span>
+                                          </a>
+                                      </td>
+									</tr>
+								  </tbody>
+								</table>
+							    </div>
+							  </div>
+				            </div>
+                            <div class="p-md form-inline" ng-show="activeAtaTab==3">
+                                <div class="m-b">
+                                    <form name="bookingRoomForm" class="form-inline" role="form" ng-submit="searchBooking(param)">
+                                    <label class="control-label m-b"><i class="fas fa-clock"></i> </label>
+                                    <select class="form-control" ng-model="param.condition_date">
+                                      <option value="">选择日期</option>
+									  <option value="check_in">预抵日期</option>
+									  <option value="actual_check_in">入住日期</option>
+									</select>
+                                    <input type="text" size="9" class="form-control w-thumb-lg" ng-model="param.search_date" data-date-format="yyyy-MM-dd" data-date-type="number"  data-autoclose="true"  data-min-date="02/10/86" data-autoclose="1" bs-datepicker>
+                                    <select class="form-control" ng-model="param.condition_key">
+                                      <option value="">选择条件</option>
+                                      <option value="booking_number">订单号</option>
+									  <option value="member_mobile">移动电话</option>
+									  <option value="member_email">Email</option>
+									  <option value="member_name">预订人</option>
+									</select>
+                               		<div class="input-group">
+                                        <input type="text" size="9" class="form-control w-thumb-lg" ng-model="param.search_value">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="submit">Go!</button>
+                                        </span>
+                                    </div>
+                                    </form>
+                                </div>
+                                <div class="table-responsive">
+								<table class="table table-bordered table-striped bg-white table-hover">
+								  <thead>
+									<tr>
+								      <th>订单号</th>
+									  <th translate="module.channel.market_name">客源市场</th>
+									  <th>房型</th>
+                                      <th>价格类型</th>
+									  <th>房号</th>
+									  <th>预订人</th>
+									  <th>电话/email</th>
+									  <th>预抵</th>
+									  <th>预离</th>
+									  <th></th>
+									</tr>
+								  </thead>
+								  <tbody><!-- bookingDetail -->
+									<tr ng-repeat="(detail_id, detail) in bookingSearchList">
+								      <td>{{detail.booking_number}}</td>
+									  <td class="text-nowrap">{{detail.market_name}}</td>
+									  <td><span>{{detail.item_category_name}}</span></td>
+                                      <td><span>{{detail.price_system_name}}</span></td>
+									  <td>{{detail.item_name==''?'未排房':detail.item_name}}</td>
+									  <td>{{bookList[detail.booking_number].member_name}}</td>
+									  <td>{{bookList[detail.booking_number].member_mobile==''?bookList[detail.booking_number].member_email:bookList[detail.booking_number].member_mobile}}</td>
+									  <td>{{detail.check_in | limitTo:10}}</td>
+									  <td>{{detail.check_out | limitTo:10}}</td>
+									  <td>
+                                          <a class="btn btn-xs btn-rounded btn-stroke btn-primary" ng-click="editRoomBook(detail, 1)">
+                                            <span>查看</span>
+                                          </a>
+                                      </td>
+									</tr>
+								  </tbody>
+								</table>
+							  </div>
+				            </div>
+						</div>
+                    </div>
+                    <div ng-show="activeTab==3">
+                        <form name="nightAuditorForm" class="form-validation" id="nightAuditorForm" ng-submit="nightAuditor(-1, '')">
+                          <div class="form-inline form-group">
+                            <label class="control-label m-b"><i class="fa fa-clock-o"></i> 营业日</label>
+                            <div class="input-group">
+                                <input type="text" size="9" class="form-control w-thumb-lg" ng-model="param.night_date" data-date-format="yyyy-MM-dd" data-date-type="string" data-start-view="0" data-autoclose="true" data-max-date="{{getBusinessDay('MM/dd/yyyy')}}" data-autoclose="1" name="night_date" bs-datepicker value="{{getDay('yyyy-MM-dd')}}">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="submit"> Go!</button>
+                                    <button class="btn btn-default" type="button" ng-click="passBusinessDay()"><i class="ti-calendar"></i> 夜审完毕 过营业日</button>
+                                </span>
+                            </div>
+                          </div>
+                        </form>
+                        <div class="form-group m-h-n clearfix">
+							<div class="p-md">
+							  <div class="table-responsive">
+								<table class="table bg-white">
+								  <thead>
+									<tr>
+								      <th>订单号</th>
+									  <th translate="module.channel.market_name">客源市场</th>
+									  <th>房号</th>
+									  <th>价格</th>
+									  <th>营业日</th>
+									  <th>审核</th>
+									</tr>
+								  </thead>
+								  <tbody>
+									<tr ng-repeat="(i, night) in nightAuditorList">
+								      <td>{{night.booking_number}}</td>
+									  <td class="text-nowrap">{{night.market_name}}</td>
+									  <td><span>{{night.item_name}}</span></td>
+									  <td>{{night.consume_price_total}}</td>
+									  <td>{{night.business_day}}</td>
+									  <td>
+									      <a class="btn btn-xs btn-default" ng-click="nightAuditor(night.bc_id, night)" ng-if="night.confirm==0"><span translate="common.hint.confirm" >确认</span></a>
+                                          <small ng-if="night.confirm>0">已确认</small>
+									  </td>
+									</tr>
+								  </tbody>
+								</table>
+							  </div>
+							</div>
+						</div>
+                    </div>
+                    <div ng-show="activeTab==4"><!-- 远期房态 -->
+                        <div class="form-group m-h-n clearfix">
+							<div class="p-md">
+                              <form name="roomForcastingForm" class="form-validation" id="roomForcastingForm" ng-submit="roomForcasting(true)">
+							  <div class="form-inline form-group">
+                                <label class="control-label m-b"><i class="fa fa-clock-o"></i> 月份</label>
+                                <div class="input-group">
+                                    <input type="text" size="9" class="form-control w-thumb-lg" ng-model="param.eta_date" data-date-format="yyyy-MM-dd" data-date-type="string" data-start-view="0" data-min-view="0" data-autoclose="true" data-min-date="{{getBusinessDay('MM/dd/yyyy')}}" data-autoclose="1" name="eta_date" bs-datepicker value="{{business_day}}">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="submit"> Go!</button>
+                                    </span>
+                                </div>
+                              </div>
+                              </form>
+							  <div class="table-responsive scroll-x scroll-y">
+								<table class="table table-bordered table-striped bg-white text-nowrap">
+                                  <thead>
+                                    <tr class="bg-light">
+                                      <th class="w" style="padding:1px;"></th>
+                                      <th style="padding:1px;"></th>
+                                      <th class="w-xs col-sm-1 b-r" ng-repeat="(thisDate, date) in forwardCalendar" style="padding:1px;"><div class="w-xs"></div></th>
+                                      <th style="padding:1px;"></th>
+                                    </tr>
+                                    <tr class="bs-sidebar">
+                                      <th class="w"><div class="w-xs">房型\日期</div></th>
+                                      <th class="no-padding panel"></th>
+                                      <th class="w-xs col-sm-1 b-r" ng-repeat="(thisDate, date) in forwardCalendar">
+                                        {{date.day}}<span class="text-xs m-l-xs" ng-class="date.week=='六'||date.week=='日'?'text-warning':'text-muted'"><small>{{date.week}}</small></span>
+                                      </th>
+                                      <th></th>
+                                    </tr>
+                                  </thead>
+                                  <!--房型列表-->
+                                  <tbody>
+                                    <tr><th colspan="{{forwardColspan}}"></th></tr>
+                                    <tr><th>全部房型 <code class="small font-thin">{{channelRoomNum}} <small>可订/已订 入住率</small></code></th><th class="no-padding panel"></th>
+                                        <td ng-repeat="(thisDate, date) in forwardCalendar">
+                                            {{channelAllRoomReservation[thisDate].room_num}}<small>/{{channelAllRoomReservation[thisDate].book_num}}  {{channelAllRoomReservation[thisDate].percentage}}%</small>
+                                        </td>
+                                    <th></th></tr>
+                                    <tr ng-repeat="(layout_id, layout) in layoutList"><!--酒店房型列表 循环 i-->
+                                      <td class="no-padding panel" ng-init="forwardLayoutShow[layout.item_id]=0">
+                                          <div style="padding: 10px 5px 7px 10px;">{{layout.item_name}} <code class="small" ng-if="layoutRoomNum[layout_id]>0">{{layoutRoomNum[layout_id]}}</code> <i class="ti-angle-double-down small pull-right cursor" ng-show="forwardLayoutShow[layout.item_id]==0" ng-click="setForwardLayoutShow(layout.item_id, 1)"></i> <i class="ti-angle-up small pull-right cursor" ng-show="forwardLayoutShow[layout.item_id]==1" ng-click="setForwardLayoutShow(layout.item_id, 0)"></i>
+                                          </div>
+                                          <table class="table no-margin"><!--酒店房型的房间列表 循环 i-->
+                                            <tr ng-repeat="room in layoutRoomList[layout.item_id]" ng-show="forwardLayoutShow[layout.item_id]==1">
+                                                <td>{{room.item_name}}</td>
+                                            </tr>
+                                          </table>
+                                      </td>
+                                      <td class="no-padding panel"></td>
+                                      <td class="w-xs col-sm-1 b-r cursor no-padding panel" ng-repeat="(thisDate, date) in forwardCalendar" ng-click="selectThisLayout($event)">
+                                        <table class="table no-margin">
+                                            <tr>
+                                                <td class="p-xs">
+                                                    {{channelRoomReservation[layout_id][thisDate].room_num}}
+                                                    <small>/{{channelRoomReservation[layout_id][thisDate].book_num}}</small>
+                                                </td>
+                                            </tr>
+                                            <tr ng-repeat="room in layoutRoomList[layout.item_id]" ng-show="forwardLayoutShow[layout.item_id]==1">
+                                                <td class="w-xs w-xs-min" ng-class="channelRoomReservation[layout_id][thisDate]['room'][room.item_id].is_book==1?'room_is_book':''">
+                                                    <div ng-if="channelRoomReservation[layout_id][thisDate]['room'][room.item_id].is_book==1"><div class="book_status btn btn-sm btn-default btn-rounded" ng-repeat="(booking_detail_id,bookRoom) in channelRoomReservation[layout_id][thisDate]['room'][room.item_id].book_info" ng-style="bookRoom.style" ng-class="bookRoom.booking_detail_status==1?'':''" data-title="订单：{{bookRoom.booking_number}}<br>预抵：{{bookRoom.check_in}}　　<br>预离：{{bookRoom.check_out}}　　" data-placement="right" data-animation="am-flip-x" data-html="true" bs-tooltip="tooltip"><span ng-if="bookRoom.booking_detail_status=='1'&&bookRoom.check_out!=business_day">住 <i class="small fa fa-caret-right"></i></span><span ng-if="bookRoom.booking_detail_status=='1'&&bookRoom.check_out==business_day">预离 <i class="small fa fa-caret-right"></i></span><span ng-if="bookRoom.booking_detail_status=='0'">预抵 <i class="small fa fa-caret-right"></i></span></div></div>
+                                                    <div ng-if="channelRoomReservation[layout_id][thisDate]['room'][room.item_id].is_book==0">&nbsp;</div>
+                                                </td>
+                                            </tr>
+                                          </table>
+                                      </td>
+                                      <td></td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+							  </div>
+							</div>
+						</div>
+                    </div>
+                 </div>
+              </div>  
+
+              <div class="p-xs"></div>
+              <!-- / detail -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="box">
+        <div class="p p-v-sm b-b">
+          <script type="text/ng-template" id="filter">
+            <ul tabindex="-1" class="dropdown-menu" role="menu">
+              <li><a >Read</a></li>
+              <li><a >Unread</a></li>
+            </ul>
+          </script>
+          <a href class="pull-right text-muted"><i class="fa fa-trash"></i></a>
+          <a href class="btn btn-default btn-xs text-muted" bs-dropdown="dropdown" data-animation="am-flip-x" data-template-url="filter">
+            Filter <span class="caret"></span>
+          </a>
+        </div>
+        <!-- use box row -->
+        <div class="box-row">
+          <div class="box-cell scrollable hover">
+            <div class="box-inner">
+              <!-- mail list -->
+              <div class="list-group list-group-md no-border no-radius no-margin">
+                
+              </div>
+              <!-- / mail list -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/ng-template" id="/app/book_message.html">
+<div class="list-group-item">
+  <a href class="w-thumb-md pull-left m-r"><img src="/data/images/userimg/user_m.png" class="img-responsive"></a>
+  <div class="clear m-b-sm">
+    <span class="pull-right text-muted text-xs">
+      12:30 PM
+      <label class="ui-checks m-l-sm"><input type="checkbox"><i></i></label>
+    </span>
+    <div>David M.</div>
+    <a href class="text-md text-ellipsis">Easy Angular development with Yeoman</a>
+  </div>
+  <small class="text-muted">One of the best things to happen in web development over the past few years has been the variety of tools</small>
+</div>
+<div class="list-group-item select">
+  <a href class="w-thumb-md pull-left m-r"><img src="images/a1.jpg" class="img-responsive"></a>
+  <div class="clear m-b-sm">
+    <span class="pull-right text-muted text-xs">
+      10:34 PM 
+      <i class="fa fa-paperclip m-l-sm"></i>
+      <label class="ui-checks m-l-sm"><input type="checkbox"><i></i></label>
+    </span>
+    <div>Eric Dane</div>
+    <a href class="text-md text-ellipsis">This is a short and opinionated review of the AngularJS</a>
+  </div>
+  <small class="text-muted">AngularJS is what HTML would have been, designed for building web-apps.</small>
+</div>
+<div class="list-group-item">
+  <a href class="w-thumb-md pull-left m-r"><img src="images/a2.jpg" class="img-responsive"></a>
+  <div class="clear m-b-sm">
+    <span class="pull-right text-muted text-xs">
+      9:34 PM 
+      <i class="fa fa-paperclip m-l-sm"></i>
+      <label class="ui-checks m-l-sm"><input type="checkbox"><i></i></label>
+    </span>
+    <div>Ryan Gosling</div>
+    <a href class="text-md text-ellipsis">Correct the known issue</a>
+  </div>
+  <small class="text-muted">This is a known issue. Please set the correct node write permissions with sudo</small>
+</div>
+<div class="list-group-item">
+  <a href class="w-thumb-md pull-left m-r"><img src="images/a4.jpg" class="img-responsive"></a>
+  <div class="clear m-b-sm">
+    <span class="pull-right text-muted text-xs">
+      July 9
+      <label class="ui-checks m-l-sm"><input type="checkbox"><i></i></label>
+    </span>
+    <div>Richard Hammond</div>
+    <a href class="text-md text-ellipsis">Angular bootstrap</a>
+  </div>
+  <small class="text-muted">Native AngularJS (Angular) directives for Bootstrap. Small footprint</small>
+</div>
+<div class="list-group-item">
+  <a href class="w-thumb-md pull-left m-r"><img src="images/a5.jpg" class="img-responsive"></a>
+  <div class="clear m-b-sm">
+    <span class="pull-right text-muted text-xs">
+      March 10
+      <i class="fa fa-paperclip m-l-sm"></i>
+      <label class="ui-checks m-l-sm"><input type="checkbox"><i></i></label>
+    </span>
+    <div>Ossily</div>
+    <a href class="text-md text-ellipsis">Building an Angular App: Bootstrapping</a>
+  </div>
+  <small class="text-muted">Using angular.bootstrap to Initialize Your App</small>
+</div>
+<div class="list-group-item">
+  <a href class="w-thumb-md pull-left m-r"><img src="images/a6.jpg" class="img-responsive"></a>
+  <div class="clear m-b-sm">
+    <span class="pull-right text-muted text-xs">
+      Feb 8
+      <i class="fa fa-paperclip m-l-sm"></i>
+      <label class="ui-checks m-l-sm"><input type="checkbox"><i></i></label>
+    </span>
+    <div>Patrick</div>
+    <a href class="text-md text-ellipsis">AngularJS Documentation for bootstrap</a>
+  </div>
+  <small class="text-muted">Place ng-app to the root of your application</small>
+</div>
+</script>
+<script type="text/ng-template" id="/app/manage_room.html">
+<ul class="dropdown-menu">
+  <li><a style="display:inline;" ng-click="editRoomStatus('dirty')"><i class="fas fa-broom small"></i> 脏房</a>
+      <a style="display:inline;" ng-click="editRoomStatus('clean')"><i class="fas fa-magic"></i> 净房</a></li>
+  <li class="divider"></li>
+  <li><a style="display:inline;" ng-click="editRoomStatus('lock')"><i class="fas fa-lock"></i> 锁房</a>
+      <a style="display:inline;" ng-click="editRoomStatus('unlock')"><i class="fas fa-lock-open"></i> 解锁</a></li>
+  <li class="divider" style="height:0;"></li>
+  <li><a style="display:inline;" ng-click="editRoomStatus('repair')"><i class="fas fa-tools"></i> 维修</a>
+      <a style="display:inline;" ng-click="editRoomStatus('repair_ok')"><i class="fas fa-user-check small"></i> 修好</a></li>
+  <li class="divider"></li>
+  <li>
+      <a style="display:inline;" ng-click="editRoomStatus('room_card')"><i class="fas fa-id-card-alt"></i> 房卡</a>
+      <a style="display:inline;" ng-click="editRoomStatus('empty_room')"><i class="fas fa-circle-notch"></i> 空房</a></li>
+  </li>
+</ul>
+</script>
+<script id="BookRoomStatusScript" language="JavaScript" src="/resource/scripts/controllers/Booking/BookRoomStatus.js?"></script>
+<script>
+    $('#BookRoomStatusScript').src="/resource/scripts/controllers/Booking/BookRoomStatus.js?"+__VERSION;
+/*(function() {
+  var hm = document.createElement("script");
+  hm.src = "/resource/scripts/controllers/Booking/BookRoomStatus.js?"+__VERSION;
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();*/
+</script>
+
+

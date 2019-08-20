@@ -1,0 +1,102 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="SectorPositionController">
+
+    <form name="SectorPositionForm" class="form-inline" role="form">
+        <ul class="nav nav-tabs" ui-nav>
+            <li class="active">
+                <a href>部门管理</a>
+            </li>
+            <li><a href="#!/app/Setting/{{position.view}}/{{position.url}}">职位管理</a></li>
+            <button class="btn btn-addon btn-default pull-right m-l" ng-click="addSectorPosition(0)"><i class="fa fa-plus"></i>新建价格类型</button>
+            <button type="button" class="btn btn-default pull-right" ng-model="param.channel_id" data-html="1" data-toggle="true" bs-options="channel.channel_id as channel.channel_name for channel in thisChannel" bs-select placeholder="<i class='icon fa fa-building text-lt'></i> 选择酒店">
+              Action <span class="caret"></span>
+            </button>
+        </ul>
+        <div class="p b-a no-b-t bg-white m-b table-responsive">
+            <table class="table table-bordered table-striped bg-white">
+                <thead>
+                    <tr>
+                        <th class="w">企业</th>
+                        <th class="w">一级部门</th>
+                        <th class="w-md">二级部门</th>
+                        <th class="col-sm-3"></th>
+                        <th class="col-sm-3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="(i, system) in dataList">
+                        <td class="text-nowrap">{{system.price_system_name}}</td>
+                        <td><span ng-repeat="(j, market_id) in system.market_ids"><i class="fa fa-check-circle"> </i> {{marketChildrenHash[market_id].market_name}} </span></td>
+                        <th class="col-sm-3"></th>
+                        <td><a ng-click="addSectorPosition(system)" class="pull-right ng-scope"><i class="fa fa-edit"></i></a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<script language="javascript" src="/resource/vendor/modules/angular-smart-table/smart-table.min.js"></script>
+<script language="javascript">
+    app.controller('SectorPositionController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $alert) {
+        //获取数据
+        var _channel = $scope.$stateParams.channel; var _view = $scope.$stateParams.view, common = '';
+        var param = 'channel=' + _channel + '&view=' + _view;
+        $scope.loading.show();
+        $httpService.post('/app.do?' + param, $scope, function(result) {
+            $scope.loading.hide();
+            if (result.data.success == '0') {
+                var message = $scope.getErrorByCode(result.data.code);
+                $alert({ title: 'Error',content: message,templateUrl: '/modal-warning.html',show: true});
+            }
+            common = result.data.common;
+            $scope.setCommonSetting(common);
+            $scope.setThisChannel('Hotel');
+            $scope.roomPriceListUrl = result.data.item.roomPriceListUrl;
+        });
+
+        //
+        var asideSectorPosition = '';
+        $scope.addSectorPosition = function(_this) {
+            $scope.param = {};$scope.param["_valid"] = "1";$scope.param["_price_system_type"] = "direct";
+            if (_this != 0) {
+                $scope.param = _this;
+            }
+
+            $scope.action = '添加/编辑';
+            asideSectorPosition = $aside({scope: $scope,title: $scope._self_module.module_name,placement: 'top',animation: 'am-fade-and-slide-top',backdrop: "static",container: 'body',templateUrl: '/resource/views/Setting/SectorPositionAddEdit.tpl.html'});
+            asideSectorPosition.$promise.then(function() {
+                asideSectorPosition.show();
+                $(document).ready(function() {
+
+                });
+            })
+        };
+
+        $scope.saveData = function() {
+            var param = this.param;
+            if (param._price_system_type == 'formula') {
+                if(param.price_system_father_id == '0' || param.price_system_father_id == 0) {
+					$alert({title: 'Notice', content: '公式价格放盘必须选择继承父价格！', templateUrl: '/modal-warning.html', show: true});
+                	return;
+				}
+            } else {
+				param.price_system_father_id = 0;
+			}
+            $scope.loading.show();
+            var formParam = $.serializeFormat('#thisForm');
+            formParam['cancellation_policy'] = param['policy'];
+            formParam['price_system_father_id'] = '0';
+            if (angular.isDefined(param['price_system_father_id']) && param['price_system_father_id'] > 0) formParam['price_system_father_id'] = param['price_system_father_id'];
+            formParam['price_system_id'] = param['price_system_id'];
+            $scope.param = formParam;
+            $httpService.post('/app.do?channel=' + common.saveAddEditUrl, $scope, function(result) {
+                $scope.loading.hide();
+                if (result.data.success == '0') return;
+                solutionData(result.data.item);
+                asideSectorPosition.hide();
+            });
+        }
+        
+        $httpService.deleteHeader('refresh');
+    });
+</script>

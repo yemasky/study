@@ -1,0 +1,143 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="RoomOrderController">
+    <div class="" append-source>
+            <form name="bookingRoomForm" class="form-inline" role="form" ng-submit="beginBooking('')">
+            <div class="">
+            	<label class="control-label m-b"><i class="fa fa-clock-o"></i> 预抵</label>
+                <div class="form-group">
+                  <input type="text" size="9" class="form-control check_in w-thumb-lg" style="float:left;" name="check_in" ng-model="param.check_in" value="" readonly>
+                  <input type="text" size="6" class="form-control w-thumb-lg" style="" name="in_time" ng-model="param.in_time" data-autoclose="1" data-time-format="HH:mm" placeholder="14:00" value="14:00" data-length="3" data-minute-step="15" data-timezone="UTC" bs-timepicker>
+                </div>
+                <label class="control-label m-b"><i class="fa fa-clock-o"></i> 预离</label>
+                <div class="form-group">
+                  <input type="text" size="9" class="form-control check_out w-thumb-lg" style="float:left;" name="check_out" ng-model="param.check_out" value="" readonly>
+                  <input type="text" size="6" class="form-control w-thumb-lg" style="" name="out_time" ng-model="param.out_time" data-autoclose="1" data-time-format="HH:mm" placeholder="12:00" value="12:00" data-length="3" data-minute-step="15" data-timezone="UTC" bs-timepicker>
+                  <button class="btn btn-default check_date" type="button"><i class="fa fa-calendar text-info"> 选择日期</i></button>
+                </div>
+                <div class="form-group" ng-include="'/app/customerMarket.html'"></div>
+                <div class="form-group"><button class="btn btn-default" type="button" ng-click="checkOrderData()"><i class="fa fa-search"> </i> 查价格</button></div>
+                <!--<button type="button" class="btn btn-default" data-animation="am-flip-x" bs-dropdown aria-haspopup="true" aria-expanded="false" data-trigger=""><i class="icon fa fa-users text-lt"></i> {{market_name}} <i class="fa fa-caret-down"></i></button>
+                    <ul class="dropdown-menu" role="menu" style="overflow:visible;">
+                      <li ng-repeat="(i, father) in marketList" class="dropdown-submenu">
+                        <a onClick="return false;"><span class="pull-right text-muted"><i class="fa fa-caret-down"></i></span> {{father.market_name}}</a>
+                        <ul class="dropdown-menu" role="menu" ng-if="father.children!=''">
+                            <li ng-repeat="(j, market) in father.children"><a class="" ng-click="selectCustomerMarket(market)">{{market.market_name}}</a></li>
+                        </ul>
+                      </li>
+                    </ul>-->
+                <hr>
+            </div>
+            <div class="table-responsive scroll-x" style="padding-bottom:36px;">
+            	<button type="button" class="btn btn-default icon fa fa-building text-lt" ng-model="param.channel_id" data-html="1" data-toggle="true" bs-options="channel.channel_id as channel.channel_name for channel in thisChannel" bs-select placeholder=" {{defaultHotel}}" ng-change="selectChannel(param.channel_id)">
+              Action <span class="caret"></span>
+            	</button>
+                <div class="form-group">
+                  <i class="fa fa-user"></i> {{customer_name}}
+                  <input type="text" size="10" class="form-control" id="member_name" name="member_name" ng-model="param.member_name" required >
+                  <i class="ti-mobile"></i>手机/Email
+                  <div class="input-group">
+                      <input type="text" size="10" class="form-control" id="mobile_email" name="mobile_email" ng-model="param.mobile_email" required >
+                      <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="beginBooking('member')"><i class="fa fa-search"> </i> 会员</button>
+                      </span>
+                  </div> <span ng-show="market_father_id==7||market_father_id==8"><i class="fas fa-globe-asia"></i> OTA订单
+                  <input type="text" size="16" class="form-control btn-default" id="booking_number_ext" name="booking_number_ext" ng-model="param.booking_number_ext" ng-if="market_father_id==7||market_father_id==8?true:false" required></span>
+                  <i class="ti-bookmark"></i>备注
+                  <div class="input-group">
+                      <input type="text" size="10" class="form-control btn-default" id="node" name="node" ng-model="param.node" >
+                      
+                      <span class="input-group-btn">
+                          <button class="btn btn-default" type="submit" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading"><i class="fa fa-save"> </i> 预订</button>
+                      </span>
+                  </div>
+                </div>
+                <table class="table table-bordered table-striped bg-white text-nowrap">
+                  <thead>
+                    <tr class="bg-light">
+                      <th class="w" style="padding:1px;"></th>
+                      <th class="w" style="padding:1px;"></th>
+                      <th class="w-xs" style="padding:1px;"></th>
+                      <th class="w-xs col-sm-1 b-r" ng-repeat="(thisDate, date) in bookingCalendar" style="padding:1px;"><div class="w-xs"></div></th>
+                      <th style="padding:1px;"></th>
+                    </tr>
+                    <tr class="bs-sidebar hidden-print">
+                      <th class="w"><div class="w-xs">房型\日期</div></th>
+                      <th class="w">客源市场价格 
+                          <label class="ui-checks small"><input type="checkbox" value="1" ng-model="param.set_prices" ng-init="param.set_prices=''"><i></i>自定房价</label>
+                      </th>
+                      <th class="w-xs" ng-bind-html="bookRoom_quantity">数量</th>
+                      <th class="w-xs col-sm-1 b-r" ng-repeat="(thisDate, date) in bookingCalendar" ng-class="date.week=='六'||date.week=='日'?'text-warning':''">
+                      	{{date.day}}<span class="text-xs m-l-xs"><small>{{date.week}}</small></span>
+                      </th>
+                      <th></th>
+                      <!--<td class="no-padding">
+                      	<table class="table no-margin" style="width:auto;">
+                            <tbody>
+                                <tr>
+                                    <td class="w-xs col-sm-1 b-r" ng-repeat="(thisDate, date) in bookingCalendar">
+                                    {{date.day}}<span class="text-xs text-muted m-l-xs"><small>{{date.week}}</small></span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                      </td>-->
+                    </tr>
+                  </thead>
+                  <!--房型列表-->
+                  <tbody ng-repeat="(channel_id, layouts) in layoutList" ng-show="param.channel_id==channel_id">
+                    <tr><th colspan="{{colspan}}">{{employeeChannel[channel_id].channel_name}}</th></tr>
+                    <tr ng-repeat="(i, layout) in layouts" ng-if="layout.item_type=='category'&&layout.isBookRoom==true"><!--酒店房型列表 循环 i-->
+                      <td>{{layout.item_name}}
+                        <span class="label bg-light" style="margin-top:-1px; margin-left:-1px;">{{layout.room_num}}</span>
+                        <i class="ti-angle-double-down small pull-right cursor" ng-show="layoutShow[layout.item_id]==0&&layoutSystemMore[market_id][channel_id][layout.item_id]==1" ng-click="showLayout(layout.item_id, 1)"></i>
+                        <i class="ti-angle-up small pull-right cursor" ng-show="layoutShow[layout.item_id]==1" ng-click="showLayout(layout.item_id, 0)"></i>
+                      </td>
+                      <td class="no-padding panel">
+                          <!--<button type="button" class="btn btn-default" ng-model="system_price[channel_id][layout.item_id]" data-html="1" data-toggle="true" bs-options="priceSystem.price_system_id as priceSystem.price_system_name for priceSystem in marketSystemLayout[market_id][channel_id][layout.item_id]" bs-select placeholder="<i class='icon fa fa-stop-circle text-lt'></i>请选择价格" ng-change="selectMarketLayoutPrice(channel_id, layout.item_id, system_price[channel_id][layout.item_id])">
+              				Action <span class="caret"></span>
+            			  </button>-->
+                          <table class="table no-margin"><!--酒店价格体系列表 循环 i-->
+                            <tr ng-repeat="layout_system in marketSystemLayout[market_id][channel_id][layout.item_id] track by $index" ng-show="$index==0||layoutShow[layout.item_id]==1">
+                                <td>{{layout_system.price_system_name}}</td>
+                            </tr>
+                          </table>
+                      </td>
+                      <td class="w-xs no-padding panel">
+                      	  <!--<button type="button" class="btn btn-default" ng-model="select_room_num[channel_id][layout.item_id]" data-html="1" data-toggle="true" bs-options="room.value as room.label for room in layout.select_room_num" bs-select placeholder=" 0">
+              				Action <span class="caret"></span>
+            			  </button>-->
+                          <table class="table no-margin">
+                            <tr ng-repeat="layout_system in marketSystemLayout[market_id][channel_id][layout.item_id] track by $index" ng-show="$index==0 || layoutShow[layout.item_id]==1">
+                                <td style="padding:1px 0px 2px 1px;">
+                                    <div class="w-xs">
+                                      <ui-select ng-model="booking_room[channel_id][layout.item_id][layout_system.price_system_id]" ng-change="select_room($select.selected, channel_id,layout.item_id,layout_system.price_system_id)" theme="bootstrap">
+                                          <ui-select-match placeholder="0　">{{$select.selected.value}}</ui-select-match>
+                                          <ui-select-choices repeat="room in maxChannelRoomReservation[channel_id][layout.item_id].select_room_num | filter: $select.search">
+                                            <div ng-bind-html="room.value | highlight: $select.search" ng-init="room.room_info.price_system_name=layout_system.price_system_name"></div>
+                                          </ui-select-choices>
+                                      </ui-select>
+                                   </div>
+                                </td>
+                            </tr>
+                          </table>
+                      </td>
+                      <td class="w-xs col-sm-1 b-r cursor no-padding panel" ng-repeat="(thisDate, date) in bookingCalendar" ng-click="selectThisLayout($event)">
+                        <table class="table no-margin">
+                            <tr ng-repeat="layout_system in marketSystemLayout[market_id][channel_id][layout.item_id] track by $index" ng-show="$index==0||layoutShow[layout.item_id]==1">
+                                <td style="padding:1px 0px 1px 1px;">
+                      	            <small class="label badge-xs up" style="margin-top:-1px; margin-left:-1px;" ng-class="channelRoomReservation[channel_id][layout.item_id][thisDate].room_num>0?'bg-info':''">{{channelRoomReservation[channel_id][layout.item_id][thisDate].room_num}}</small>
+                                    <!--<span ng-model="booking_price[channel_id][layout.item_id][layout_system.price_system_id]" ng-if="param.set_prices==''">{{marketChannelLayoutPrice[market_id][channel_id][layout.item_id][layout_system.price_system_id][thisDate]}}</span>-->
+                                    <!--booking_room[channel_id][layout.item_id][layout_system.price_system_id]-->
+                                    <span ng-model="booking_price[channel_id][layout.item_id][layout_system.price_system_id]"><input type="text" ng-model="marketChannelLayoutPrice[market_id][channel_id][layout.item_id][layout_system.price_system_id][thisDate]" class="form-control w-xs" size="6" value="{{marketChannelLayoutPrice[market_id][channel_id][layout.item_id][layout_system.price_system_id][thisDate]}}" ng-class="param.set_prices?'enable_select':'unable_select'" ng-readonly="param.set_prices==''" ng-change="inputPriceChange(channel_id,layout.item_id,layout_system.price_system_id)" ng-click="inputPriceChangeClick($event)"></span>
+                                </td>
+                            </tr>
+                          </table>
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+             </div>
+            </form>
+    </div>
+</div>
+<script language="JavaScript" src="/resource/scripts/controllers/Booking/Room.js?"></script>

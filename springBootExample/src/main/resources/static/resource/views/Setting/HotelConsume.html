@@ -1,0 +1,122 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="HotelConsumeController">
+	<div class="box b-a bg-white m-b">
+    	<div class="col-md-10">
+      		<div class="panel-heading b-b b-light"><span class="no-margin" ng-bind-html="_self_module.module_name"></span> <a class="pull-right fa fa-plus" ng-click="addChannelConsume(0)"> </a></div>
+            <div class="p-md">
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped bg-white">
+              <thead>
+                <tr>
+                    <th class="w">类别</th>
+                    <th class="w">中文名称</th>
+                    <th class="w">英文名称</th>
+                    <th class="w">有效</th>
+                    <th>编辑</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(id, consume) in dataConsume">
+                  <td class="no-padding panel" colspan="5">
+                      <table class="table no-margin">
+                          <tr ng-repeat="(consume_id, data) in consume">
+                              <td class="w text-nowrap b-r">{{dataConsumeFather[data.channel_consume_father_id].consume_title}}</td>
+                              <td class="w b-r">{{data.consume_title}}</td>
+                              <td class="w b-r">{{data.consume_title_en}}</td>
+                              <td class="w b-r">
+                                <i ng-if="data.valid=='1'" class="fas fa-check-circle text-success"></i>
+                                <i ng-if="data.valid=='0'" class="fa fa-ban text-warning"></i>
+                              </td>
+                              <td>
+                                <a class="pull-right" ng-click="addChannelConsume(data)" ng-if="data.company_id>0"><i class="fa fa-edit"></i> </a>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+            </div>
+        
+     	</div>
+     	<div class="col-md-2 b-l no-border-sm">
+     		
+     	</div>
+     </div>
+</div>
+<script language="javascript">
+app.controller('HotelConsumeController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $alert, $filter) {
+	//获取数据
+	var _channel = $scope.$stateParams.channel, common = '';
+	var _view = $scope.$stateParams.view, dataConsume = {}, dataConsumeFather = {};
+	var param = 'channel='+_channel+'&view='+_view;
+	$scope.loading.show();
+	$httpService.post('/app.do?'+param, $scope, function(result){
+		$scope.loading.hide();
+		if(result.data.success == '0') {
+			var message = $scope.getErrorByCode(result.data.code);
+			$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+		}
+		common = result.data.common;
+		$scope.setCommonSetting(common);
+		$scope.dataList = result.data.item.channelConsume;
+        if($scope.dataList != '') {
+            for(var i in $scope.dataList){
+                var data = $scope.dataList[i];
+                if(data.channel_consume_id == data.channel_consume_father_id)   {
+                    dataConsumeFather[data.channel_consume_id] = data;
+                } else {
+                    if(angular.isUndefined(dataConsume[data.channel_consume_father_id])) dataConsume[data.channel_consume_father_id] = {};
+                    dataConsume[data.channel_consume_father_id][data.channel_consume_id] = data;
+                }
+            }
+        }
+	});
+    $scope.dataConsume = dataConsume;$scope.dataConsumeFather = dataConsumeFather;
+	//
+	var asideChannelConsume = '', begin_datetime = {}, end_datetime = {};
+	$scope.addChannelConsume = function(_this) {
+		$scope.param = {}; $scope.param["valid"] = "1";
+		if(_this != 0) {
+			$scope.param = _this;
+		}
+		$scope.action = '添加/编辑';
+		asideChannelConsume = $aside({scope : $scope, title: $scope.action_nav_name, placement:'top',animation:'am-fade-and-slide-top',backdrop:"static",container:'body', templateUrl: '/resource/views/Setting/HotelConsumeAddEdit.tpl.html'});
+		asideChannelConsume.$promise.then(function() {
+			asideChannelConsume.show();
+			$(document).ready(function(){
+				$('#rules').val($scope.param["rules"]);
+			});
+		})
+	};
+    $scope.changeChannelConsume = function(channel_consume_father_id) {
+        $scope.param.consume_code = $scope.dataConsumeFather[channel_consume_father_id].consume_code;
+    };
+	$scope.saveData = function() {
+		var param = this.param;
+		if(param == null || param == '' || !angular.isDefined(param.channel_consume_father_id)) {
+			$alert({title: 'Notice', content: '“酒店消费类别”必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+		$scope.loading.show();
+		$scope.param = param;
+        $httpService.header('method', 'editChannelConsume');
+		$httpService.post('/app.do?channel='+common.saveAddEditUrl, $scope, function(result){
+            $httpService.deleteHeader('method');
+			$scope.loading.hide();
+			if(result.data.success == '0') {
+				return;
+			}
+            var channel_consume_id = result.data.item.channel_consume_id;
+            param.channel_consume_id = channel_consume_id;
+			$scope.dataList[param.channel_consume_father_id][channel_consume_id] = angular.copy(param);
+			asideChannelConsume.hide();
+			
+		});
+	}
+	$httpService.deleteHeader('refresh');
+	
+});
+
+</script>

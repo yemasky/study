@@ -1,0 +1,206 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="RoomPriceSystemController">
+
+    <form name="RoomPriceSystemForm" class="form-inline" role="form">
+        <ul class="nav nav-tabs" ui-nav>
+            <li>
+                <a href="#!/app/Setting/{{roomPriceListUrl.view}}/{{roomPriceListUrl.url}}">客房价格</a>
+            </li>
+            <li class="active"><a href>{{_self_module.module_name}}</a></li>
+            <button class="btn btn-addon btn-default pull-right m-l" ng-click="addRoomPriceSystem(0)"><i class="fa fa-plus"></i>新建价格类型</button>
+            <button type="button" class="btn btn-default pull-right" ng-model="param.channel_id" data-html="1" data-toggle="true" bs-options="channel.channel_id as channel.channel_name for channel in thisChannel" bs-select placeholder="<i class='icon fa fa-building text-lt'></i> 选择酒店">
+              Action <span class="caret"></span>
+            </button>
+        </ul>
+        <div class="p b-a no-b-t bg-white m-b table-responsive">
+            <table class="table table-bordered table-striped bg-white">
+                <thead>
+                    <tr>
+                        <th class="w">价格类型</th>
+                        <th class="w">客源市场</th>
+                        <th class="w-md">适用酒店房型</th>
+                        <th class="w-xs">类型</th>
+                        <th class="w-xs">继承</th>
+                        <th class="w-sm">最少预订</th>
+                        <th class="w-sm">取消政策</th>
+                        <th class="w-thumb-xs"></th>
+                        <th class="w-thumb-xs"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="(i, system) in dataList">
+                        <td class="text-nowrap">{{system.price_system_name}}</td>
+                        <td><span ng-repeat="(j, market_id) in system.market_ids"><i class="fa fa-check-circle"> </i> {{marketChildrenHash[market_id].market_name}} </span></td>
+                        <td>
+                            <span ng-repeat="(channel_id, channel) in system.layout_item">
+                    			<span class="badge clearfix">{{employeeChannel[channel_id].channel_name}}</span>
+                            	<span ng-repeat="(j, layout_id) in channel"><i class="fa fa-check-circle"> </i> {{layoutHash[layout_id].item_name}} </span><br>
+                            </span>
+                        </td>
+                        <td><span ng-if="system.price_system_type=='direct'">手输</span><span ng-if="system.price_system_type=='formula'">公式</span></td>
+                        <td>{{dataList[system.price_system_father_id].price_system_name}}</td>
+                        <td>{{system.book_min_day}}天</td>
+                        <td>{{policyHash[system.cancellation_policy].policy_name}}</td>
+                        <td>
+                            <i class="fa fa-dot-circle-o text-success" ng-if="system.valid==1"></i>
+                            <i class="fa fa-ban text-warning ng-scope" ng-if="system.valid==0"></i>
+                        </td>
+                        <td><a ng-click="addRoomPriceSystem(system)" class="pull-right ng-scope"><i class="fa fa-edit"></i></a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<script language="javascript" src="/resource/vendor/libs/moment.min.js"></script>
+<script language="javascript" src="/resource/vendor/libs/daterangepicker.js"></script>
+<script language="javascript" src="/resource/vendor/modules/angular-smart-table/smart-table.min.js"></script>
+<script language="javascript">
+    app.controller('RoomPriceSystemController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $alert) {
+        //获取数据
+        var _channel = $scope.$stateParams.channel; var _view = $scope.$stateParams.view, common = '';
+        var param = 'channel=' + _channel + '&view=' + _view;
+        $scope.loading.show();
+        $httpService.post('/app.do?' + param, $scope, function(result) {
+            $scope.loading.hide();
+            if (result.data.success == '0') {
+                var message = $scope.getErrorByCode(result.data.code);
+                $alert({ title: 'Error',content: message,templateUrl: '/modal-warning.html',show: true});
+            }
+            $scope.selectChannel = {};
+            var marketHash = result.data.item.marketHash,marketChildrenHash = {};
+            $scope.marketHash = marketHash;
+            for (var i in marketHash) {
+                for (var j in marketHash[i].children) {
+                    marketChildrenHash[j] = marketHash[i].children[j];
+                }
+            }
+            $scope.marketChildrenHash = marketChildrenHash;
+            var layoutHash = result.data.item.layoutHash,hotelLayoutHash = {};
+            $scope.layoutHash = layoutHash;
+            for (var i in layoutHash) {
+                var channel_id = layoutHash[i].channel_id;
+                var item_id = layoutHash[i].item_id;
+                if (!angular.isDefined(hotelLayoutHash[channel_id])) {
+                    hotelLayoutHash[channel_id] = {};
+                    hotelLayoutHash[channel_id]['channel_id'] = channel_id;
+                    hotelLayoutHash[channel_id]['item'] = {};
+                }
+                hotelLayoutHash[channel_id]['item'][item_id] = layoutHash[i];
+            }
+            $scope.hotelLayoutHash = hotelLayoutHash;
+            $scope.policyList = result.data.item.policyList;
+            //
+            solutionData(result.data.item.priceSystemHash);
+            //
+            var policyHash = {};
+            for (var i in $scope.policyList) {
+                policyHash[$scope.policyList[i].policy_id] = $scope.policyList[i];
+            }
+            $scope.policyHash = policyHash;
+            common = result.data.common;
+            $scope.setCommonSetting(common);
+            $scope.setThisChannel('Hotel');
+            $scope.roomPriceListUrl = result.data.item.roomPriceListUrl;
+        });
+
+        $scope.market_name = $scope.reconvertChinese($translate.instant("module.channel.market_name"));
+        //
+        var asideRoomPriceSystem = '';
+        $scope.addRoomPriceSystem = function(_this) {
+            $scope.param = {};$scope.param["_valid"] = "1";$scope.param["_price_system_type"] = "direct";
+            if (_this != 0) {
+                var param = _this;var selectChannel = {},channel_layout = {};
+                for (var channel_id in _this.layout_item) {
+                    selectChannel[channel_id] = true;
+                    var layout = _this.layout_item[channel_id];
+                    for (var item_id in layout) {
+                        channel_layout[item_id] = true;
+                    }
+                }
+                $scope.selectChannel = selectChannel;
+                param.channel_layout = channel_layout;
+                var channel_market = {};
+                for (var market_id in _this.market_ids) {
+                    channel_market[market_id] = true;
+                }
+                param.channel_market = channel_market;
+                param['policy'] = param['cancellation_policy'];
+                param['_price_system_name'] = param['price_system_name'];
+                param['_price_system_en_name'] = param['price_system_en_name'];
+                param['_price_system_type'] = param['price_system_type'];
+                param['_book_min_day'] = param['book_min_day'];
+                param['_valid'] = param['valid'];
+                $scope.param = param;
+            }
+
+            $scope.action = '添加/编辑';
+            asideRoomPriceSystem = $aside({scope: $scope,title: $scope._self_module.module_name,placement: 'top',animation: 'am-fade-and-slide-top',backdrop: "static",container: 'body',templateUrl: '/resource/views/Setting/RoomPriceSystemAddEdit.tpl.html'});
+            asideRoomPriceSystem.$promise.then(function() {
+                asideRoomPriceSystem.show();
+                $(document).ready(function() {
+
+                });
+            })
+        };
+        $scope.setPriceSystemType = function(type) {
+            if (type == 'direct') {
+                $('#direct_div').hide();
+            } else {
+                $('#direct_div').show();
+            }
+        };
+        $scope.saveData = function() {
+            var param = this.param;
+            if (param._price_system_type == 'formula') {
+                if(param.price_system_father_id == '0' || param.price_system_father_id == 0) {
+					$alert({title: 'Notice', content: '公式价格放盘必须选择继承父价格！', templateUrl: '/modal-warning.html', show: true});
+                	return;
+				}
+            } else {
+				param.price_system_father_id = 0;
+			}
+            $scope.loading.show();
+            var formParam = $.serializeFormat('#thisForm');
+            formParam['cancellation_policy'] = param['policy'];
+            formParam['price_system_father_id'] = '0';
+            if (angular.isDefined(param['price_system_father_id']) && param['price_system_father_id'] > 0) formParam['price_system_father_id'] = param['price_system_father_id'];
+            formParam['price_system_id'] = param['price_system_id'];
+            $scope.param = formParam;
+            $httpService.post('/app.do?channel=' + common.saveAddEditUrl, $scope, function(result) {
+                $scope.loading.hide();
+                if (result.data.success == '0') return;
+                solutionData(result.data.item);
+                asideRoomPriceSystem.hide();
+            });
+        }
+
+        function solutionData(priceSystemHash) {
+            var priceSystemFather = [];
+            var j = 0
+            for (var i in priceSystemHash) {
+                if (priceSystemHash[i].channel_ids != '') priceSystemHash[i].channel_ids = angular.fromJson(priceSystemHash[i].channel_ids);
+                if (priceSystemHash[i].market_ids != '') priceSystemHash[i].market_ids = angular.fromJson(priceSystemHash[i].market_ids);
+                if (priceSystemHash[i].layout_item != '') priceSystemHash[i].layout_item = angular.fromJson(priceSystemHash[i].layout_item);
+                if (priceSystemHash[i].price_system_type == 'direct') {
+                    priceSystemFather[j] = {};
+                    priceSystemFather[j]['price_system_name'] = priceSystemHash[i]['price_system_name'];
+                    priceSystemFather[j]['price_system_en_name'] = priceSystemHash[i]['price_system_en_name'];
+                    priceSystemFather[j]['price_system_id'] = priceSystemHash[i]['price_system_id'];
+                    j++;
+                }
+            }
+            $scope.dataList = priceSystemHash;
+            $scope.priceSystemFather = priceSystemFather;
+        };
+        $scope.checkSelectPriceSystemFather = function(_this) {
+            if ($scope.param.price_system_father_id == $scope.param.price_system_id) {
+                $alert({title: 'Notice',content: '不能继承自己！',templateUrl: '/modal-warning.html',show: true});
+                $scope.param.price_system_father_id = '';
+                return;
+            }
+
+        }
+        $httpService.deleteHeader('refresh');
+    });
+</script>

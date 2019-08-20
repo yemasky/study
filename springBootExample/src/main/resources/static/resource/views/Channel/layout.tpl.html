@@ -1,0 +1,218 @@
+<div class="aside box-shadow h-10x" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <form name="form-layout" class="form-validation" id="setItemForm" ng-submit="saveItem()">
+      <div class="aside-body" ng-show="content">
+        <div class="tab-container ng-scope ng-valid ng-dirty">
+            <ul class="nav nav-tabs" ng-init="activeTab=1">
+                <li ng-class="{active:activeTab==1}" ng-click="activeTab=1">
+                    <a>基本信息</a>
+                </li>
+                <li ng-class="{active:activeTab==2}" ng-click="activeTab=2">
+                    <a>属性</a>
+                </li>
+                <li ng-class="{active:activeTab==3}" ng-click="activeTab=3">
+                    <a>图片</a>
+                </li>
+                <li ng-class="{active:activeTab==4}" ng-click="activeTab=4;getRoomItem()">
+                    <a>房间</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div ng-show="activeTab==1">
+                    <div class="form-group m-h-n clearfix">
+                      <div class="col-sm-3">
+                        <label>房型中文名称</label>
+                        <input class="form-control" name="item_name" ng-model="param.item_name" required type="text">
+                      </div>
+                      <div class="col-sm-3">
+                        <label>房型英文名称</label>
+                        <input class="form-control" name="item_en_name" ng-model="param.item_en_name" type="text">
+                      </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                      <div class="col-sm-2">
+                        <label>最多住几人</label>
+                        <input class="form-control w-xs" name="number_max" string-to-number ng-model="param.number_max" required type="number">
+                      </div>
+                      <div class="col-sm-2">
+                        <label>最多住小孩</label>
+                        <input class="form-control w-xs" name="number_min" string-to-number ng-model="param.number_min" type="number">
+                      </div>
+                      <div class="col-sm-2">
+                        <label>最多加床</label>
+                        <input class="form-control w-xs" name="item_attr3_value" string-to-number ng-model="param.item_attr3_value" type="number">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="radio-inline"> <input type="radio" value="1" id="valid1" ng-model="param.valid" name="valid" checked> 有效</label>
+                        <label class="radio-inline"> <input type="radio" value="0" id="valid0" ng-model="param.valid" name="valid"> 无效</label>
+                    </div>
+                    <div class="form-group">
+                        <label>房型类型</label>
+                        <div ng-repeat="(i, defaultAttr) in arrayDefaultAttr" ng-if="i==1">
+                        <div class="checkbox" ng-repeat="(j, attr) in defaultAttr">
+                          <label class="checkbox-inline ui-checks" ng-repeat="(k, attribute) in attr">
+                            <input type="checkbox" class="attr_value_1" name="attr_value[1][{{i}}-{{j}}-{{k}}]" value="{{attribute[0]}}">
+                            <i></i>
+                            {{attribute[0]}}
+                          </label>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                        <div class="col-sm-6"><label>特色描述</label>
+                        <input class="form-control" name="describe" ng-model="param.describe" type="text"></div>
+                        <div class="col-sm-6"><label>特色描述(英文)</label>
+                        <input class="form-control" name="describe_en" ng-model="param.describe_en" type="text"></div>
+                    </div>
+                    <div class="form-group">
+                      <label>房型主图</label>
+                      <div class="w-xl w-auto-xs">
+                        <div class="box bg-white">
+                          <div class="box-col w-auto-xs v-m">
+                            <img id="main_images" ng-src="{{param.image_src}}" width="120" height="120" class="b p-xs">
+                            <input id="image_src" name="image_src" type="hidden" ng-model="param.image_src" value="{{param.image_src}}">
+                          </div>
+                          <div class="box-col p">
+                            <button class="btn btn-addon btn-default set_image_src" type="button" isMain="1"><i class="fa fa-upload"></i> 上传图片</button>
+                            [2M/600x600px]
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div ng-show="activeTab==2">
+                	<div class="list-group no-border-sm" ng-repeat="(father_id, childen) in configArrtibute[0]" ng-if="childen.attribute_id>1">
+                      <div class="panel-heading no-border no-radius b-b b-light">{{childen.attribute_name}}</div>
+                      <div class="list-group-item" ng-repeat="(j, sub) in configArrtibute[father_id]">
+                          <span class="pull-right"></span>
+                          <span class="pull-left col-sm-1">
+                          <i class="fa fa-fw fa-circle text-info"></i>
+                          {{sub.attribute_name}}
+                          </span>
+                          <div class="clear">
+                            <div class="font-bold block" ng-if="sub.input_type=='checkbox'">
+                            	<label class="checkbox-inline ui-checks" ng-repeat="(i, defaultAttr) in arrayDefaultAttr[sub.attribute_id]">
+                                    <input type="checkbox" class="attr_value_{{sub.attribute_id}}" name="attr_value[{{sub.attribute_id}}][{{i}}]" value="{{defaultAttr[0]}}">
+                                    <i></i>
+                                    {{defaultAttr[0]}}
+                                </label>
+                                <label class="checkbox-inline">
+                                	<input class="form-control w-sm attr_value_{{sub.attribute_id}}_0" type="text" name="attr_value[{{sub.attribute_id}}][-1]" value="" placeholder="自定义" >
+                                </label>
+                            </div>
+                            <div class="clear" ng-if="sub.input_type=='boolean'">
+                                <label class="radio-inline">
+                                  <input type="radio" value="1" class="attr_value_{{sub.attribute_id}}" name="attr_value[{{sub.attribute_id}}][0]" checked> 有
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" value="0" class="attr_value_{{sub.attribute_id}}" name="attr_value[{{sub.attribute_id}}][0]"> 无
+                                </label>
+                                <label class="radio-inline">
+                                	<input name="attr_value[{{sub.attribute_id}}][1]" placeholder="自定义" class="form-control w-sm attr_value_{{sub.attribute_id}}_0" type="text" value=""> 
+                                </label>
+                            </div>
+                            <div class="col-sm-12" ng-repeat="(l, subChilden) in configArrtibute[sub.attribute_id]">
+                                <label class="col-sm-1 w-xs m-t-xs control-label">
+                                    <span class="fa fa-angle-right fa-fw text-muted"></span>
+                                    {{subChilden.attribute_name}}
+                                </label>
+                                <div class="col-sm-11" ng-if="subChilden.input_type=='checkbox'">
+                                <label class="checkbox-inline ui-checks" ng-repeat="(i, defaultAttr) in arrayDefaultAttr[subChilden.attribute_id]">
+                                    <input type="checkbox" class="attr_value_{{subChilden.attribute_id}}" name="attr_value[{{subChilden.attribute_id}}][{{i}}]" value="{{defaultAttr[0]}}">
+                                    <i></i>
+                                    {{defaultAttr[0]}}
+                                </label>
+                                </div>
+                                <div class="col-sm-1" ng-if="subChilden.input_type=='number'">
+                                	<input type="number" min="1" class="form-control attr_value_{{subChilden.attribute_id}}_0" name="attr_value[{{subChilden.attribute_id}}][0]" value="">
+                                </div>
+                            </div>
+                            <div class="font-bold block" ng-if="sub.input_type=='extend_text'">
+                            	<span ng-repeat="(attr_id, extend) in extend_attr">
+                            	<label class="control-label checkbox-inline no-padding m-b-xs attr_extend" ng-repeat="(i, attr) in extend">
+                                	<input class="form-control w-xxl extend_text_{{attr_id}}" type="text" data-id="{{i}}" name="attr_value[{{attr_id}}][{{i}}]" value="{{attr.attr_value}}">
+                                </label>
+                                </span>
+								<label class="control-label checkbox-inline no-padding m-b-xs attr_extend" id="attr_extend">
+                                	<input class="form-control w-xxl extend_text_10" type="text" data-id="-1" name="attr_value[10][-1]" value="">
+                                </label>
+                                <div class="checkbox-inline"> <a ng-click="attrExtend(10)" class="fa fa-plus-square" attr-id='10'> </a></div>
+                                
+                            </div>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+                <div ng-show="activeTab==3">
+                    <label>房型图片</label>                      
+                    <div class="clear" id="selectImages">
+                    	<div class="box-col w-auto-xs v-m col-sm-1 w-thumb-lg m-r-xs no-padding" ng-repeat="(url, title) in haveSelectImages">
+                            <div><img width="128" height="128" class="b p-xs" ng-src="{{url}}" /></div>
+                            <div class="input-group w-thumb-lg">
+                            	<input class="form-control" name="item_images[{{url}}][name]" type="text" placeholder="标题" value="{{title}}"> 
+                                <input type="hidden" name="item_images[{{url}}][url]" value="{{url}}">
+                                <a class="input-group-addon ti-trash no-radius" ng-click="setSubImages(url, '_del_images')"></a>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="list-group no-radius clear">
+                      <div class="m-t-sm">
+                        <button class="btn btn-addon btn-default set_image_src" type="button" isMain="0"><i class="fa fa-upload"></i> 上传图片</button>
+                            [2M/600x600px]
+                      </div>
+                      
+                    </div>
+                </div>
+                <div ng-show="activeTab==4">
+                        <div class="list-group no-radius clear" id="selectRoom">
+                            <input id="channel_item_multipe_delete" type="hidden" value="">
+                        	<div class="list-group-item col-sm-2 m-xs" ng-repeat="(room_id, room) in haveSelectRoom">
+                            	<span class="pull-left w-thumb m-r b-b-2x"><img class="img-responsive" ng-src="/resource/images/room.png" src="/resource/images/room.png"></span>
+                             	{{room.item_name}}  
+                                <label class="checkbox-inline ui-checks pull-right">
+                                    <input type="checkbox" name="channel_item_multipe[{{room.item_id}}]" ng-click="selectRoom($event, room_id)" value="{{room.item_id}}" checked>
+                                    <i></i>
+                                </label>
+                            </div>
+                        </div>
+                    	<div class="buliding clear m-b" ng-repeat="(buliding_key, buliding) in roomList">
+                        	<div class="m-b-xs"><i class="fa fa-building text-xs"> {{buliding_key}}楼栋</i></div>
+                        	<div class="floor clearfix" ng-repeat="(floor_key, floor) in buliding">
+                            	<span class="badge badge-xs bg-success pos-rlt m-r-xs">{{floor_key}}楼层</span>
+                            	<div class="list-group no-radius">
+                                    <div class="list-group-item col-sm-2 m-xs" ng-repeat="(i, room) in floor">
+                                      <span class="pull-left w-thumb m-r b-b-2x"><img class="img-responsive" ng-src="{{_resource}}images/room.png"></span>
+                                      <div class="clear">
+                                        <span class="font-bold block">房间号:<span>{{room.item_name}}</span> 
+                                        <label class="checkbox-inline ui-checks pull-right">
+                                            <input type="checkbox" id="item_room_{{room.item_id}}" ng-model="room[room.item_id]" ng-click="selectRoom($event, room.item_id);" value="{{room.item_id}}">
+                                            <i></i>
+                                        </label>
+                                            
+                                        </span> 
+                                        {{room.describe}}
+                                      </div>
+                                    </div>
+                                </div> 
+                        	</div>
+                    	</div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer panel-footer">
+        <input type="hidden" name="item_id" value="" ng-model="param.item_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

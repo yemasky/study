@@ -1,0 +1,130 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="EmployeeController">
+	<div class="box b-a bg-white m-b">
+    	<div class="col-md-6">
+      		<div class="panel-heading b-b b-light"><span class="no-margin" ng-bind-html="_self_module.module_name"></span> <a class="pull-right fa fa-plus" ng-click="addPaymentType(0)"> </a></div>
+            <div class="p-md">
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped bg-white">
+              <thead>
+                <tr>
+                  <th>类型</th>
+                  <th class="no-padding panel">
+                    <table class="table no-margin">
+                        <tbody>
+                            <tr>
+                                <th class="col-md-5">中文名称</th>
+                                <th class="col-md-4"></th>
+                                <th class="col-md-2">有效</th>
+                                <th class="col-md-1"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(i, data) in dataList">
+                  <td class="text-nowrap">{{data.payment_name}}</td>
+                  <td class="no-padding panel">
+                    <table class="table no-margin">
+                        <tbody>
+                            <tr ng-repeat="(children_id, children) in data.children">
+                                <td class="col-md-5">{{children.payment_name}}</td>
+                                <td class="col-md-4">{{children.payment_en_name}}<span ng-if="children.payment_en_name==''">　</span> </td>
+                                <td class="col-md-2">
+                                	<i ng-if="children.valid==1" class="fa fa-dot-circle-o text-success"></i>
+                                	<i ng-if="children.valid==0" class="fa fa-ban text-warning"></i>
+                                </td>
+                                <td class="col-md-1">
+                                	<a class="pull-right" ng-click="addPaymentType(children)" ng-if="children.company_id>0"><i class="fa fa-edit"></i> </a>
+                                    <span class="pull-right" ng-if="children.company_id==0">　</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+            </div>
+        
+     	</div>
+     	<div class="col-md-6 b-l no-border-sm">
+     		<div class="panel-heading b-b b-light"> 应收账款</div>
+            <div class="list-group no-border no-radius">
+                <div class="list-group-item">
+                  <span class="pull-right">293,200</span>
+                  <i class="fa fa-fw fa-circle text-info"></i>
+                  Vatican City
+                </div>
+             </div>
+     	</div>
+     </div>
+</div>
+<script language="javascript">
+app.controller('EmployeeController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $alert) {
+	//获取数据
+	var _channel = $scope.$stateParams.channel, common = '';
+	var _view = $scope.$stateParams.view;
+	var param = 'channel='+_channel+'&view='+_view;
+	$scope.loading.show();
+	$httpService.post('/app.do?'+param, $scope, function(result){
+		$scope.loading.hide();
+		if(result.data.success == '0') {
+			var message = $scope.getErrorByCode(result.data.code);
+			$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+		}
+		common = result.data.common;
+		$scope.setCommonSetting(common);
+		var dataList = result.data.item;
+		if(angular.isDefined(dataList)) {
+			$scope.dataList = dataList;
+			var keyData = []; var i = 0;
+			for(var data_id in dataList) {
+				keyData[i] = {};
+				keyData[i]['value'] = dataList[data_id].payment_name;
+				keyData[i]['value_en'] = dataList[data_id].payment_en_name;
+				keyData[i]['value_id'] = dataList[data_id].payment_id;
+				keyData[i]['label'] = dataList[data_id].payment_id;
+				i++;
+			}
+			$scope.keyData = keyData;
+		}
+	});
+	//
+	var asidePaymentType = '';
+	$scope.addPaymentType = function(_this) {
+		$scope.param = {}; $scope.param["valid"] = "1";
+		if(_this != 0) $scope.param = _this;
+		$scope.action = '添加/编辑';
+		asidePaymentType = $aside({scope : $scope, title: $scope.action_nav_name, placement:'top',animation:'am-fade-and-slide-top',backdrop:"static",container:'body', templateUrl: '/resource/views/Setting/PaymentTypeAddEdit.tpl.html'});
+		asidePaymentType.$promise.then(function() {
+			asidePaymentType.show();
+			$(document).ready(function(){
+				
+			});
+		})
+		
+	};
+	$scope.saveData = function() {
+		var param = this.param;
+		if(param == null || param == '' || !angular.isDefined(param.payment_father_id)) {
+			$alert({title: 'Notice', content: '类型必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+		$scope.loading.show();
+		$scope.param = param;
+		$httpService.post('/app.do?channel='+common.saveAddEditUrl, $scope, function(result){
+			$scope.loading.hide();
+			$scope.dataList = result.data.item;
+			asidePaymentType.hide();
+			
+		});
+	}
+	$httpService.deleteHeader('refresh');
+	
+});
+
+</script>

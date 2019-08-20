@@ -1,0 +1,620 @@
+<div class="aside box-shadow h-10x b-r box-shadow no-padding" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <form name="RoomBookEditForm" class="form-validation" id="thisForm" ng-submit="">
+      <div class="aside-body h-8x no-padding">
+		  <div class="m">
+			  <a href class="w-thumb-md pull-left m-r"><img src="/data/images/userimg/user_m.png" class="img-responsive"></a>
+			  <div class="clear m-b-sm">
+				  <div>{{bookDetail.member_name}} <code class="small">订单号 {{bookDetail.booking_number}}</code> 
+                      <span class="small fas fa-coins" ng-class="billAccount[bookDetail.booking_number]>0?'text-success-dk':billAccount[bookDetail.booking_number]<0?'text-danger-dk':''">{{billAccount[bookDetail.booking_number]}}</span>
+                  </div>
+				  <span>{{bookDetail.member_mobile}} {{bookDetail.member_email}}</span>
+				  <span class="text-muted text-xs">
+                      <i class="far fa-clock"></i> {{bookDetail.check_in|limitTo:10}}~{{bookDetail.check_out|limitTo:10}}
+				  </span>
+			  </div>
+		  </div>
+        <div class="tab-container">
+            <ul class="nav nav-tabs">
+                <li ng-class="{active:activeRoomBookEditTab==1}" ng-click="activeRoomBookEditTab=1">
+                    <a ng-bind-html="actionEdit"></a>
+                </li>
+                <!--<li ng-class="{active:activeRoomBookEditTab==2}" ng-click="activeRoomBookEditTab=2">
+                    <a ng-bind-html="actionConsume"></a>
+                </li>-->
+				<li ng-class="{active:activeRoomBookEditTab==3}" ng-click="activeRoomBookEditTab=3">
+                    <a ng-bind-html="actionAccounts"></a>
+                </li>
+                <li ng-class="{active:activeRoomBookEditTab==4}" ng-click="activeRoomBookEditTab=4;getBookingOperation();">
+                    <a ng-bind-html="actionEditLog"></a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div ng-show="activeRoomBookEditTab==1">
+                    <div class="btn-group m-b">
+                        <button type="button" class="btn btn-rounded btn-default" ng-click="addGuestLiveIn('', '')"><i class="fas fa-user-plus"></i> 添加住客</button>
+                        <button type="button" class="btn btn-rounded btn-default" ng-click="addGuestLiveIn('AddBookRoom', '')"><i class="fas fa-bed"></i> 添加客房</button>
+                        <button type="button" class="btn btn-rounded btn-default" ng-click="addGuestLiveIn('HaveLiveIn', roomDetail)"><i class="fas fa-procedures"></i> 客房入住</button>
+                    </div>
+                      <div class="table-responsive">
+						<table class="table">
+						  <thead>
+							<tr>
+							  <th class="col-xs-1">状态</th>
+							  <th class="col-xs-1">房号</th>
+							  <th class="col-xs-2">房型</th>
+							  <th class="col-xs-2" translate="module.channel.market_name">客源市场</th>							  
+							  <th class="col-xs-2">价格类型</th>
+                              <th class="col-xs-1">价格</th>
+							  <th class="col-xs-1">预抵</th>
+							  <th class="col-xs-1">预离</th>
+							  <th translate="common.hint.manager">管理</th>
+							</tr>
+						  </thead>
+						  <tbody><!-- 单个订单 roomDetail -->
+							<tr ng-repeat="(edit_i, rDetail) in roomDetail">
+								<td colspan="9" class="no-padding panel">
+								  <table class="table no-margin">
+									  <tr>
+										  <td class="col-xs-1 small">
+                                              <a class="fas fa-user-plus" ng-click="addGuestLiveIn('AddLiveIn', rDetail)" title="添加住客"></a>
+											  <code class="small" ng-if="rDetail.booking_detail_status==0">预抵</code>
+											  <a class="btn btn-xs btn-default" ng-if="rDetail.booking_detail_status==1"> 已入住</a>
+										  </td>
+										  <td class="col-xs-1" toggle-class="fa fa-edit" class-target="a">{{rDetail.item_name==''?'未排房':rDetail.item_name}}
+											<a class="fa pull-right" ng-click="showEditBookRoomAside(rDetail, 'Room')"></a></td>
+										  <td class="col-xs-2">{{rDetail.item_category_name}}
+											<a class="pull-right" ng-click="showEditBookRoomAside(rDetail, 'category')"></a></td>
+										  <td class="col-xs-2" toggle-class="fa fa-edit" class-target="a" class="text-nowrap">{{rDetail.market_name}}
+											<a class="pull-right" ng-click="showEditBookRoomAside(rDetail, 'market')"></a></td>
+										  <td class="col-xs-2" toggle-class="fa fa-edit" class-target="a">{{rDetail.price_system_name}}
+											<a class="pull-right" ng-click="showEditBookRoomAside(rDetail, 'system')"></a></td>
+										  <td class="col-xs-1" show-bookroom-price="close" ng-Model="consumeList[rDetail.booking_number][rDetail.booking_detail_id]">{{bookConsumePrice[rDetail.booking_number][rDetail.booking_detail_id]}}<a class="pull-right"></a></td>
+										  <td class="col-xs-1">{{rDetail.check_in}}</td>
+										  <td class="col-xs-1">{{rDetail.check_out}}</td>
+										  <td>
+											  <button class="btn btn-xs btn-default" ng-click="showEditBookRoomAside(rDetail, 'market')"><i class="glyphicon glyphicon-edit text-info"></i></button>
+											  <a class="btn btn-xs btn-default" ng-click="addGuestLiveIn('LiveInOne', rDetail)" ng-if="rDetail.booking_detail_status==0"><i class="fas fa-procedures"></i> 入住</a>
+										  </td>
+									  </tr>
+                                      <tr>
+                                          <td colspan="9" class="no-padding panel">
+                                              <table class="table no-margin">
+                                                  <tr ng-repeat="(live_in_id, LiveIn) in guestLiveInList[rDetail.booking_number][rDetail.booking_detail_id]">
+                                                      <td class="col-xs-1"></td>
+                                                      <td  class="col-xs-1" toggle-class="fa fa-edit" class-target="a"><i class="fa fa-user" ng-click="addGuestLiveIn('EditLiveIn', LiveIn)"></i> <a class="" ng-click="addGuestLiveIn('EditLiveIn', LiveIn)"></a></td>
+                                                      <td class="col-xs-1">{{LiveIn.member_name}}</td>
+                                                      <td class="col-xs-1">{{LiveIn.member_sex==1?'男':'女'}}</td>
+                                                      <td class="col-xs-1">{{LiveIn.member_mobile}}</td>
+                                                      <td class="col-xs-1">
+                                                          {{LiveIn.member_idcard_type=='id_card'?'身份证':''}}
+                                                          {{LiveIn.member_idcard_type=='passport'?'护照':''}}
+                                                          {{LiveIn.member_idcard_type=='officer_permit'?'军官证':''}}
+                                                          {{LiveIn.member_idcard_type=='tw_permit'?'台胞证':''}}
+                                                          {{LiveIn.member_idcard_type=='hk_permit'?'港澳台通行证':''}}
+                                                          {{LiveIn.member_idcard_type=='other_permit'?'其它':''}}
+                                                      </td>
+                                                      <td class="col-xs-1">{{LiveIn.member_idcard_number}}</td>
+                                                      <td><a class="btn btn-xs btn-default"><i class="ti-credit-card"></i> 做门卡</a></td>
+                                                      <td colspan="2"></td>
+                                                  </tr>
+                                                </table>
+                                            </td>
+                                      </tr>
+								  </table>
+								</td>
+							</tr>
+						  </tbody>
+						</table>
+                    </div>
+                </div>
+				<div ng-show="activeRoomBookEditTab==2">
+                      <div class="table-responsive"></div>
+                </div>
+                <div ng-show="activeRoomBookEditTab==3">
+                    <script type="text/ng-template" id="/app/checkOutMenu.html">
+                        <ul class="dropdown-menu">
+                          <li><a href ng-click="bookingClose(bookDetail, 'refund')"><i class="fas fa-tasks"></i> 结账退房</a></li>
+                          <li><a href ng-click="bookingClose(bookDetail, 'hanging')"><i class="fas fa-tasks"></i> 挂账退房</a></li>
+                          <li><a href ng-click="bookingClose(bookDetail, 'escape')"><i class="fas fa-grimace"></i> 走结退房</a></li>
+                          <li class="divider"></li>
+                          <li><a href ng-click="bookingClose(bookDetail, 'cancel')"><i class="fas fa-times"></i> 取消订单</a></li>
+                        </ul>
+                    </script>
+                    <div class="panel-heading">
+                        <div class="btn-group m-b" ng-init="activeBookAccountsEditTab=1">
+                            <label class="btn btn-rounded btn-default" ng-class="{active:activeBookAccountsEditTab==1}" ng-click="activeBookAccountsEditTab=1"><i class="fas fa-list-alt"></i> 消费表</label>
+                            <label class="btn btn-rounded btn-default" ng-class="{active:activeBookAccountsEditTab==2}" ng-click="activeBookAccountsEditTab=2"><i class="far fa-list-alt"></i> 账务表</label>
+                            <label class="btn btn-rounded btn-default" ng-class="{active:activeBookAccountsEditTab==3}" ng-click="activeBookAccountsEditTab=3"><i class="far fa-list-alt"></i> 借物表</label>
+                        </div>
+                        <div class="btn-group m-b">
+                            <div class="btn-group dropdown">
+                              <button type="button" class="btn btn-rounded btn-default" bs-dropdown="dropdown" data-animation="am-fade-and-slide-top"><i class="fas fa-cash-register"></i> 
+                                消费 <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li><a href ng-click="activeBookAccountsEditTab=1;bookingConsume('consume');"><i class="fas fa-yen-sign"></i> 消费</a></li>
+                                  <li><a href ng-click="activeBookAccountsEditTab=3;bookingConsume('borrowing');"><i class="fas fa-clipboard-list"></i> 借物</a></li>
+                              </ul>
+                            </div>
+                            <div class="btn-group dropdown" ng-click="activeBookAccountsEditTab=2">
+                              <button type="button" class="btn btn-rounded btn-default" bs-dropdown="dropdown" data-animation="am-fade-and-slide-top" data-template-url="/app/accountsMenu.html"><i class="fas fa-wallet"></i> 
+                                入账 <span class="caret"></span>
+                              </button>          
+                            </div>
+                            <div class="btn-group dropdown">
+                              <button type="button" class="btn btn-rounded btn-default" bs-dropdown="dropdown" data-animation="am-fade-and-slide-top" data-template-url="/app/checkOutMenu.html"><i class="fas fa-cash-register"></i> 
+                                结账 <span class="caret"></span>
+                              </button>          
+                            </div>
+                        </div>
+					</div>
+                    <div class="tab-container">
+                        <div ng-show="activeBookAccountsEditTab==1">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped bg-white text-nowrap">
+                                  <thead>
+                                    <tr>
+                                      <th class="w">房号</th>
+                                      <th class="w">项目</th>
+                                      <!--<th class="w">数量</th>-->
+                                      <th class="w">金额</th>
+                                      <th class="w">营业日</th>
+                                      <th class="col-xs-1">管理</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr ng-repeat="(detail_id, consumes) in consumeDetail">
+                                        <td colspan="6" class="no-padding panel">
+                                            <table class="table no-margin">
+                                                <tr ng-repeat="(i, consume) in consumes">
+                                                    <td class="w">{{consume.item_name}}</td>
+                                                    <td class="w">{{consume.consume_title}}</td>
+                                                    <!--<td class="w">{{consume.item_amount}}</td>-->
+                                                    <td class="w">{{consume.consume_price_total}}</td>
+                                                    <td class="w">{{consume.business_day}}</td>
+                                                    <td class="col-xs-1">
+                                                        <span class="btn-group">
+                                                            <button class="btn btn-xs btn-default" ng-click="editConsume(consume)"><span translate="common.hint.edit" >编辑</span></button>
+                                                            <button class="btn btn-xs btn-default" ng-click="editConsume(consume)"><span translate="common.hint.backout" >撤销</span></button>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div ng-show="activeBookAccountsEditTab==2">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped bg-white text-nowrap">
+                                  <thead>
+                                    <tr>
+                                      <th>房号</th>
+                                      <th>支付方式</th>
+                                      <th>项目</th>
+                                      <th>金额</th>
+                                      <th>营业日</th>
+                                      <th>时间</th>  
+                                      <th>管理</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr ng-repeat="(i, account) in accountDetail">
+                                      <td>{{account.item_name}}</td>
+                                      <td>{{account.payment_name}}</td>
+                                      <td>{{account.accounts_type=='receipts'?'收款':account.accounts_type=='refund'?'退款':''}}</td>
+                                      <td>{{account.money}}</td>
+                                      <td>{{account.business_day}}</td>
+                                      <td>{{account.add_datetime}}</td>
+                                      <td>
+                                          <span class="btn-group">
+                                          <button class="btn btn-xs btn-default" ng-click="editAccounts(account)"><span translate="common.hint.edit" >编辑</span></button>
+                                          <button class="btn btn-xs btn-default" ng-click="editAccounts(account)"><span translate="common.hint.backout" >撤销</span></button>
+                                          </span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <th class="text-nowrap">合计</th>
+                                      <td>收款</td>
+                                      <td></td>
+                                      <td>退款</td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                    </tr>  
+                                  </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div ng-show="activeBookAccountsEditTab==3">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped bg-white text-nowrap">
+                                  <thead>
+                                    <tr>
+                                      <th class="w">房号</th>
+                                      <th class="w">物品</th>
+                                      <th class="w">数量</th>
+                                      <th class="w">押金</th>
+                                      <th class="w">时间</th>
+                                      <th class="w">已还</th>  
+                                      <th class="col-xs-1">管理</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr ng-repeat="(detail_id, borrowing) in bookBorrowing">
+                                        <td colspan="7" class="no-padding panel">
+                                            <table class="table no-margin">
+                                                <tr ng-repeat="(borrow_id, borrow) in borrowing">
+                                                    <td class="w">{{borrow.item_name}}</td>
+                                                    <td class="w">{{borrow.borrowing_name}}</td>
+                                                    <td class="w">{{borrow.borrowing_num}}</td>
+                                                    <td class="w">{{borrow.cash_pledge}}</td>
+                                                    <td class="w">{{borrow.add_datetime}}</td>
+                                                    <td class="w">{{borrow.borrowing_return_num}}</td>
+                                                    <td class="col-xs-1">
+                                                        <span class="btn-group">
+                                                            <button class="btn btn-xs btn-default" ng-click="editBorrowing(borrow)"><span translate="common.hint.edit" >编辑</span></button>
+                                                            <button class="btn btn-xs btn-default" ng-click="editBorrowing(borrow)"><span translate="common.hint.give_back" >归还</span></button>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                      <th class="text-nowrap">合计</th>
+                                      <td>收款</td>
+                                      <td></td>
+                                      <td>退款</td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                    </tr>  
+                                  </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div ng-show="activeRoomBookEditTab==4">
+                      <div class="table-responsive">
+						<table class="table bg-white">
+						  <thead>
+							<tr>
+							  <th>时间</th>
+							  <th>标题</th>
+							  <th>内容</th>
+							  <th>操作人</th>
+							  <th></th>
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr ng-repeat="(i, Operation) in bookingOperationList">
+							  <td class="text-nowrap">{{Operation.add_datetime}}</td>
+							  <td>{{Operation.operation_title}}</td>
+							  <td>{{Operation.operation_content}}</td>
+							  <td>{{Operation.employee_name}}</td>
+							  <td>{{Operation.request}}</td>
+							</tr>
+						  </tbody>
+						</table>
+                    </div>
+                </div>
+                <div class="form-group"></div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer panel-footer">
+      	<input type="hidden" name="item_id" value="" ng-model="param.item_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script language="javascript">
+app.controller('EditBookRoomController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $ocLazyLoad, $alert, $filter, $modal) {
+    //获取数据
+	var _channel = $scope.$stateParams.channel;
+	var _view = $scope.$stateParams.view,common = '';
+	var param = 'channel='+_channel+'&view='+_view;
+    ////////begin Borrowing 借物
+    $scope.changeBorrowing = function() {
+        $scope.param.money = $scope.borrowing.borrowing_price * $scope.param.borrowing_num;
+    }
+    $scope.saveBorrowing = function() {
+        $scope.param.booking_number = $scope.bookDetail.booking_number;
+        $scope.param.channel = $scope.bookDetail.channel;
+        $scope.param.book_id = $scope.bookDetail.book_id;
+        $scope.param.borrowing_id = $scope.borrowing_id;
+        $scope.param.borrowing_name = $scope.borrowing_name;
+        $scope.param.payment_id = $scope.payment_id;
+        $scope.param.payment_name = $scope.payment_name;
+        $scope.loading.show();$httpService.header('method', 'saveBorrowing');
+        $httpService.post('/app.do?'+param, $scope, function(result){
+            $httpService.deleteHeader('method');
+            $scope.loading.percent();
+            if(result.data.success == '0') {
+                var message = $scope.getErrorByCode(result.data.code);
+                //$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+                return;//错误返回
+            }
+            $scope.asideConsume.hide();
+        });
+    };
+    //////end Borrowing
+    
+    //////Consume
+    $scope.saveConsume = function() {
+        $scope.param.booking_number = $scope.bookDetail.booking_number;
+        $scope.param.channel = $scope.bookDetail.channel;
+        $scope.param.consume_title = $scope.consume_title;
+        $scope.param.booking_type = $scope.thisConsume.consume_code;
+        $scope.param.channel_consume_id = $scope.thisConsume.channel_consume_id;
+        $scope.param.channel_consume_father_id = $scope.thisConsume.channel_consume_father_id;
+        $scope.param.book_id = $scope.bookDetail.book_id;
+        $scope.loading.show();$httpService.header('method', 'saveConsume');
+        $httpService.post('/app.do?'+param, $scope, function(result){
+            $httpService.deleteHeader('method');
+            $scope.loading.percent();
+            if(result.data.success == '0') {
+                var message = $scope.getErrorByCode(result.data.code);
+                //$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+                return;//错误返回
+            }
+            var consume_id = result.data.item.consume_id, c_id = result.data.item.bc_id,business_day=result.data.item.business_day;
+            if(angular.isUndefined($scope.consumeDetail[$scope.param.booking_detail_id][consume_id])) { 
+                consume_price_total = result.data.item.consume_price_total;
+                $scope.param.consume_id = consume_id;$scope.param.c_id = c_id;
+                $scope.param.business_day = business_day;
+            } 
+            $scope.param.consume_price_total = $scope.param.money;$scope.param.consume_price = $scope.param.money;
+            $scope.param.original_price = $scope.param.money;$scope.param.item_amount = 1;
+            $scope.consumeDetail[$scope.param.booking_detail_id][consume_id] = angular.copy($scope.param);
+            $scope.param.c_id = '';
+            $scope.asideConsume.hide();
+        });
+    }
+    //////end Consume
+    //选择客人市场
+    $scope.showCustomerMarket = function($event) {
+        //$('#customer_ul').mouseover(function(e) {$('#customer_ul').next().show();});
+        $('#customer_ul').next().show();
+    }
+    $scope.market_id = '';
+    $scope.selectCustomerMarket = function(market, ajax) {
+        $scope.marketSystemLayout = {};
+        if(angular.isDefined(market)) {
+            $scope.market_name = market.market_name;
+            $scope.market_id = market.market_id;
+            $scope.market_father_id =  market.market_father_id;
+            $('#customer_ul').next().hide();
+            $scope.customer_name = $scope.roomDetailEdit.market_name;
+            if(market.market_father_id == '4') {//判断会员是否正确
+                $scope.customer_name = market.market_name;
+            }
+        }
+    };
+    ////保存编辑预订客源市场等
+    $scope.saveEditRoomForm = function (roomDetailEdit) {//单个roomDetail
+        $httpService.header('method', 'editBookRoom');
+        $scope.param.detail_id = roomDetailEdit.detail_id;
+        if(angular.isDefined($scope.market_id) && $scope.market_id > 0) {
+            $scope.param.market_id = $scope.market_id;
+            $scope.param.market_name = $scope.market_name;
+            $scope.param.market_father_id = $scope.market_father_id;
+        }
+        if(angular.isDefined($scope.param.item_category_id) && $scope.param.item_category_id > 0 && 
+           angular.isDefined($scope.param.item_room) && $scope.param.item_room > 0) {
+            var categoryRoom = $scope.layoutRoomList[$scope.param.item_category_id];
+            if(angular.isUndefined(categoryRoom[$scope.param.item_room])) {
+                $alert({title: 'Error', content: '请选择房型下的房间！', templateUrl: '/modal-warning.html', container: 'body', show: true});
+                return;
+            }
+        }
+        var getParam = '';var roomDetailEdit = angular.copy($scope.roomDetailEdit);
+        if($scope.param.changeCheckDate == 1) {
+            var market_id,market_name,market_father_id,price_system_id,price_system_name,item_category_id,item_category_name,item_room,item_room_name;
+            if(angular.isUndefined($scope.param.market_id) || $scope.param.market_id == '') {
+                market_id = roomDetailEdit.market_id;market_name = roomDetailEdit.market_name;market_father_id = roomDetailEdit.market_father_id;
+            } else {
+                market_id = $scope.param.market_id;market_name = $scope.param.market_name;market_father_id = $scope.param.market_father_id;
+            }
+            getParam += '&market_id='+market_id+'&market_name='+market_name+'&market_father_id='+market_father_id;
+            if(angular.isUndefined($scope.param.price_system_id)) {
+                price_system_id = roomDetailEdit.price_system_id; price_system_name = roomDetailEdit.price_system_name;
+            } else {
+                price_system_id = $scope.param.price_system_id;price_system_name = $scope.param.price_system_name;
+            }
+            getParam += '&price_system_id='+price_system_id+'&price_system_name='+price_system_name;
+            if(angular.isUndefined($scope.param.item_category_id)) {
+                item_category_id = roomDetailEdit.item_category_id;item_category_name = roomDetailEdit.item_category_name;
+            } else {
+                item_category_id = $scope.param.item_category_id;item_category_name = $scope.param.item_category_name;
+            }
+            getParam += '&item_category_id='+item_category_id+'&item_category_name='+item_category_name;
+            if(angular.isUndefined($scope.param.item_room)) {
+                item_room = roomDetailEdit.item_id;item_room_name = roomDetailEdit.item_name;
+            } else {
+                item_room = $scope.param.item_room;item_room_name = $scope.param.item_room_name;
+            }
+            getParam += '&item_room='+item_room+'&item_room_name='+item_room_name;
+        }
+        $scope.param.book_id = roomDetailEdit.book_id;
+        $scope.beginLoading =! $scope.beginLoading;
+        $httpService.post('/app.do?'+param+getParam, $scope, function(result) {
+            $scope.beginLoading =! $scope.beginLoading;
+            $scope.param.changeCheckDate = 0;
+            $httpService.deleteHeader('method');
+            if (result.data.success == '0') {
+                var message = $scope.getErrorByCode(result.data.code);
+                //$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+                return;//错误返回
+            }
+            roomDetailEdit.item_id = $scope.param.item_room;
+            if($scope.param.item_room_name != '') roomDetailEdit.item_name = $scope.param.item_room_name;
+            //$scope.roomDetail.item_id = $scope.param.item_room;
+            //if($scope.param.item_room_name != '') $scope.roomDetail.item_name = $scope.param.item_room_name;
+            //$scope.roomDetailList[roomDetailEdit.booking_number] = $scope.roomDetail;
+            $scope.editBookRoomAside.$promise.then($scope.editBookRoomAside.hide);
+            $scope.successAlert.startProgressBar();
+            $scope.param.market_id = '';
+        });
+    };
+    $scope.selectPriceSystem = function(system) {
+        $scope.param.price_system_id = system.price_system_id;
+        $scope.param.price_system_name = system.price_system_name;
+        $scope.param.cancellation_policy = system.cancellation_policy;
+    }
+    $scope.selectItemCategory = function(itemCategory) {
+        $scope.param.item_category_id = itemCategory.item_id;
+        $scope.param.item_category_name = itemCategory.item_name;
+        $scope.layoutSelectRoom = $scope.layoutRoomList[itemCategory.item_id];
+    }
+    //延住
+    var source_consumeRoomPrice = angular.copy($scope.consumeRoomPrice);
+    $scope.changeCheckDate = function(checkDate) {
+        var getParam = '',market_id,price_system_id;var item_category_id = '';
+        if(angular.isUndefined($scope.param.market_id)) {market_id = $scope.roomDetailEdit.market_id;
+        } else {market_id = $scope.param.market_id;}
+        if(angular.isUndefined($scope.param.price_system_id)) {price_system_id = $scope.roomDetailEdit.price_system_id;
+        } else {price_system_id = $scope.param.price_system_id;}
+        if(angular.isUndefined($scope.param.item_category_id)) {item_category_id = $scope.roomDetailEdit.item_category_id;
+        } else {item_category_id = $scope.param.item_category_id;}
+        getParam = '&market_id='+market_id+'&price_system_id='+price_system_id+'&item_category_id='+item_category_id;
+        $scope.beginLoading =! $scope.beginLoading;
+        $httpService.header('method', 'changeCheckDate');
+        $httpService.post('/app.do?'+param+getParam, $scope, function(result) {
+            $scope.beginLoading =! $scope.beginLoading;
+            $scope.param.changeCheckDate = 1;
+            $httpService.deleteHeader('method');
+            if (result.data.success == '0') {
+                var message = $scope.getErrorByCode(result.data.code);
+                //$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+                return;//错误返回
+            }
+            var priceSystemHash = $scope.priceSystemHash;//价格体系
+            //房量
+            var bookingRoomList = result.data.item.bookingRoom;//已定房量
+            var layoutList = $scope.layoutList;//房型数据 
+            //重组按日期价格
+            var datePrice = {};
+            if(result.data.item.priceLayout != '') {
+                for(var i in result.data.item.priceLayout) {
+                    datePrice[result.data.item.priceLayout[i].layout_price_date] = result.data.item.priceLayout[i];
+                }
+            }
+            var channel_id = $scope.param.channel_id;
+            //重新计算时间 价格
+            var in_date = $scope.param.check_in,out_date = $scope.param.check_out;
+            var layoutPriceSystem = $scope.priceSystemHash[price_system_id];
+            var channel_ids = angular.fromJson(layoutPriceSystem.channel_ids),layout_item = angular.fromJson(layoutPriceSystem.layout_item);
+            var channel_formula = layoutPriceSystem.formula != '' ? angular.fromJson(layoutPriceSystem.formula) : '';
+            var layout_formula = {},roomList = $scope.roomList;//客房列表 总共有几个客房
+            var layoutRoom = $scope.layoutRoom;//房型房间对应关系;
+            if(channel_formula != '' && angular.isUndefined(channel_formula[channel_id + '-' + item_category_id])) {//未设置房型价格
+                layout_formula = -999;//表示未设置房型价格
+                $scope.param.set_prices = 1;
+                var message = '价格类型："'+$scope.priceSystemHash[price_system_id].price_system_name 
+                             +'" 对应房型："'+$scope.layoutList[item_category_id].item_name+'" 未设置价格！使用默认价格！';
+                $alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+            } else if(channel_formula != '' && angular.isDefined(channel_formula[channel_id + '-' + item_category_id])) {
+                layout_formula = channel_formula[channel_id + '-' + item_category_id];
+            } else {
+                channel_formula = '';
+            }
+            //if(typeof(priceSystemHash[_system_id]) != 'undefined') {
+            var system_type = layoutPriceSystem.price_system_type,decimal_price = 0;
+            if(typeof($rootScope.channelSettingList[channel_id]) != 'undefined') 
+                decimal_price = $rootScope.channelSettingList[channel_id].decimal_price - 0;
+            //获取价格
+            var check_in = new Date(in_date.replace(/-/g, '/')),check_out = new Date(out_date.replace(/-/g, '/'));
+            var check_in_time = check_in.getTime(),check_out_time = check_out.getTime();
+            var consumeRoomPrice = {};//angular.copy(source_consumeRoomPrice);
+            $scope.param.price = {};var bookingCalendar = {};//预定日历
+            for(var i = check_in_time; i < check_out_time; i += 86400000) {
+                var thisDate = new Date(i);var year = thisDate.getFullYear();
+                var month = thisDate.getMonth() - 0 + 1; if(month < 10) month = '0'+month;
+                var day = thisDate.getDate() - 0; if(day < 10) day = '0'+day;
+                var price_key = year+'-'+month+'-01';
+                //date_key = 年-月-日 2018-01-01
+                var date_key = year+'-'+month+'-'+day;
+                bookingCalendar[date_key] = {};
+                if(typeof(consumeRoomPrice[date_key]) == 'undefined') {
+                    if(angular.isDefined(source_consumeRoomPrice[date_key])) {
+                        consumeRoomPrice[date_key] = angular.copy(source_consumeRoomPrice[date_key]);
+                        $scope.param.price[date_key] = consumeRoomPrice[date_key].consume_price;
+                    } else {
+                        consumeRoomPrice[date_key] = {};
+                        var price = datePrice[price_key]['day_'+day];
+                        if(system_type == 'formula' && layout_formula != -999) {//公式
+                            if(layout_formula['formula_value'] - 0 > 0)
+                                price = $scope.arithmetic(price, layout_formula['formula'], layout_formula['formula_value'], decimal_price);
+                            if(layout_formula['formula_second_value'] - 0 > 0)
+                                price = $scope.arithmetic(price, layout_formula['formula_second'], layout_formula['formula_second_value'], decimal_price);
+                        }
+                        consumeRoomPrice[date_key]['business_day'] = date_key;
+                        consumeRoomPrice[date_key]['consume_price'] = price;
+                        $scope.param.price[date_key] = price;
+                    }
+                } 
+            }
+            $scope.consumeRoomPrice = consumeRoomPrice;
+            //计算已预定房型数据
+            var bookingCategory = {};
+            var categoryRoom = $scope.layoutRoomList[item_category_id];//全部该房型下全部想房间
+            var categoryRoomNum = Object.keys(categoryRoom).length;
+            for(var i in bookingRoomList) {
+                var bookingRoom = bookingRoomList[i];
+                var check_in_time = new Date(bookingRoom.check_in.replace(/-/g, '/')).getTime(); 
+                var check_out_time = new Date(bookingRoom.check_out.replace(/-/g, '/')).getTime();
+                var channel_id = bookingRoom.channel_id;
+                var book_room_id = bookingRoom.item_id;
+                for(var i = check_in_time; i < check_out_time; i += 86400000) {
+                    var thisDate = new Date(i);var year = thisDate.getFullYear();
+                    var month = thisDate.getMonth() - 0 + 1; if(month < 10) month = '0'+month;
+                    var day = thisDate.getDate() - 0; if(day < 10) day = '0'+day;
+                    //date_key = 年-月-日 2018-01-01
+                    var date_key = year+'-'+month+'-'+day;
+                    if(angular.isUndefined(bookingCategory[date_key])) {
+                        bookingCategory[date_key] = {};
+                        bookingCategory[date_key]['book_num'] = 0;
+                        bookingCategory[date_key]['book_room'] = {};
+                    }
+                    bookingCategory[date_key]['book_num']++;
+                    bookingCategory[date_key]['book_room'][book_room_id] = book_room_id;
+                }
+            }
+            //计算日期可订房数量
+            var roomDetailEdit = angular.copy($scope.roomDetailEdit);
+            var channelRoomReservation = {};console.log(bookingCalendar);
+            for(var date_key in bookingCalendar) {
+                if(angular.isUndefined(channelRoomReservation[date_key])) {
+                    channelRoomReservation[date_key] = {};
+                    channelRoomReservation[date_key]['room_num'] = categoryRoomNum;//date_key当天可定全部房量
+                }
+                if(angular.isDefined(source_consumeRoomPrice[date_key])) {
+                    channelRoomReservation[date_key]['room_num'] = '1'; continue;
+                }
+                if(angular.isUndefined(bookingCategory[date_key])) continue;//如果没有这个预定这跳过
+                if(angular.isDefined(bookingCategory[date_key])) {//已定房量
+                    var book_num = angular.copy(bookingCategory[date_key].book_num);//已定房量
+                    var _room_num = angular.copy(channelRoomReservation[date_key]['room_num']);
+                    var room_num_reservation = _room_num - book_num;//总房量-已定房量=可定房量
+                    channelRoomReservation[date_key]['room_num'] = room_num_reservation;
+                }
+            }
+            $scope.channelRoomReservation = channelRoomReservation;
+        });
+    }
+});    
+</script>

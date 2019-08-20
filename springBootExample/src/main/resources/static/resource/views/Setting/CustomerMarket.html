@@ -1,0 +1,258 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="CustomerMarketController">
+	<div class="box b-a bg-white m-b">
+    	<div class="col-md-6">
+      		<div class="panel-heading b-b b-light"><span class="no-margin" ng-bind-html="action_nav_name"></span> <a class="pull-right fa fa-plus" ng-click="addCustomerMarket(0)"> </a></div>
+            <div class="p-md">
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped bg-white">
+              <thead>
+                <tr>
+                  <th>类别</th>
+                  <th>类型</th>
+                  <th class="no-padding panel">
+                    <table class="table no-margin">
+                        <tbody>
+                            <tr>
+                                <th class="col-md-5">中文名称</th>
+                                <th class="col-md-4"></th>
+                                <th class="col-md-2">有效</th>
+                                <th class="col-md-1"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(i, data) in dataList">
+                  <td class="text-nowrap">{{data.market_name}}</td>
+                  <td class="text-nowrap"><span ng-if="data.marketing==1">直销</span><span ng-if="data.marketing==2">分销</span><span ng-if="data.marketing==3">OTA</span><span ng-if="data.marketing==0">其它</span></td>
+                  <td class="no-padding panel">
+                    <table class="table no-margin">
+                        <tbody>
+                            <tr ng-repeat="(children_id, children) in data.children">
+                                <td class="col-md-5">{{children.market_name}}</td>
+                                <td class="col-md-4">{{children.market_en_name}}<span ng-if="children.market_en_name==''">　</span> </td>
+                                <td class="col-md-2">
+                                	<i ng-if="children.valid==1" class="fa fa-dot-circle-o text-success"></i>
+                                	<i ng-if="children.valid==0" class="fa fa-ban text-warning"></i>
+                                </td>
+                                <td class="col-md-1">
+                                	<a class="pull-right" ng-click="addCustomerMarket(children)" ng-if="children.company_id>0"><i class="fa fa-edit"></i></a>
+                                    <span class="pull-right" ng-if="children.company_id==0">　</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+            </div>
+        
+     	</div>
+     	<div class="col-md-6 b-l no-border-sm">
+     		<div class="panel-heading b-b b-light"> 会员设置</div>
+            <div class="list-group no-border no-radius">
+                <div class="list-group-item">
+                  <span class="pull-right"> </span>
+                  <i class="fa fa-fw fa-circle text-info"></i>
+                   
+                </div>
+             </div>
+             <div class="panel-heading b-b b-light"></div>
+             <div class="list-group no-border no-radius">
+                <!----- ------>
+                 <div class="panel panel-default no-border">
+                    <div class="panel-heading">协议客源  <a class="pull-right fa fa-plus" ng-click="addReceivable(0,-1)"> </a></div>
+                    <table st-pipe="callServer" st-table="displayed" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th st-ratio="40" st-sort="receivable_name">应收账款名称</th>
+                            <th st-ratio="10" st-sort="receivable_type">类型</th>
+                            <th st-ratio="15" st-sort="credit">信用额度</th>
+                            <th st-ratio="15" st-sort="credit_used">已用额度</th>
+                            <th st-ratio="15" st-sort="valid_date">有效期</th>
+                            <th st-ratio="5"></th>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <input st-search="" class="input-sm form-control w" name="receivable_name" id="receivable_name" type="text" ng-model="receivable_name" >
+                            </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="(i,row) in displayed">
+                            <td st-ratio="40">{{row.receivable_name}}</td>
+                            <td st-ratio="10">{{row.receivable_type}}</td>
+                            <td st-ratio="15">{{row.credit}}</td>
+                            <td st-ratio="15">{{row.credit_used}}</td>
+                            <td st-ratio="15">{{row.valid_date}}</td>
+                            <td st-ratio="5"><a class="pull-right" ng-click="addReceivable(row, i)"><i class="fa fa-edit"></i></a></td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <div st-items-by-page="10" st-pagination="" st-template="pagination.custom.html">
+                                    
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                  </div>
+                <!----- ------>
+             </div>
+     	</div>
+     </div>
+</div>
+<script language="javascript">  
+app.controller('CustomerMarketController', function($rootScope,$scope,$httpService,$location,$translate,$aside,$alert,$ocLazyLoad) {
+    //$ocLazyLoad.load([$scope._resource + "vendor/modules/angular-smart-table/smart-table.debug.js"]);
+	//获取数据
+    $scope.param = {};
+	var _channel = $scope.$stateParams.channel;
+	var _view = $scope.$stateParams.view,common = '';
+	var param = 'channel='+_channel+'&view='+_view;
+	$scope.loading.show();
+	$httpService.post('/app.do?'+param, $scope, function(result){
+		$scope.loading.hide();
+		if(result.data.success == '0') {
+			var message = $scope.getErrorByCode(result.data.code);
+			$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+		}
+		common = result.data.common;
+		$scope.setCommonSetting(common);
+		var dataList = result.data.item.customerMarket;
+		$scope.dataList = dataList;
+		if(angular.isDefined($scope.dataList)) {
+			var keyData = []; var i = 0;
+			for(var data_id in dataList) {
+				keyData[i] = {};
+				keyData[i]['value'] = dataList[data_id].market_name;
+				keyData[i]['value_en'] = dataList[data_id].market_en_name;
+				keyData[i]['value_id'] = dataList[data_id].market_id;
+				keyData[i]['label'] = dataList[data_id].market_id;
+				keyData[i]['marketing'] = dataList[data_id].marketing;
+				i++;
+			}
+			$scope.keyData = keyData;
+            $scope.receivableData = {};var receivableData = [], i = 0;
+            for(var key in $scope.dataList[6].children) {
+                receivableData[i] = $scope.dataList[6].children[key]; i++;
+            }
+            $scope.receivableData = receivableData;
+            var receivableType = [{'id':'personal','value':'个人'},{'id':'company','value':'公司'},{'id':'OTA','value':'OTA'}];
+            $scope.receivableType = receivableType;
+		}
+	});
+	//
+	var asideCustomerMarket = '';
+	$scope.addCustomerMarket = function(_this) {
+		$scope.param = {}; $scope.param["valid"] = "1";
+		if(_this != 0) $scope.param = _this;
+		$scope.action = '添加/编辑';
+		asideCustomerMarket = $aside({scope : $scope, title: $scope.action_nav_name, placement:'top',animation:'am-fade-and-slide-top',backdrop:"static",container:'body', templateUrl: '/resource/views/Setting/CustomerMarketAddEdit.tpl.html'});
+		asideCustomerMarket.$promise.then(function() {
+			asideCustomerMarket.show();
+			$(document).ready(function(){
+				
+			});
+		})
+		
+	};
+	$scope.saveData = function() {
+		var param = this.param;
+		if(param == null || param == '' || !angular.isDefined(param.market_father_id)) {
+			$alert({title: 'Notice', content: '类型必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+		$scope.loading.show();
+		var market = $scope.dataList[param['market_father_id']];
+		param['marketing'] = market['marketing'];
+		$scope.param = param;
+		$httpService.post('/app.do?channel='+common.saveAddEditUrl, $scope, function(result){
+			$scope.loading.hide();
+			$scope.dataList = result.data.item;
+			asideCustomerMarket.hide();
+		});
+	}
+    //
+    var asideReceivable = '',editReceivable = 0;
+	$scope.addReceivable = function(_this, i) {
+		$scope.param = {}; $scope.param["valid"] = "1"; editReceivable = i;
+		if(_this != 0) $scope.param = angular.copy(_this);
+		$scope.action = '添加/编辑';
+		asideReceivable = $aside({scope : $scope, title: $scope.action_nav_name, placement:'top',animation:'am-fade-and-slide-top',backdrop:"static",container:'body', templateUrl: '/resource/views/Setting/CustomerMarketReceivableAddEdit.tpl.html'});
+		asideReceivable.$promise.then(function() {
+			asideReceivable.show();
+			$(document).ready(function(){
+				
+			});
+		})
+		
+	};
+	$scope.saveReceivableData = function() {
+		var param = this.param;
+		if(param == null || param == '' || !angular.isDefined(param.market_id)) {
+			$alert({title: 'Notice', content: '协议客源必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+        if(!angular.isDefined(param.receivable_type)) {
+			$alert({title: 'Notice', content: '类型必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+		$scope.loading.show();
+		$scope.param = param;
+        $scope.beginLoading =! $scope.beginLoading;
+        $httpService.header('method', 'Receivable');
+		$httpService.post('/app.do?channel='+common.saveAddEditUrl, $scope, function(result){
+            $scope.beginLoading =! $scope.beginLoading;
+            $httpService.deleteHeader('method');
+			$scope.loading.hide();
+			asideReceivable.hide();
+            if(editReceivable >= 0) {
+                $scope.displayed[editReceivable] = $scope.param;
+            } else {
+                var length = $scope.displayed.length;
+                $scope.displayed[length] = $scope.param;
+                $scope.displayed[length].receivable_id = result.data.item.receivable_id;
+                $scope.displayed[length].cr_id = result.data.item.cr_id;
+            }
+		});
+	}
+    /////////
+    $scope.displayed = [];
+    $scope.callServer = function callServer(tableState) {
+        $scope.param = {};        
+        $scope.param.tableState = tableState;
+        $scope.loading.start();
+        $httpService.header('method', 'ReceivablePagination');
+        $httpService.post('/app.do?'+param, $scope, function(result){
+            $scope.loading.percent();
+            $httpService.deleteHeader('method');
+            $scope.displayed = result.data.item.receivableData.data;
+            tableState.pagination.numberOfPages = result.data.item.receivableData.numberOfPages;
+        });
+    };
+
+    ////////
+	$httpService.deleteHeader('refresh');
+});
+app.directive('stRatio',function(){
+    return {
+      link:function(scope, element, attr){
+        var ratio=+(attr.stRatio);
+
+        element.css('width',ratio+'%');
+
+      }
+    };
+});
+
+</script>
+
+

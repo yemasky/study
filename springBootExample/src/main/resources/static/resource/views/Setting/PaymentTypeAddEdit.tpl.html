@@ -1,0 +1,53 @@
+<div class="aside box-shadow h-10x" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <form name="thisForm" class="form-validation" id="thisForm" ng-submit="saveData()">
+      <input type="hidden" name="item_type" value="item">
+      <div class="aside-body h-8x scrollable">
+        <div class="tab-container ng-scope ng-valid ng-dirty">
+            <ul class="nav nav-tabs" ng-init="activeTab=1">
+                <li ng-class="{active:activeTab==1}" ng-click="activeTab=1">
+                    <a ng-bind-html="action"></a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div ng-show="activeTab==1">
+                    <div class="form-group m-h-n clearfix">
+                      <div class="col-sm-2 w-sm">
+                      	<label>类型</label>
+                        <button id="select_customer_market" type="button" class="btn btn-default w-sm text-left" name="payment_father_id" ng-model="param.payment_father_id" data-html="0" data-toggle="true"  
+                        	bs-options="i.value_id as i.value for i in keyData" bs-select ng-change="selectCustomerMarket()">
+                      		Action <span class="caret"></span>
+                    	</button>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                        <label>支付名称</label>
+                        <input class="form-control w" name="item_number" value="" ng-model="param.payment_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>支付英文名称</label>
+                        <input class="form-control w" name="item_number" value="" ng-model="param.payment_en_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="radio-inline"> <input type="radio" value="1" id="valid1" ng-model="param.valid" name="valid" checked> 有效</label>
+                        <label class="radio-inline"> <input type="radio" value="0" id="valid0" ng-model="param.valid" name="valid"> 无效</label>
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer panel-footer">
+      	<input type="hidden" name="item_id" value="" ng-model="param.item_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

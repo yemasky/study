@@ -1,0 +1,76 @@
+{
+"header" : {
+	"navbar" : {
+		"DASHBOARD" : "Dashboard",
+		"EMAIL" : "Email",
+		"UIKITS" : "UI Kits",
+		"PAGES" : "Pages"
+	}
+},
+"login" : {
+	"hint": {
+		"WORD":"Sign in with your Account",
+		"SIGN":"Sign in", 
+		"ERROR_MESSAGE":"login error, wrong login name and password!"
+	}
+},
+"common" : {
+	"hint": {
+		"LOADING":"Loading...",
+		"SAVE":"Save",
+		"date":"Date",
+		"manager":"Manager",
+		"edit":"Edit",
+		"config":"Config",,"confirm":"Confirm",
+		"PayingTheBill":"Paying the Bill","backout":"Backout","give_back":"Give back"
+	}
+},
+"error" : {
+	"code": {
+		"000000":"The connection server is timeout!",
+		"000001":"Success.",
+		"000002":"Error Login Info.",
+		"000003":"System Error!",
+		"000004":"Save Error, Duliccate Data!",
+		"000005":"No Permission!",
+		"000006":"No Module!",
+		"000007":"Update Error, Wrong Data!",
+		"000008":"Parameter Error.",
+		"000009":"Data not found.",
+		"000010":"No Data Update.",
+		"000011":"Login OverTime,Please Re-logon.",
+		"000012":"Beyond reasonable time.",
+        "100001":"no price!",
+		"100002":"over booking.",
+		"100003":"lock room.",
+		"100004":"repair room.",
+		"100005":"dirty room.",
+		"100006":"live in room.",
+        "100007":"No Room Number."
+	}
+},
+"notice" : {
+	"code": {
+		"200001":"The account is rough."
+	}
+},
+"module" : {
+	"channel" : {
+		"channel" : "Channel",
+		"member_of" : "Member Of",
+		"channel_name" : "Channel Name",
+		"channel_short_name" : "Short Name",
+		"channel_en_name" : "English Name",
+		"web" : "web",
+		"mobile" : "mobile",
+		"email" : "Email",
+		"fax" : "Fax",
+		"star" : "Star",
+		"phone" : "Phone",
+		"address" : "Address",
+		"arrtibute":"Arrtibute",
+		"market_name":"Customer Market"
+	}
+}
+	
+}

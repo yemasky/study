@@ -1,0 +1,104 @@
+<div class="aside col-sm-11 b-r box-shadow no-padding" tabindex="-1" role="dialog" ng-controller="EditBookRoomController">
+  <div class="aside-dialog aside-lg">
+    <div class="aside-content">
+      <div class="aside-header">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title">编辑</h4>
+      </div>
+      <form name="form-layout" class="form-validation ng-pristine ng-valid ng-valid-required" id="setEditRoomForm" ng-submit="saveEditRoomForm(roomDetailEdit)">
+          <input type="hidden" ng-model="param.detail_id" value="{{roomDetailEdit.booking_detail_id}}">
+      <div class="aside-body no-padding m-t"> 
+          <div class="clearfix p">
+            <div class="tab">
+                <div class="form-inline">
+                    <div class="form-group p-xs">客源市场 </div> <div class="form-group" ng-include="'/app/customerMarket.html'"></div>
+                    <div class="form-group p-xs">价格类型</div>
+                    <div class="form-group w">
+                      <ui-select ng-model="select_price_system" theme="bootstrap" ng-change="selectPriceSystem($select.selected)" >
+                          <ui-select-match placeholder="{{roomDetailEdit.price_system_name}} 　">{{$select.selected.price_system_name}}</ui-select-match>
+                          <ui-select-choices repeat="item in priceSystemList | filter: $select.search">
+                            <div ng-bind-html="item.price_system_name | highlight: $select.search"></div>
+                          </ui-select-choices>
+                      </ui-select>
+                    </div>
+                    <!-- 房型选择 -->
+                    <div class="m-t">
+                        <div class="form-group p-xs">选择房型</div>
+                        <div class="form-group w">
+                          <ui-select ng-model="select_item_category" theme="bootstrap" ng-change="selectItemCategory($select.selected)" >
+                              <ui-select-match placeholder="{{roomDetailEdit.item_category_name}} 　">{{$select.selected.item_name}}</ui-select-match>
+                              <ui-select-choices repeat="item in layoutArray | filter: $select.search">
+                                <div ng-bind-html="item.item_name | highlight: $select.search"></div>
+                              </ui-select-choices>
+                          </ui-select>
+                        </div>
+                        <div class="table-responsive">
+                            <div class="list-group no-radius">
+                                <div class="list-group-item col-sm-2 p-xs m-xs" ng-repeat="(room_id, room) in layoutSelectRoom">
+                                  <span class="pull-left w-thumb-xs m-r b-b-2x"><img class="img-responsive" ng-src="{{_resource}}images/room.png"></span>
+                                  <div class="clear">
+                                    <span class="font-bold block">{{room.item_name}}
+                                        <label class="checkbox-inline ui-checks pull-right">
+                                            <input type="radio" ng-click="setEditItemRoomName(room.item_name)" ng-checked="roomDetailEdit.item_id==room.item_id" name="item_room" ng-model="param.item_room" value="{{room.item_id}}">
+                                            <i></i>
+                                        </label>
+                                    </span>
+                                    <span data-title="{{room.describe}}" data-placement="bottom" bs-tooltip>{{room.describe | limitTo:3}}..</span>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 预抵预离 -->
+                    <div class="form-group col-sm-12 m-t">
+                        <label class="control-label m-b"><i class="fa fa-clock-o"></i> 预抵</label>
+                        <div class="form-group">
+                          <input type="text" size="9" class="form-control w-thumb-lg" name="check_in" ng-model="param.check_in" data-date-format="yyyy-MM-dd" data-date-type="string" data-autoclose="true" data-min-date="{{getDay('MM/dd/yyyy')}}" data-autoclose="1" bs-datepicker value="" ng-change="changeCheckDate('check_in')" ng-readonly="roomDetailEdit.booking_detail_status!=0">
+       
+                        </div>
+                        <label class="control-label m-b"><i class="fa fa-clock-o"></i> 预离</label>
+                        <div class="form-group">
+                          <input type="text" size="9" class="form-control w-thumb-lg" name="check_out" ng-model="param.check_out" data-date-format="yyyy-MM-dd" data-date-type="string" data-autoclose="true" data-min-date="{{param.check_in}}" data-autoclose="1" bs-datepicker value="" ng-change="changeCheckDate('check_out')">
+                        </div>
+                        <label class="ui-checks">
+                            <input type="checkbox" value="1" ng-model="param.set_prices" ng-init="param.set_prices=''">
+                            <i></i>
+                            自定房价
+                        </label>
+                    </div>
+                    <div class="table-responsive scroll-x scroll-y p-xs">
+                        <table class="table table-bordered table-striped bg-white text-nowrap">
+                          <thead>
+                            <tr class="bg-light">
+                              <th class="w-xs" style="padding:1px;"></th>
+                              <th class="w-xs col-sm-1 b-r" ng-repeat="(i, consumeRoom) in consumeRoomPrice" style="padding:1px;"><div class="w-xs"></div></th>
+                              <th style="padding:1px;"></th>
+                            </tr>
+                            <tr class="bs-sidebar">
+                              <th class="w-xs"><div class="w-xs">日期</div></th>
+                              <th class="w-xs col-sm-1 font-thin" ng-repeat="(i, consumeRoom) in consumeRoomPrice">{{consumeRoom.business_day}}<span class="badge badge-xs" ng-if="channelRoomReservation[consumeRoom.business_day].room_num<=0">满</span></th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <!--房型列表-->
+                          <tbody>
+                            <tr><!--酒店房型列表 循环 i-->
+                              <td>价格</td>
+                                <td class="w-xs col-sm-1 cursor book_input" ng-repeat="(i, consumeRoom) in consumeRoomPrice"><input type="text" ng-model="param.price[consumeRoom.business_day]" class="form-control" ng-class="param.set_prices?'enable_select':'unable_select_edit'" size="7" value="{{consumeRoom.consume_price}}"></td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer">
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+ </div>

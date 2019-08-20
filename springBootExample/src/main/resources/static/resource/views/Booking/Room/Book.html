@@ -1,0 +1,15 @@
+<div class="aside h-10x col-sm-11 b-r box-shadow no-padding" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <div class="aside-body h-10x no-padding" ng-include="'/resource/views/Booking/RoomOrder.html'"></div>
+      <div class="aside-footer panel-footer">
+      	<input type="hidden" name="item_id" value="" ng-model="param.item_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

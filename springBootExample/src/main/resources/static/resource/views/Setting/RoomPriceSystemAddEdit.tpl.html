@@ -1,0 +1,104 @@
+<div class="aside box-shadow h-10x" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <form name="thisForm" class="form-validation" id="thisForm" ng-submit="saveData()">
+      <div class="aside-body h-8x scrollable">
+        <div class="tab-container ng-scope ng-valid ng-dirty">
+            <ul class="nav nav-tabs" ng-init="activeTab=1">
+                <li ng-class="{active:activeTab==1}" ng-click="activeTab=1">
+                    <a ng-bind-html="action"></a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div ng-show="activeTab==1">
+					<div class="form-group m-h-n clearfix">
+                    	<div class="col-sm-3">
+                        <label for="market_name">价格类型</label>
+                        <input class="form-control w" name="price_system_name" value="" ng-model="param._price_system_name" required>
+						</div>
+                        <div class="col-sm-3">
+                        <label for="market_en_name">价格英文名称</label>
+                        <input class="form-control w" name="price_system_en_name" value="" ng-model="param._price_system_en_name" required>
+                        </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                      <div class="col-sm-12">
+                      	<label for="channel_id">适用酒店</label>
+                        <div>
+                        <label class="checkbox-inline ui-checks" ng-repeat="(i, channel) in thisChannel">
+                        	<input ng-model="selectChannel[channel.channel_id]" class="" type="checkbox" value="{{channel.channel_id}}" name="channel_ids[{{channel.channel_id}}]"><i></i>{{channel.channel_name}}
+                        </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                        <div class="col-sm-12"><label>房型</label>
+                            <div ng-repeat="(i, hotel) in hotelLayoutHash" ng-show="selectChannel[hotel.channel_id]==true">
+                            	<label class="w"><span class="badge">{{employeeChannel[hotel.channel_id].channel_name}}</span></label>
+                                <label class="checkbox-inline ui-checks" ng-repeat="(i, layout) in hotel.item">
+                                	<input class="" type="checkbox" value="{{layout.item_id}}" ng-model="param.channel_layout[layout.item_id]" name="layout_item[{{hotel.channel_id}}][{{layout.item_id}}]"><i></i>{{layout.item_name}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                        <div class="col-sm-12"><label>{{market_name}}</label>
+                            <div class="checkbox">
+                            	<span ng-repeat="(i, father) in marketHash" ng-if="father.children!=''"><!--<label class="w-xs">{{father.market_name}}</label>-->
+                                    <label class="checkbox-inline ui-checks" ng-repeat="(j, market) in father.children">
+                                        <input class="" type="checkbox" value="{{market.market_id}}" ng-model="param.channel_market[market.market_id]" name="market_ids[{{market.market_id}}]"><i></i>{{market.market_name}}
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                    	<div class="col-sm-3 w-md"><label>价格放盘类型</label>
+                        	<div>
+                        	<label class="radio-inline"> 
+                            	<input type="radio" name="price_system_type" ng-click="setPriceSystemType('direct')" ng-model="param._price_system_type" id="direct" value="direct" required> 手输价格
+                            </label>
+                        	<label class="radio-inline"> 
+                            	<input type="radio" name="price_system_type" ng-click="setPriceSystemType('formula')" ng-model="param._price_system_type" id="formula" value="formula" > 公式价格
+                            </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-9" id="direct_div" ng-class="{hide:param._price_system_type=='direct'}">
+                        	<button type="button" class="btn btn-default" name="price_system_father_id" ng-model="param.price_system_father_id" data-html="1" data-toggle="true" bs-options="father.price_system_id as father.price_system_name for father in priceSystemFather" bs-select placeholder="<i class='ti-exchange-vertical text-lt'></i> 继承自" ng-change="checkSelectPriceSystemFather()">继承自
+                              Action <span class="caret"></span>
+                            </button>
+                      </div>
+                     </div>
+                     <div class="form-group m-h-n clearfix">
+                        <div class="col-sm-3"><label>最少预订天数</label>
+                        <input type="number" string-to-number ng-model="param._book_min_day" name="book_min_day" class="form-control w-xs" required></div>
+                        <div class="col-sm-3"><label></label>
+                        	<div>
+                            <button type="button" class="btn btn-default" name="cancellation_policy" ng-model="param.policy" data-html="1" data-toggle="true" bs-options="policy.policy_id as policy.policy_name for policy in policyList" bs-select placeholder="<i class='icon ti-eraser text-lt'></i> 取消政策">取消政策
+                              Action <span class="caret"></span>
+                            </button>
+                            </div>
+                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="radio-inline"> <input type="radio" value="1" id="valid1" ng-model="param._valid" name="valid" checked> 有效</label>
+                        <label class="radio-inline"> <input type="radio" value="0" id="valid0" ng-model="param._valid" name="valid"> 无效</label>
+                        <input type="hidden" value="" name="price_system_id" ng-model="param.price_system_id">
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer panel-footer">
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

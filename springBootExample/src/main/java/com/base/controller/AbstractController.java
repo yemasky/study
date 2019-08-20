@@ -32,7 +32,7 @@ public abstract class AbstractController {
 	public AbstractController() {
 	
 	}
-
+	
 	@ModelAttribute
 	public void excuseController(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 		this.request = httpRequest;

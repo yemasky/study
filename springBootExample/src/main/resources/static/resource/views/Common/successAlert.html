@@ -1,0 +1,9 @@
+<div class="alert panel bg-success no-padding" tabindex="-1" ng-class="[type ? 'alert-' + type : null]" style="opacity: 0.7;">
+    <div class="panel-heading lt text-lt">
+        <span class="pull-right"> <button type="button" class="close" ng-click="$hide()">&times;</button></span>
+        <div class="clear"><i class="fas fa-check-circle text-lt"> </i>　<span ng-bind="title"></span>　<span class="font-bold text-lt" ng-bind-html="content"></span></div>
+    </div>
+    <div class="progress progress-xxs no-margin no-radius dk">
+        <div class="progress-bar bg-light" ng-style="{width: vm.value + '%'}"></div>
+    </div>
+</div>

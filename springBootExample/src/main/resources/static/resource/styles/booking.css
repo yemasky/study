@@ -1,0 +1,19 @@
+.left_triangle{
+border-style: dashed;
+border-top-width: 0!important;
+border-left-color: #ef7601;
+border-bottom-style: solid;
+border-right-color: transparent!important;
+border-width: 20px;
+border-bottom-color: transparent!important;
+margin-top:-9px;
+margin-left:-15px;
+position:absolute;
+}
+.enable_select{}
+.unable_select{border-color:#FFFFFF;background-color: #FFFFFF !important;cursor:pointer !important;}
+.unable_select_edit{border-color:#fdfdfe;background-color: #fdfdfe !important;cursor:pointer !important;}
+.book_input {padding:1px 0px 1px 1px !important;}
+.book_status{position: relative; min-width: 46px; filter: alpha(Opacity=90);-moz-opacity: 0.9;opacity: 0.9; padding-left: 0px; padding-right: 0px;}
+.w-xs-min{min-width: 92px;max-width: 92px;}
+.room_is_book{padding-top: 3px !important; padding-bottom: 4px !important;}

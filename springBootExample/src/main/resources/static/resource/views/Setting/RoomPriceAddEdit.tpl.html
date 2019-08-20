@@ -1,0 +1,120 @@
+<div class="aside box-shadow h-10x" tabindex="-1">
+    <div class="aside-dialog"  id="wertyuio">
+    <div class="aside-header" ng-show="title">
+    	<button type="button" class="close" ng-click="$hide()">&times;</button>
+    	<h4 class="aside-title" ng-bind-html="title"></h4>
+    </div>
+    <form name="thisForm" class="form-horizontal form-validation" id="thisForm" ng-submit="saveData()">
+    <div class="box bg-white">
+        <div class="col-md-7">
+          <div class="panel-heading b-b b-light">价格放盘</div>
+          <div class="panel-body">
+          	<div class="clearfix">
+                <button type="button" class="btn btn-default w-sm text-left clearfix m-b" ng-model="param.price_system_id" data-html="1" data-toggle="true" bs-options="priceSystem.price_system_id as priceSystem.price_system_name for priceSystem in priceSystemList" bs-select placeholder="选择客房价格类型" ng-change="selectPriceSystem(param.price_system_id)">
+                  Action <span class="caret"></span>
+                </button>
+                <div ng-show="thisPriceSystem.price_system_type=='direct'" class="m-b">
+                    <input class="form-control w-thumb-lg col-xs-1" name="begin_date" id="begin_date" type="text" value="" ng-model="_beginDay" data-min-date="{{_minDay}}" size="12" data-date-format="yyyy-MM-dd" data-autoclose="1" bs-datepicker placeholder="开始日期" onKeyPress="return false;" required style="cursor:pointer;">
+                    <input class="form-control w-thumb-lg col-xs-1 m-l" name="end_date" id="end_date" type="text" value="" ng-model="_nextDay" data-min-date="{{_minDay}}" data-max-date="{{_maxDay}}" size="12" data-date-format="yyyy-MM-dd" data-autoclose="1" bs-datepicker placeholder="结束日期" onKeyPress="return false;" required style="cursor:pointer;">
+                    <label class="checkbox-inline">[最大90天]</label>
+                    <label class="checkbox-inline ui-checks"><input type="checkbox" name="week[0]" value="0" checked><i></i> 日</label>
+                    <label class="checkbox-inline ui-checks"><input type="checkbox" name="week[1]" value="1" checked><i></i> 一</label>
+                    <label class="checkbox-inline ui-checks"><input type="checkbox" name="week[2]" value="2" checked><i></i> 二</label>
+                    <label class="checkbox-inline ui-checks"><input type="checkbox" name="week[3]" value="3" checked><i></i> 三</label>
+                    <label class="checkbox-inline ui-checks"><input type="checkbox" name="week[4]" value="4" checked><i></i> 四</label>
+                    <label class="checkbox-inline ui-checks"><input type="checkbox" name="week[5]" value="5" checked><i></i> 五</label>
+                    <label class="checkbox-inline ui-checks"><input type="checkbox" name="week[6]" value="6" checked><i></i> 六</label>
+                </div>
+            </div>
+            
+            <div class="m-b-lg table-responsive clearfix">
+            	<table class="table table-bordered table-striped bg-white">
+                  <thead>
+                    <tr>
+                      <th class="w">客源市场</th>
+                      <th class="w">适用酒店房型</th>
+                      <th>
+                      	<span ng-show="thisPriceSystem.price_system_type=='formula'">公式价格放盘</span>
+                        <span ng-show="thisPriceSystem.price_system_type=='direct'">手输价格放盘[<span class="text-warning">价格为0或者空不做更新</span>]</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-nowrap">
+                      	<span class="clearfix" ng-repeat="(market_id, market) in thisPriceSystem.market_ids"><i class="fa fa-check-circle"> </i> {{marketChildrenHash[market_id].market_name}} </span>
+                      </td>
+                      <td class="no-padding panel" colspan="2">
+                      	<table class="table no-margin" ng-repeat="(channel_id, layout) in thisPriceSystem.layout_item">
+                            <tbody>
+                            	<tr><th><i class="fa fa-building"></i> {{employeeChannel[channel_id].channel_name}}</th><th></th></tr>
+                                <tr ng-repeat="(layout_id, id) in layout">
+                                    <td class="w">{{layoutHash[id].item_name}}</td>
+                                    <td>
+                                    	<span ng-show="thisPriceSystem.price_system_type=='formula'">
+                                        	<label class="radio-inline no-margin no-padding">
+                                                <select name="formula[{{channel_id}}-{{layout_id}}][formula]" id="formula_{{layout_id}}" class="form-control w-xxs">
+                                                    <option value="+">+</option><option value="-">-</option><option value="*">×</option>
+                                                </select>
+                                            </label>
+                                            <label class="radio-inline no-padding" style="margin:0px !important;">
+                                                <input type="number" string-to-number step="0.01" min="0" ng-model="param.formula_value[layout_id]" class="form-control w-xs" name="formula[{{channel_id}}-{{layout_id}}][formula_value]" id="formula_value_{{layout_id}}" value="" >
+                                            </label>
+                                            <label class="radio-inline no-padding" style="margin:0px !important;">
+                                                <select name="formula[{{channel_id}}-{{layout_id}}][formula_second]" id="formula_second_{{layout_id}}" class="form-control w-xxs">
+                                                    <option value="+">+</option><option value="-">-</option><option value="*">×</option>
+                                                </select>
+                                            </label>
+                                            <label class="radio-inline no-padding" style="margin:0px !important;">
+                                                <input type="number" string-to-number step="0.01" min="0" ng-model="param.formula_second_value[layout_id]" class="form-control w-xs" name="formula[{{channel_id}}-{{layout_id}}][formula_second_value]" id="formula_second_value_{{layout_id}}" value="" >
+                                            </label>
+                                            <label class="radio-inline no-padding" style="margin:0px !important;"><a ng-click="checkHistoryPrice(layout_id, channel_id)">[预览]</a></label>
+                                        </span>
+                        				<span ng-show="thisPriceSystem.price_system_type=='direct'" class="input-group">
+                                        <span class="input-group-btn w-thumb-lg">
+                                        	<input class="form-control w-thumb-lg" ng-model="param.layout_price[layout_id]" name="layout_price[{{channel_id}}-{{layout_id}}]" type="number" string-to-number step="0.01" min="0" value=""  > <button class="btn btn-default" tabindex="-1" type="button" ng-click="checkHistoryPrice(layout_id, channel_id)">[价格预览]</button>
+                                        </span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5 no-border-sm">
+          <div class="panel-heading b-l b-b b-light">价格预览</div>
+          <div class="list-group no-border no-radius">
+            <table class="table table-bordered table-hover bg-white">
+              <thead>
+                <tr>
+                  <th>日</th>
+                  <th>一</th>
+                  <th>二</th>
+                  <th>三</th>
+                  <th>四</th>
+                  <th>五</th>
+                  <th>六</th>
+                </tr>
+              </thead>
+              <tbody ng-repeat="(yearMonth, week) in yearWeekDays">
+                <tr><td colspan="7">{{yearMonth}}</td></tr>
+                <tr ng-repeat="(i, days) in week">
+                  <td ng-repeat="(j, day) in days"><b class="badge badge-xs bg-light up">{{day}}</b><span class="pull-right">{{layoutPrice[yearMonth+'-01']['day_'+day]}}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+    <div class="aside-footer panel-footer">
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+    </div>
+    </form>
+  </div>
+</div>

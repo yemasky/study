@@ -1,0 +1,66 @@
+<div class="aside box-shadow h-10x b-r col-sm-5 no-padding" tabindex="-1">
+    <div class="aside-dialog"  id="wertyuio">
+    <div class="aside-header" ng-show="title">
+    	<button type="button" class="close" ng-click="$hide()">&times;</button>
+    	<h4 class="aside-title" ng-bind-html="_self_module.module_name"></h4>
+    </div>
+    <form name="thisForm" class="form-validation" id="thisForm" ng-submit="saveData()">
+    <div class="aside-content h-8x">
+      <div class="aside-body h-8x scrollable" style="overflow:visible">
+        <div>
+           <div class="form-group m-h-n clearfix">
+            	<div class="col-sm-12">
+                    <div class="col-sm-12 w-sm no-padding">
+                    <label for="rules">属于企业</label>
+                    <select class="form-control w-sm" name="channel_id" id="channel_id" ng-model="param.channel_id" required ng-options="channel.channel_id as channel.channel_name for channel in employeeChannel" ng-change="selectChange(param.channel_id)">
+                        <option value="">选择企业</option>
+                    </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group m-h-n clearfix">
+            	<div class="col-sm-6">
+                <label for="borrowing_name">借物名称</label>
+                <input class="form-control w" name="borrowing_name" value="" ng-model="param.borrowing_name" required>
+                </div>
+                <div class="col-sm-6">
+            	<label for="borrowing_en_name">借物英文名称</label>
+                <input class="form-control w" name="borrowing_en_name" value="" ng-model="param.borrowing_en_name" required>
+                </div>
+            </div>
+            <div class="form-group m-h-n clearfix">
+            	<div class="col-sm-6">
+                <label for="policy_name">借物押金(价值)</label>
+                <input class="form-control w" name="borrowing_price" value="" ng-model="param.borrowing_price" type="number" string-to-number required>
+                </div>
+                <div class="col-sm-6">
+            	<label for="policy_en_name">借物库存</label>
+                <input class="form-control w" name="borrowing_stock" value="" ng-model="param.borrowing_stock" type="number" string-to-number required>
+                </div>
+            </div>
+            <div class="form-group m-h-n clearfix">
+            	<div class="col-sm-6">
+                <label for="policy_name">借物类别/标签</label>
+                <input class="form-control w" name="borrowing_tag" value="" ng-model="param.borrowing_tag" required>
+                </div>
+                <div class="col-sm-6">
+            	<label for="policy_en_name">借物描述</label>
+                <input class="form-control w" name="borrowing_describe" value="" ng-model="param.borrowing_describe" required>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <label class="radio-inline"> <input type="radio" value="1" id="valid1" ng-model="param.valid" name="valid" checked> 有效</label>
+                <label class="radio-inline"> <input type="radio" value="0" id="valid0" ng-model="param.valid" name="valid"> 无效</label>
+            </div>
+            <div class="form-group"></div>
+        </div>
+      </div>
+      
+    </div>
+    <div class="aside-footer panel-footer">
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+    </div>
+    </form>
+  </div>
+</div>

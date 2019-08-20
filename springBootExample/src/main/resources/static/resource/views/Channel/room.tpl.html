@@ -1,0 +1,97 @@
+<div class="aside box-shadow h-10x" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <form name="form_room" class="form-validation" id="setItemForm" ng-submit="saveItem()">
+      <input type="hidden" name="item_type" value="item">
+      <div class="aside-body h-8x scrollable">
+        <div class="tab-container ng-scope ng-valid ng-dirty">
+            <ul class="nav nav-tabs" ng-init="activeTab=1">
+                <li ng-class="{active:activeTab==1}" ng-click="activeTab=1">
+                    <a>基本信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div ng-show="activeTab==1">
+                    <div class="form-group m-h-n clearfix">
+                      <div class="col-sm-2 w-sm">
+                      	<label>楼栋</label>
+                        <input class="form-control w-xs" name="item_attr2_value" ng-model="param.item_attr2_value" required type="text" ng-pattern="/^([0-9a-zA-Z\-_\.]+?)$/"  data-trigger="focus" data-container="body" data-html="true" data-type="success" data-title="数字,字母,含 _ - 和 . 符号" bs-tooltip>
+                      </div>
+                      <div class="col-sm-2 w-sm">
+                        <label>楼层</label>
+                        <input class="form-control w-xs" name="item_attr1_value" ng-model="param.item_attr1_value" required type="text" ng-pattern="/^([0-9a-zA-Z\-_\.]+?)$/" data-trigger="focus" data-container="body" data-html="true" data-type="success" data-title="数字,字母,含 _ - 和 . 符号" bs-tooltip>
+                      </div>
+                      <div class="col-sm-2 w-sm">
+                        <label for="item_name">房间名称/编号</label>
+                        <input class="form-control w-xs" name="item_name" ng-model="param.item_name" required type="text" />
+                      </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                      <div class="col-sm-2 w-sm">
+                      	<label>最多住几人</label>
+                        <input class="form-control w-xs" value="2" name="number_max" ng-model="param.number_max" required type="number" string-to-number min="1" data-trigger="focus" data-container="body" data-html="true" data-type="success" data-title="填入大于0数字" bs-tooltip>
+                      </div>
+                      <div class="col-sm-2 w-sm">
+                        <label>最多住小朋友</label>
+                        <input class="form-control w-xs" value="1" name="number_min" ng-model="param.number_min" required type="number" string-to-number min="0" data-trigger="focus" data-container="body" data-html="true" data-type="success" data-title="填入大于等于0数字" bs-tooltip>
+                      </div>
+                      <div class="col-sm-2">
+                        <label>加床</label>
+                        <input class="form-control w-xs" value="0" name="item_attr3_value" ng-model="param.item_attr3_value" required type="number" string-to-number min="0" data-trigger="focus" data-container="body" data-html="true" data-type="success" data-title="填入大于等于0数字" bs-tooltip>
+                      </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                    	<div class="col-sm-2 w-sm">
+                            <label>面积</label>
+                            <input class="form-control w-xs" value="20" name="item_attr4_value" ng-model="param.item_attr4_value" required type="number" string-to-number min="0">
+                        </div>
+                        <div class="col-sm-2">
+                            <label>朝向</label>
+                            <select class="form-control w-xs" name="item_attr5_value" ng-model="param.item_attr5_value" required>
+                            	<option value="东">东</option>
+                                <option value="南">南</option>
+                                <option value="西">西</option>
+                                <option value="北">北</option>
+                                <option value="东南">东南</option>
+                                <option value="西北">西北</option>
+                                <option value="东北">东北</option>
+                                <option value="西南">西南</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>门锁号</label>
+                        <input class="form-control w-xs" name="item_number" value="" ng-model="param.item_number">
+                    </div>
+                    <div class="form-group">
+                        <label class="radio-inline"> <input type="radio" value="1" id="valid1" ng-model="param.valid" name="valid" checked> 有效</label>
+                        <label class="radio-inline"> <input type="radio" value="0" id="valid0" ng-model="param.valid" name="valid"> 无效</label>
+                    </div>
+                    <div class="form-group">
+                        <label>房间类型</label>
+                        <div class="checkbox" ng-repeat="(i, defaultAttr) in arrayDefaultAttr" ng-if="i==9">
+                          <label class="checkbox-inline ui-checks"  ng-repeat="(j, attribute) in defaultAttr">
+                            <input type="checkbox" class="describe" name="describe[{{j}}]" value="{{attribute[0]}}">
+                            <i></i>
+                            {{attribute[0]}}
+                          </label>
+                        </div>
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer panel-footer">
+      	<input type="hidden" name="item_id" value="" ng-model="param.item_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -20,7 +20,9 @@ class MongoDbQueryTest {
 			Col result = MongoDbQuery.instance("mongodb.host1").findById(Col.class, id);
 			System.out.println(result.getBy());
 			List<Col> lsit = MongoDbQuery.instance("mongodb.host1").findAll(Col.class);
-			System.out.println(lsit.get(0).get_id());
+			if (lsit != null) {
+				System.out.println(lsit.get(0).get_id());
+			}
 			//
 			BasicDBObject basicDBObject = new BasicDBObject("title", "MongoDB 教程");
 			lsit = MongoDbQuery.instance("mongodb.host1").find(Col.class, basicDBObject);

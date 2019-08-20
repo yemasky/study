@@ -1,0 +1,100 @@
+<div class="aside box-shadow h-10x" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title">协议客源</h4>
+      </div>
+      <form name="receivableForm" class="form-validation" id="receivableForm" ng-submit="saveReceivableData()">
+      <div class="aside-body h-8x">
+        <div class="tab-container ng-scope ng-valid ng-dirty">
+            <ul class="nav nav-tabs" ng-init="activeTab=1">
+                <li ng-class="{active:activeTab==1}" ng-click="activeTab=1">
+                    <a ng-bind-html="action"></a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div ng-show="activeTab==1">
+                    <div class="form-group m-h-n clearfix">
+                      <div class="col-sm-2 w-sm m-r">
+                      	<label for="">协议客源</label>
+                        <button id="select_Receivable" name="market_id" type="button" class="btn btn-default w-sm text-left" ng-model="param.market_id" data-toggle="true"  
+                        	bs-options="Data.market_id as Data.market_name for Data in receivableData" bs-select required>
+                      		Action <span class="caret"></span>
+                    	</button>
+                      </div>
+                      <div class="col-sm-2 w-sm">
+                      	<label for="">类型</label>
+                        <button name="receivable_type" type="button" class="btn btn-default w-sm text-left" ng-model="param.receivable_type" data-toggle="true"  
+                        	bs-options="Data.id as Data.value for Data in receivableType" bs-select required>
+                      		Action <span class="caret"></span>
+                    	</button>
+                      </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                        <div class="col-sm-2 w m-r">
+                            <label for="receivable_name">协议公司/个人/OTA 名称</label>
+                            <input class="form-control w" name="receivable_name" value="" ng-model="param.receivable_name" required>
+                        </div>
+                        <div class="col-sm-2 w m-r">
+                            <label for="receivable_credit_code">公司信用代码/个人身份证</label>
+                            <input class="form-control w" name="receivable_credit_code" value="" ng-model="param.receivable_credit_code" required>
+                        </div>
+                        <div class="col-sm-2 w-xxl">
+                            <label for="market_en_name">地址</label>
+                            <input class="form-control w-xxl" name="receivable_address" value="" ng-model="param.receivable_address" required>
+                        </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                        <div class="col-sm-2 w m-r">
+                            <label for="credit">信用额度</label>
+                            <input class="form-control w" type="number" name="credit" value="" ng-model="param.credit" required>
+                        </div>
+                        <div class="col-sm-2 w">
+                            <label for="valid_date">有效期至</label>
+                            <input class="form-control w-thumb-lg col-xs-1" name="valid_date" id="valid_date" type="text" value="" ng-model="param.valid_date" data-min-date="{{_minDay}}" size="12" data-date-format="yyyy-MM-dd" data-date-type="string" data-autoclose="1" bs-datepicker placeholder="点击选择时间" onKeyPress="return false;" required style="cursor:pointer;">
+                        </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                        <div class="col-sm-2 w m-r">
+                            <label for="credit">开户行</label>
+                            <input class="form-control w" name="bank" value="" ng-model="param.bank" required>
+                        </div>
+                        <div class="col-sm-2 w">
+                            <label for="bank_account">银行帐号</label>
+                            <input class="form-control w" name="bank_account" value="" ng-model="param.bank_account" required>
+                        </div>
+                    </div>
+                    <div class="form-group m-h-n clearfix">
+                        <div class="col-sm-2 w m-r">
+                            <label for="contact_name">联系人</label>
+                            <input class="form-control w" name="contact_name" value="" ng-model="param.contact_name" required>
+                        </div>
+                        <div class="col-sm-2 w m-r">
+                            <label for="contact_mobile">手机</label>
+                            <input class="form-control w" name="contact_mobile" value="" ng-model="param.contact_mobile" required>
+                        </div>
+                        <div class="col-sm-2 w">
+                            <label for="contact_email">Email</label>
+                            <input class="form-control w" name="contact_email" value="" ng-model="param.contact_email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="radio-inline"> <input type="radio" value="1" id="valid1" ng-model="param.valid" name="valid" ng-checked="param.valid==1"> 有效</label>
+                        <label class="radio-inline"> <input type="radio" value="0" id="valid0" ng-model="param.valid" name="valid" ng-checked="param.valid==0"> 无效</label>
+                        <input type="hidden" value="" name="market_id" ng-model="param.market_id">
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer panel-footer">
+      	<input type="hidden" name="item_id" value="" ng-model="param.item_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

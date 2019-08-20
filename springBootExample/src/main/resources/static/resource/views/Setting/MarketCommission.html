@@ -1,0 +1,219 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="MarketCommissionController">
+	<div class="box b-a bg-white m-b">
+    	<div class="col-md-8">
+      		<div class="panel-heading b-b b-light">
+                <button type="button" class="btn btn-default" ng-model="channel_id" data-html="1" data-toggle="true" bs-options="channel.channel_id as channel.channel_name for channel in thisChannel" bs-select placeholder="<i class='icon fa fa-building text-lt'></i> 选择酒店"  ng-change="changeChannel(channel_id)">
+                  Action <span class="caret"></span>
+                </button>
+                <a class="pull-right fa fa-plus" ng-click="addMarketCommission(0)"> </a>
+            </div>
+            <div class="p-md">
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped bg-white">
+              <thead>
+                <tr>
+                  <th>客源市场</th>
+                  <th class="no-padding panel">
+                    <table class="table no-margin">
+                        <tbody>
+                            <tr>
+                                <th class="col-md-3">价格类型</th>
+                                <th class="col-md-3">佣金类型</th>
+                                <th class="col-md-2">佣金形式</th>
+                                <th class="col-md-2">佣金</th>
+                                <th class="col-md-1">有效</th>
+                                <th class="col-md-1"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(data_id, data) in dataList">
+                  <td class="text-nowrap">{{marketChildrenHash[data_id].market_name}}</td>
+                  <td class="no-padding panel">
+                    <table class="table no-margin">
+                        <tbody>
+                            <tr ng-repeat="(children_id, children) in data">
+                                <td class="col-md-3 text-nowrap">{{priceSystemList[children_id].price_system_name}}</td>
+                                <td class="col-md-3">
+                                    <span ng-if="children.commision_type==1">底价收款</span>
+                                    <span ng-if="children.commision_type==2">后付佣金</span>
+                                </td>
+                                <td class="col-md-2">
+                                    <span ng-if="children.commision_form=='percent'">百分比</span>
+                                    <span ng-if="children.commision_form=='night'">间夜</span>
+                                    <span ng-if="children.commision_form=='manually'">手动</span>
+                                </td>
+                                <td class="col-md-2">{{children.commision_form_value}}</td>
+                                <td class="col-md-1">
+                                	<i ng-if="children.valid==1" class="fa fa-check-circle text-success"></i>
+                                	<i ng-if="children.valid==0" class="fa fa-ban text-warning"></i>
+                                </td>
+                                <td class="col-md-1">
+                                	<a class="pull-right" ng-click="addMarketCommission(children)" ng-if="children.company_id>0"><i class="fa fa-edit"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+            </div>
+        
+     	</div>
+     	<div class="col-md-4 b-l no-border-sm">
+     		<div class="panel-heading b-b b-light"> 会员设置</div>
+            <div class="list-group no-border no-radius">
+                <div class="list-group-item">
+                  <span class="pull-right"></span>
+                  <i class="fa fa-fw fa-circle text-info"></i>
+                   
+                </div>
+             </div>
+     	</div>
+     </div>
+</div>
+<script language="javascript">
+app.controller('MarketCommissionController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $alert) {
+	//获取数据
+	var _channel = $scope.$stateParams.channel;
+	var _view = $scope.$stateParams.view,common = '';
+	var param = 'channel='+_channel+'&view='+_view;
+    var channelCommisionList = {};
+	$scope.loading.show();
+	$httpService.post('/app.do?'+param, $scope, function(result){
+		$scope.loading.hide();
+		if(result.data.success == '0') {
+			var message = $scope.getErrorByCode(result.data.code);
+			$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+		}
+		common = result.data.common;
+		$scope.setCommonSetting(common);
+        $scope.setThisChannel('Hotel');
+		$scope.marketList = result.data.item.marketList;
+        $scope.marketChildrenHash = {};
+        if($scope.marketList != '') {
+            var marketChildrenHash = {};
+            for(var i in $scope.marketList) {
+                for(var j in $scope.marketList[i].children) {
+                    marketChildrenHash[j] = $scope.marketList[i].children[j];
+                }
+            }
+            $scope.marketChildrenHash = marketChildrenHash;
+        }
+        channelCommisionList = result.data.item.channelCommisionList;
+        var priceSystemList      = result.data.item.priceSystemHash;
+        var systemList = [], j = 0, marketPriceSystem = {}, k = 0;
+		if(priceSystemList != "") {
+            for(var key in priceSystemList) {
+                systemList[j] = priceSystemList[key];j++;
+                //
+                var marketIds = angular.fromJson(priceSystemList[key].market_ids);
+                for(var market_id in marketIds) {
+                    if(angular.isUndefined(marketPriceSystem[market_id])) {
+                        marketPriceSystem[market_id] = [];k = 0;
+                    } else {
+                        k = marketPriceSystem[market_id].length;
+                    }
+                    marketPriceSystem[market_id][k] = priceSystemList[key];
+                }
+            }
+            $scope.marketPriceSystem = marketPriceSystem;
+        }
+        $scope.priceSystemList = systemList;
+        $scope.commisionTypeList = [{'commision_name':'底价收款','commision_value':'1'},{'commision_name':'后付佣金','commision_value':'2'}];
+        $scope.commisionFormList = [{'commision_name':'百分比','commision_value':'percent'},{'commision_name':'间夜','commision_value':'night'},{'commision_name':'手动','commision_value':'manually'}];
+        $scope.channel_id = $rootScope.defaultChannel.channel_id;
+        $scope.dataList = channelCommisionList[$scope.channel_id];
+	});
+    $scope.changeChannel = function(channel_id) {
+        $scope.dataList = channelCommisionList[channel_id];
+    }
+	//
+	var asideMarketCommission = '';
+	$scope.addMarketCommission = function(_this) {
+		$scope.param = {}; $scope.param["valid"] = "1";
+        if(angular.isUndefined($scope.param.channel_id)) {
+            $scope.param.channel_id = angular.copy($scope.channel_id);
+        }
+		if(_this != 0) {
+            $scope.param = _this;
+            $scope.market_name = $scope.marketChildrenHash[_this.market_id].market_name;
+            $scope.market_id = _this.market_id;
+        }
+		$scope.action = '添加/编辑';
+		asideMarketCommission = $aside({scope : $scope, title: $scope.action_nav_name, placement:'top',animation:'am-fade-and-slide-top',backdrop:"static",container:'#MainController', templateUrl: '/resource/views/Setting/MarketCommissionAddEdit.tpl.html'});
+		asideMarketCommission.$promise.then(function() {
+			asideMarketCommission.show();
+			$(document).ready(function(){
+				
+			});
+		})
+		
+	};
+    //选择客源市场
+    $scope.market_name = '选择客源市场';$scope.market_id = '';
+    $scope.showCustomerMarket = function($event) {
+        //$('#customer_ul').mouseover(function(e) {$('#customer_ul').next().show();});
+        $('#customer_ul').next().show();
+    }
+    $scope.selectCustomerMarket = function(market, ajax) {
+        $scope.marketSystemLayout = {};
+        if(angular.isDefined(market)) {
+            $scope.market_name = market.market_name;
+            $scope.market_id = market.market_id;
+            $scope.market_father_id =  market.market_father_id;
+            $('#customer_ul').next().hide();
+        }
+    };
+	$scope.saveData = function() {
+		var postParam = $scope.param;
+        postParam.market_father_id = $scope.market_father_id;
+        postParam.market_id = $scope.market_id;
+		if(postParam == null || postParam == '' || !angular.isDefined(postParam.market_id)) {
+			$alert({title: 'Notice', content: '客源市场必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+        if(!angular.isDefined(postParam.channel_id)) {
+			$alert({title: 'Notice', content: '酒店必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+        if(!angular.isDefined(postParam.price_system_id)) {
+			$alert({title: 'Notice', content: '客房价格类型必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+        if(!angular.isDefined(postParam.commision_type)) {
+			$alert({title: 'Notice', content: '佣金类型必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+        if(!angular.isDefined(postParam.commision_form)) {
+			$alert({title: 'Notice', content: '佣金形式必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+        
+		$scope.loading.show();
+		$scope.param = postParam;
+        $httpService.header('method', 'addEditMarketCommission');
+		$httpService.post('/app.do?'+param, $scope, function(result){
+            $httpService.deleteHeader('method');
+			$scope.loading.hide();
+			asideMarketCommission.hide();
+            var channel_id = postParam.channel_id;
+            var market_id = postParam.market_id;
+            var price_system_id = postParam.price_system_id;
+            if(angular.isUndefined(channelCommisionList[channel_id])) channelCommisionList[channel_id] = {};
+            if(angular.isUndefined(channelCommisionList[channel_id][market_id])) channelCommisionList[channel_id][market_id] = {};
+            if(angular.isUndefined(channelCommisionList[channel_id][market_id][price_system_id])) channelCommisionList[channel_id][market_id][price_system_id] = {};
+            channelCommisionList[channel_id][market_id][price_system_id] = postParam;
+            $scope.changeChannel(channel_id);			
+		});
+	}
+	$httpService.deleteHeader('refresh');
+});
+
+</script>

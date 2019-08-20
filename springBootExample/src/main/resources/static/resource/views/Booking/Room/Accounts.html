@@ -1,0 +1,75 @@
+<div class="aside col-sm-4 b-r box-shadow no-padding" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+     <form name="AccountsForm" class="form-validation" id="thisAccountsForm" ng-submit="saveAccounts();">
+      <div class="aside-header">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title">账务项</h4>
+      </div>
+      <div class="aside-body">
+          <input name="accounts_type" size="9" type="hidden" id="accounts_type" value="" class="form-control" ng-model="param.accounts_type">
+          <div class="form-inline">
+              <div class="form-group p-v-xs">
+                 <aside class="app-aside bg-white lt w-sm">
+                    <nav>
+                      <ul class="nav">
+                        <li>
+                            <a class="btn btn-default customer_btn" style="padding:6px !important;" id="payment_ul" ng-mouseover="showPaymentUL()">
+                                <span class="pull-right text-muted">
+                                  <i class="fa fa-caret-down"></i>
+                                </span>
+                                <i class="icon fas fa-money-check text-lt"></i>
+                                <span>{{payment_name}}</span>
+                             </a>
+                             <ul class="nav nav-sub bg b">
+                                <li ng-repeat="(i, father) in paymentTypeList">
+                                  <a class="">
+                                    <span class="pull-right text-muted" ng-if="father.children!=''">
+                                      <i class="fa fa-caret-down"></i>
+                                    </span>
+                                    <span class="font-normal">{{father.payment_name}}</span>
+                                  </a>
+                                  <ul class="nav nav-sub bg b" ng-if="father.children!=''">
+                                    <li ng-repeat="(j, payment) in father.children"><a ng-click="selectPaymentType(payment, true)">{{payment.payment_name}}</a></li>
+                                  </ul>
+                                </li>
+                             </ul>
+                        </li>
+                      </ul>
+                    </nav>
+                </aside>
+            </div>
+            <div class="form-group" ng-if="payment_id==11">
+                <div class="input-group w-sm p-v-xs">
+                    <span class="input-group-btn"><button class="btn btn-default" type="button">授权号</button></span><input value="" type="text" class="form-control" name="credit_authorized_number" ng-model="param.credit_authorized_number">
+                </div>
+                <div class="input-group w p-v-xs">
+                    <span class="input-group-btn"><button class="btn btn-default" type="button">卡号</button></span><input value="" type="text" class="form-control" name="credit_card_number" ng-model="param.credit_card_number">
+                </div>
+                <div class="input-group w-sm p-v-xs">
+                    <input value="{{getDay('yyyy-mm-dd HH:mm:ss')}}" ng-model="param.credit_authorized_days" type="text" class="form-control" name="credit_authorized_days" readonly>
+                </div>            
+            </div>
+            <select class="form-control" name="item_id" ng-model="param.item_id">
+                <option value="">选择房号</option>
+                <option value="{{rDetail.item_id}}" detail_id="{{rDetail.detail_id}}" booking_detail_id="{{rDetail.booking_detail_id}}" ng-repeat="(detail_id, rDetail) in roomDetail" ng-selected="rDetail.item_id==param.item_id" ng-click="selectRoomItem($event)">{{rDetail.item_name==''?'未排房':rDetail.item_name}}</option>
+            </select>
+            <div class="form-group p-v-xs">
+                <div class="input-group w-sm">
+                    <input name="money" size="9" type="number" string-to-number step="0.01" min="0" id="money" value="" class="form-control" ng-model="param.money" required>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button"><span class="fas fa-yen-sign"></span></button>
+                    </span>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer">
+        <input type="hidden" value="" ng-model="param.ba_id">
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading" ng-bind-html="title">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

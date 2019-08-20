@@ -1,0 +1,39 @@
+<div class="aside b-r box-shadow" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+     <form name="RoomStatusEditForm" class="form-validation" id="thisForm" ng-submit="saveRoomStatusEdit()">
+      <div class="aside-header">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <div class="aside-body">
+          <div class="form-group">
+              <div class="input-group m-b">
+                  <input type="hidden" ng-model="param.editType" value="">
+                  <input type="text" size="9" class="form-control" ng-model="param.begin_datetime" data-date-format="yyyy-MM-dd" data-date-type="number" data-autoclose="true"  data-min-date="02/10/86" data-autoclose="1" name="eta_date" bs-datepicker required>
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button">开始时间</button>
+                  </span>              </div>
+              <div class="input-group m-b">
+                  <input type="text" size="9" class="form-control" ng-model="param.end_datetime" data-date-format="yyyy-MM-dd" data-date-type="number" data-autoclose="true"  data-min-date="{{param.begin_datetime}}" data-autoclose="1" name="eta_date" bs-datepicker required>
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button">结束时间</button>
+                  </span>
+              </div>
+              <div class="input-group m-b">
+                  <input type="text" class="form-control" ng-model="param.even_node" required>
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button">事由备注</button>
+                  </span>
+              </div>
+           </div>
+        
+      </div>
+      <div class="aside-footer">
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

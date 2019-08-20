@@ -1,0 +1,173 @@
+<div class="aside box-shadow h-10x" tabindex="-1" role="dialog">
+  <div class="aside-dialog">
+    <div class="aside-content">
+      <div class="aside-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="aside-title" ng-bind-html="title"></h4>
+      </div>
+      <form name="RoomBookEditForm" class="form-validation" id="thisForm" ng-submit="saveData()">
+      <div class="aside-body h-8x scrollable">
+        <div class="tab-container ng-scope ng-valid ng-dirty">
+            <ul class="nav nav-tabs">
+                <li ng-class="{active:activeRoomBookEditTab==1}" ng-click="activeRoomBookEditTab=1">
+                    <a ng-bind-html="actionEdit"></a>
+                </li>
+				<li ng-class="{active:activeRoomBookEditTab==2}" ng-click="activeRoomBookEditTab=2">
+                    <a ng-bind-html="actionAccounts"></a>
+                </li>
+                <li ng-class="{active:activeRoomBookEditTab==3}" ng-click="activeRoomBookEditTab=3">
+                    <a ng-bind-html="actionEditLog"></a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div ng-show="activeRoomBookEditTab==1">
+                      <div class="table-responsive">
+						<table class="table table-bordered table-striped bg-white">
+						  <thead>
+							<tr>
+							  <th translate="module.channel.market_name">客源市场</th>
+							  <th>房型</th>
+							  <th>房号</th>
+							  <th>客人名称</th>
+							  <th translate="module.channel.phone">电话</th>
+							  <th>性别</th>
+							  <th>证件号码</th>
+							  <th>预抵</th>
+							  <th>预离</th>
+							  <th translate="common.hint.date">日期</th>
+							  <th translate="common.hint.manager">管理</th>
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr ng-repeat="(edit_i, rDetail) in roomDetail">
+							  <td class="text-nowrap" ng-mouseover="market.edit_i=true" ng-mouseleave="market.edit_i=false" ng-init="market.edit_i=false">{{rDetail.market_name}}
+                                <span ng-show="market.edit_i" class="fa fa-edit pull-right"></span></td>
+							  <td ng-mouseover="category.edit_i=true" ng-mouseleave="category.edit_i=false" ng-init="category.edit_i=false"><span>{{rDetail.item_category_name}}</span>
+								<span ng-show="category.edit_i" class="fa fa-edit pull-right"></span></td>
+							  <td><a ng-click="config(Channel.id)">{{rDetail.channel_name}}</a></td>
+							  <td>{{rDetail.channel_en_name}}</td>
+							  <td>{{rDetail.phone}}</td>
+							  <td></td>
+							  <td></td>
+							  <td>{{rDetail.check_in}}</td>
+							  <td>{{rDetail.check_out}}</td>
+							  <td>{{rDetail.add_datetime}}</td>
+							  <td>
+							  <edit class="btn btn-sm btn-default" ng-click="edit(Channel.id)"><span translate="common.hint.edit" >编辑</span></edit>
+                              </td>
+							</tr>
+						  </tbody>
+						</table>
+                    </div>
+                </div>
+				<div ng-show="activeRoomBookEditTab==2">
+                      <div class="table-responsive">
+						<table class="table table-bordered table-striped bg-white">
+						  <thead>
+							<tr>
+							  <th translate="module.channel.market_name">客源市场</th>
+							  <th>房型</th>
+							  <th>房号</th>
+							  <th>客人名称</th>
+							  <th translate="module.channel.phone">电话</th>
+							  <th translate="module.channel.address">地址</th>
+							  <th translate="common.hint.date">日期</th>
+							  <th translate="common.hint.manager">管理</th>
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr ng-repeat="(i, rDetail) in roomDetail">
+							  <td class="text-nowrap">{{rDetail.market_name}}</td>
+							  <td><span>{{rDetail.market_name}}</span></td>
+							  <td><a ng-click="config(Channel.id)">{{rDetail.channel_name}}</a></td>
+							  <td>{{rDetail.channel_en_name}}</td>
+							  <td>{{rDetail.phone}}</td>
+							  <td>{{rDetail.address}}</td>
+							  <td>{{rDetail.add_datetime}}</td>
+							  <td>
+							  <button class="btn btn-sm btn-default" ng-click="edit(Channel.id)"><span translate="common.hint.edit" >编辑</span></button>
+							  <button class="btn btn-sm btn-default" ng-click="config(Channel.id)"><span translate="common.hint.config" >配置</span></button>
+							  </td>
+							</tr>
+						  </tbody>
+						</table>
+                    </div>
+                </div>
+                <div ng-show="activeRoomBookEditTab==3">
+                      <div class="table-responsive">
+						<table class="table table-bordered table-striped bg-white">
+						  <thead>
+							<tr>
+							  <th translate="module.channel.market_name">客源市场</th>
+							  <th>房型</th>
+							  <th>房号</th>
+							  <th>客人名称</th>
+							  <th translate="module.channel.phone">电话</th>
+							  <th translate="module.channel.address">地址</th>
+							  <th translate="common.hint.date">日期</th>
+							  <th translate="common.hint.manager">管理</th>
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr ng-repeat="(i, rDetail) in roomDetail">
+							  <td class="text-nowrap">{{rDetail.market_name}}</td>
+							  <td><span>{{rDetail.market_name}}</span></td>
+							  <td><a ng-click="config(Channel.id)">{{rDetail.channel_name}}</a></td>
+							  <td>{{rDetail.channel_en_name}}</td>
+							  <td>{{rDetail.phone}}</td>
+							  <td>{{rDetail.address}}</td>
+							  <td>{{rDetail.add_datetime}}</td>
+							  <td>
+							  <button class="btn btn-sm btn-default" ng-click="edit(Channel.id)"><span translate="common.hint.edit" >编辑</span></button>
+							  <button class="btn btn-sm btn-default" ng-click="config(Channel.id)"><span translate="common.hint.config" >配置</span></button>
+							  </td>
+							</tr>
+						  </tbody>
+						</table>
+                    </div>
+                </div>
+                <div class="form-group"></div>
+            </div>
+        </div>
+      </div>
+      <div class="aside-footer panel-footer">
+      	<input type="hidden" name="item_id" value="" ng-model="param.item_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script language="javascript">
+app.directive("edit", function(){
+  return{
+    restrict: "E",
+    link: function(scope,element){
+      element.bind("click",function(e){
+        alert("I am clicked for editing");
+      });
+    }
+  }
+})
+app.directive("update",function($document){
+  return{
+    restrict: 'AE',
+    require: 'ngModel',
+    link: function(scope,element,attrs,ngModel){
+      element.bind("click",function(){
+         alert(ngModel.$modelValue + " is updated, Update your value here.");
+         var id = "txt_name_" +ngModel.$modelValue.id;
+         var obj = $("#"+id);
+         obj.removeClass("active");
+         obj.addClass("inactive");
+         obj.attr("readOnly",true);
+          scope.$apply(function(){
+           scope.showEdit = true;
+         })
+      })
+    }
+  }
+})
+
+</script>

@@ -1,0 +1,137 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="ShiftExchangeController">
+	<ul class="nav nav-tabs" ui-nav>
+        <li class="active">
+          <a href>{{_self_module.module_name}}</a>
+        </li>
+        <li>
+          <a href="#!/app/Setting/{{roomPriceSystemUrl.view}}/{{roomPriceSystemUrl.url}}">价格类型</a>
+        </li>
+        <button class="btn btn-addon btn-default pull-right" ng-click="addRoomPrice(0)"><i class="fa fa-plus"></i>价格放盘</button>
+    </ul>
+    <div class="p b-a no-b-t bg-white m-b table-responsive">
+        <table class="table table-bordered table-striped bg-white">
+          <thead>
+            <tr>
+              <th class="w">价格类型</th>
+              <th class="w">客源市场</th>
+              <th class="w">继承</th>
+              <th class="w">房型</th>
+              <th class="col-sm-7">价格</th>
+              <th class="w-thumb-xs"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="(i, system) in dataList">
+              <td class="text-nowrap">{{system.price_system_name}}</td>
+              <td><span ng-repeat="(j, market_id) in system.market_ids"><i class="fa fa-check-circle"> </i> {{marketChildrenHash[market_id].market_name}} </span></td>
+              <td>{{dataList[system.price_system_father_id].price_system_name}}</td>
+              <td class="no-padding panel " colspan="2">
+                <table class="table no-margin" ng-repeat="(channel_id, layout) in system.layout_item">
+                    <tbody>
+                        <tr><th><i class="fa fa-building"></i> {{employeeChannel[channel_id].channel_name}}</th><th></th></tr>
+                        <tr ng-repeat="(layout_id, id) in layout">
+                            <td class="w-md">{{layoutHash[id].item_name}}</td>
+                            <td>
+                                <span ng-show="system.layout_item.price_system_type=='formula'">
+                                    <label class="radio-inline no-margin no-padding">
+                                        <select name="formula[{{channel_id}}-{{layout_id}}][formula]" class="form-control w-xxs">
+                                            <option value="+">+</option><option value="-">-</option><option value="*">x</option>
+                                        </select>
+                                    </label>
+                                    <label class="radio-inline no-padding" style="margin:0px !important;">
+                                        <input type="number" string-to-number ng-model="param.formula_value[layout_id]" class="form-control w-xs" name="formula[{{channel_id}}-{{layout_id}}][formula_value]" value="" >
+                                    </label>
+                                    <label class="radio-inline no-padding" style="margin:0px !important;">
+                                        <select name="formula[{{channel_id}}-{{layout_id}}][formula_second]" class="form-control w-xxs">
+                                            <option value="+">+</option><option value="-">-</option><option value="*">x</option>
+                                        </select>
+                                    </label>
+                                    <label class="radio-inline no-padding" style="margin:0px !important;">
+                                        <input type="number" string-to-number ng-model="param.formula_second_value[layout_id]" class="form-control w-xs" name="formula[{{channel_id}}-{{layout_id}}][formula_second_value]" value="" >
+                                    </label>
+                                </span>
+                                <span ng-show="system.layout_item.price_system_type=='direct'">
+                                    <input class="form-control w-thumb-lg" name="layout_price[{{channel_id}}-{{layout_id}}]" id="price" type="text" value=""  >
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+              </td>
+              <td>
+                <i class="fa fa-dot-circle-o text-success" ng-if="system.valid==1"></i>
+                <i class="fa fa-ban text-warning ng-scope" ng-if="system.valid==0"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+     </div>
+</div>
+<script language="javascript" src="/resource/vendor/modules/angular-smart-table/smart-table.min.js"></script>
+<script language="javascript">
+app.controller('ShiftExchangeController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $alert, $filter) {
+	//获取数据
+	var _channel = $scope.$stateParams.channel;var _view = $scope.$stateParams.view,common = '';
+	var param = 'channel='+_channel+'&view='+_view;
+	$scope.loading.show();
+	$httpService.post('/app.do?'+param, $scope, function(result){
+		$scope.loading.hide();
+		if(result.data.success == '0') {
+			var message = $scope.getErrorByCode(result.data.code);
+			$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+		}
+		var marketHash = result.data.item.marketHash, marketChildrenHash = {};
+		for (var i in marketHash) {
+			for (var j in marketHash[i].children) {
+				marketChildrenHash[j] = marketHash[i].children[j];
+			}
+		}
+		$scope.marketChildrenHash = marketChildrenHash;
+		$scope.layoutHash = result.data.item.layoutHash;
+		var priceSystemHash = result.data.item.priceSystemHash, priceSystemList = [];
+		$scope.priceSystemHash = priceSystemHash;
+		var i = 0, dataList = {};
+		for(var price_system_id in priceSystemHash) {
+			priceSystemList[i] = {};
+			priceSystemList[i]['price_system_name'] = '<i class="fa fa-chevron-circle-right"></i> '+priceSystemHash[price_system_id]['price_system_name'];
+			priceSystemList[i]['price_system_id'] = priceSystemHash[price_system_id]['price_system_id'];
+			dataList[price_system_id] = priceSystemHash[price_system_id];
+			dataList[price_system_id]['layout_item'] = angular.fromJson(priceSystemHash[price_system_id]['layout_item']);
+			dataList[price_system_id]['market_ids'] = angular.fromJson(priceSystemHash[price_system_id]['market_ids']);
+			i++;
+		}
+		$scope.dataList = dataList;
+		$scope.priceSystemList = priceSystemList;
+		common = result.data.common;
+		$scope.setCommonSetting(common);
+		$scope.roomPriceSystemUrl = result.data.item.roomPriceSystemUrl;
+	});
+	//
+	
+	$scope.saveData = function() {
+		var param = this.param;
+		if(param == null || param == '' || !angular.isDefined(param.market_father_id)) {
+			//$alert({title: 'Notice', content: '类型必须选择！', templateUrl: '/modal-warning.html', show: true});
+			//return;
+		}
+		$scope.loading.show();
+		var formParam = $.serializeFormat('#thisForm');
+		formParam['cancellation_policy'] = param['policy'];
+		formParam['price_system_father_id'] = '0';
+		if(angular.isDefined(param['price_system_father_id']) && param['price_system_father_id'] >0) formParam['price_system_father_id'] = param['price_system_father_id'];
+		formParam['price_system_id'] = param['price_system_id'];
+		formParam['price_system_type'] = $scope.thisPriceSystem['price_system_type'];
+		$scope.param = formParam;
+		$httpService.post('/app.do?channel='+common.saveAddEditUrl, $scope, function(result){
+			$scope.loading.hide();
+			if(result.data.success == '0') return; 
+			//asideRoomPrice.hide();
+            $alert({title: 'Notice', content: '保存成功！', templateUrl: '/modal-success.html', show: true});
+		});
+	}
+	
+	$httpService.deleteHeader('refresh');
+});
+
+</script>

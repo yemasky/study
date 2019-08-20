@@ -1,0 +1,71 @@
+<div class="aside box-shadow h-10x" tabindex="-1">
+    <div class="aside-dialog"  id="wertyuio">
+    <div class="aside-header" ng-show="title">
+    	<button type="button" class="close" ng-click="$hide()">&times;</button>
+    	<h4 class="aside-title" ng-bind-html="title"></h4>
+    </div>
+    <form name="thisForm" class="form-validation" id="thisForm" ng-submit="saveData()">
+    <div class="aside-content h-8x">
+      <div class="aside-body h-8x scrollable" style="overflow:visible">
+        <div>
+            <div class="form-group m-h-n clearfix">
+            	<div class="col-sm-3">
+                <label for="policy_name">取消政策名称</label>
+                <input class="form-control w" name="policy_name" value="" ng-model="param.policy_name" required>
+                </div>
+                <div class="col-sm-3">
+            	<label for="policy_en_name">取消政策英文名称</label>
+                <input class="form-control w" name="policy_en_name" value="" ng-model="param.policy_en_name" required>
+                </div>
+            </div>
+            <div class="form-group m-h-n clearfix">
+            	<div class="col-sm-3">
+                    <div class="col-sm-6 w-sm no-padding">
+                    <label for="rules">取消政策扣取规则</label>
+                    <select class="form-control w-sm" name="rules" id="rules" ng-model="param.rules" required>
+                        <option value="night">间夜</option>
+                        <option value="percent">百分比</option>
+                        <option value="cash">每订单现金</option>
+                    </select>
+                    </div>
+                    <div class="col-sm-6 w-xs">
+                    <label for="rules">扣取数量</label>
+                    <input class="form-control w-xs" name="rules_value" type="number" string-to-number value="" ng-model="param.rules_value" required>
+                    </div>
+                </div>
+                <div class="col-sm-3 w-xs">
+            	<label for="rules_days">时间[天]</label>
+                <input class="form-control w-xs" name="rules_days" type="number" string-to-number value="" ng-model="param.rules_days" required>
+                </div>
+                <div class="col-sm-3">
+                <label for="rules_time">[小时前取消]</label>
+                <input class="form-control w-xs" name="rules_time" id="rules_time" value="" ng-model="param._rules_time" data-autoclose="1" data-time-format="HH:mm" data-length="1" data-minute-step="60" data-timezone="UTC" bs-timepicker required type="text">
+                </div>
+            </div>
+            <div class="form-group m-h-n clearfix">
+            	<div class="col-sm-3">
+                <label for="rules">生效时间</label>
+                <input class="form-control w" name="begin_datetime" id="begin_datetime" type="text" value="" data-date-format="MM-dd" ng-model="param._begin_datetime" data-autoclose="1" bs-datepicker>
+                </div>
+                <div class="col-sm-3">
+                <label for="rules">结束时间</label>
+                <input class="form-control w" name="end_datetime" id="end_datetime" type="text" value="" ng-model="param._end_datetime" data-min-date="{{param.begin_datetime}}" data-date-format="MM-dd" data-autoclose="1" bs-datepicker>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <label class="radio-inline"> <input type="radio" value="1" id="valid1" ng-model="param.valid" name="valid" checked> 有效</label>
+                <label class="radio-inline"> <input type="radio" value="0" id="valid0" ng-model="param.valid" name="valid"> 无效</label>
+            </div>
+            <div class="form-group"></div>
+        </div>
+      </div>
+      
+    </div>
+    <div class="aside-footer panel-footer">
+        <input type="hidden" name="policy_id" value="" ng-model="param.policy_id" >
+        <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+        <button type="submit" class="btn btn-primary" btn-loading-text="{{'common.hint.LOADING' | translate}}" trigger-loading="beginLoading">Save changes</button>
+    </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<div class="alert" tabindex="-1"><span ng-class="[type ? 'alert-' + type : null]"></span>
+    <div class="text-sm btn btn-rounded btn-success no-margin box-shadow" style="padding-bottom:0px !important;opacity: 0.8;">
+        <i class="fas fa-check-circle pull-left">　</i>
+        <span ng-bind="title"></span>　<span class="font-bold text-lt" ng-bind-html="content"></span>
+        <span class="pull-right"> <button type="button" class="close" ng-click="$hide()">&times;</button></span>
+        <div class="progress progress-xxs no-margin no-radius dk m-t-xs">
+            <div class="progress-bar progress-bar-success" ng-style="{width: vm.value + '%'}"></div>
+        </div>
+    </div>
+</div>

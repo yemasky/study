@@ -1,0 +1,121 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="BorrowingController">
+	<div class="box b-a bg-white m-b">
+    	<div class="col-md-10">
+      		<div class="panel-heading b-b b-light"><span class="no-margin" ng-bind-html="_self_module.module_name"></span> 
+                <a class="pull-right fa fa-plus" ng-click="addAndEditFunction('', '')"> </a>
+            </div>
+            <div class="p-md">
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped bg-white text-nowrap">
+              <thead>
+                <tr>
+                    <th class="w">属于企业</th>
+                    <th>借物标签</th>
+                    <th class="w">借物名称</th>
+                    <th class="w">英文名称</th>
+                    <th class="w">借物描述</th>
+                    <th>借物押金(价值)</th>
+                    <th class="w">借物库存</th>
+                    <th>有效</th>
+                    <th>编辑</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(i, dataArray) in dataList">
+                  <td class="w text-nowrap b-r">{{employeeChannel[dataArray.channel_id].channel_name}}</td>
+                  <td class="w b-r">{{dataArray.borrowing_tag}}</td>
+                  <td class="w b-r">{{dataArray.borrowing_name}}</td>
+                  <td class="w b-r">{{dataArray.borrowing_en_name}}</td>
+                  <td class="w b-r" title="{{dataArray.borrowing_describe}}">{{dataArray.borrowing_describe|limitTo:10}}</td>
+                  <td class="w b-r">{{dataArray.borrowing_price}}</td>
+                  <td class="w b-r">{{dataArray.borrowing_stock}}</td>
+                  <td class="b-r">
+                    <i ng-if="dataArray.valid=='1'" class="fas fa-check-circle text-success"></i>
+                    <i ng-if="dataArray.valid=='0'" class="fa fa-ban text-warning"></i>
+                  </td>
+                  <td>
+                    <a class="pull-right" ng-click="addAndEditFunction(dataArray, i)"><i class="fa fa-edit"></i> </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+            </div>
+        
+     	</div>
+     	<div class="col-md-2 b-l no-border-sm">
+     		
+     	</div>
+     </div>
+</div>
+<script language="javascript">
+app.controller('BorrowingController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $alert, $filter) {
+	//获取数据
+    $scope.dataFormat = {};$scope.dataFormatFather = {};
+	var _channel = $scope.$stateParams.channel, common = '';
+	var _view = $scope.$stateParams.view;
+	var param = 'channel='+_channel+'&view='+_view;
+	$scope.loading.show();
+	$httpService.post('/app.do?'+param, $scope, function(result){
+		$scope.loading.hide();
+		if(result.data.success == '0') {
+			var message = $scope.getErrorByCode(result.data.code);
+			$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+		}
+		common = result.data.common;
+		$scope.setCommonSetting(common);
+		$scope.dataList = result.data.item.channelBorrowing;
+        var dataFormat = {},dataFormatFather = {};
+        if($scope.dataList != '') {
+            
+        }
+        $scope.dataFormat = dataFormat;
+	});
+	//
+	var asideThisPage = '';
+	$scope.addAndEditFunction = function(_this, list_i) {
+		$scope.param = {}; $scope.param["valid"] = "1";$scope.list_i = $scope.dataList.length - 0;
+		if(_this != '') {
+			$scope.param = angular.copy(_this);
+            $scope.list_i = list_i;
+		}
+		$scope.action = '添加/编辑';
+		asideThisPage = $aside({scope : $scope, title: $scope.action_nav_name, placement:'top',animation:'am-fade-and-slide-top',backdrop:"static",container:'body', templateUrl: '/resource/views/Setting/BorrowingAddEdit.tpl.html'});
+		asideThisPage.$promise.then(function() {
+			asideThisPage.show();
+			$(document).ready(function(){
+				$('#rules').val($scope.param["rules"]);
+			});
+		})
+	};
+    $scope.selectChange = function(channel_id) {
+        $scope.param.channel_id = channel_id;
+        $scope.param.channel = $rootScope.employeeChannel[channel_id].channel;
+    };
+	$scope.saveData = function() {
+		var param = this.param;
+		if(param == null || param == '' || !angular.isDefined(param.channel_id)) {
+			$alert({title: 'Notice', content: '“属于企业”必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+		$scope.loading.show();
+		$scope.param = param;
+        $httpService.header('method', 'editChannelBorrowing');
+		$httpService.post('/app.do?channel='+common.saveAddEditUrl, $scope, function(result){
+            $httpService.deleteHeader('method');
+			$scope.loading.hide();
+			if(result.data.success == '0') {
+				return;
+			}
+            var borrowing_id = result.data.item.borrowing_id;
+			$scope.dataList[$scope.list_i] = angular.copy(param);
+			asideThisPage.hide();
+			
+		});
+	}
+	$httpService.deleteHeader('refresh');
+	
+});
+
+</script>

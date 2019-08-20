@@ -1,0 +1,18 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="app-content-inner" ng-controller="TestSelectController">
+  
+</div>
+<script language="javascript" src="/resource/vendor/libs/moment.min.js"></script>
+<script language="javascript" src="/resource/vendor/libs/daterangepicker.js"></script>
+<script language="javascript">
+app.controller('TestSelectController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $ocLazyLoad, $alert, $filter) {
+    $scope.param = {};
+    $ocLazyLoad.load([$scope._resource + "vendor/libs/daterangepicker.css",$scope._resource + "styles/booking.css",
+        $scope._resource + "vendor/modules/angular-ui-select/select.min.css"]);
+    $ocLazyLoad.load([$scope._resource + "vendor/modules/angular-ui-select/select.min.js"]);
+    
+	//
+	$httpService.deleteHeader('refresh');
+});
+
+</script>

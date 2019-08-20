@@ -1,0 +1,120 @@
+<span ng-include="'/resource/views/Common/nav.tpl.html'"></span>
+<div class="p-md" ng-controller="PolicyController">
+	<div class="box b-a bg-white m-b">
+    	<div class="col-md-10">
+      		<div class="panel-heading b-b b-light"><span class="no-margin" ng-bind-html="_self_module.module_name"></span> <a class="pull-right fa fa-plus" ng-click="addPolicy(0)"> </a></div>
+            <div class="p-md">
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped bg-white">
+              <thead>
+                <tr>
+                  <th>中文名称</th>
+                  <th>英文名称</th>
+                  <th>规则</th>
+                  <th>扣取数量</th>
+                  <th>取消规则</th>
+                  <th>有效时间</th>
+                  <th>有效</th>
+                  <th>编辑</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(i, data) in dataList">
+                  <td class="text-nowrap">{{data.policy_name}}</td>
+                  <td>{{data.policy_en_name}}<span ng-if="data.payment_en_name==''">　</span> </td>
+                  <td>
+                  	<span ng-if="data.rules=='night'">间夜</span> 
+                    <span ng-if="data.rules=='percent'">百分比</span> 
+                    <span ng-if="data.rules=='cash'">每订单现金</span> 
+                  </td>
+                  <td>{{data.rules_value}}</td>
+                  <td>{{data.rules_days}}天{{data.rules_time}}点前免费取消</td>
+                  <td><span ng-if="data.begin_datetime!=''">{{data.begin_datetime}}~{{data.end_datetime}}</span></td>
+                  <td>
+                    <i ng-if="data.valid==1" class="fa fa-dot-circle-o text-success"></i>
+                    <i ng-if="data.valid==0" class="fa fa-ban text-warning"></i>
+                  </td>
+                  <td>
+                    <a class="pull-right" ng-click="addPolicy(data)" ng-if="data.company_id>0"><i class="fa fa-edit"></i> </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+            </div>
+        
+     	</div>
+     	<div class="col-md-2 b-l no-border-sm">
+     		
+     	</div>
+     </div>
+</div>
+<script language="javascript" src="/resource/vendor/libs/moment.min.js"></script>
+<script language="javascript" src="/resource/vendor/libs/daterangepicker.js"></script>
+<script language="javascript">
+app.controller('PolicyController', function($rootScope, $scope, $httpService, $location, $translate, $aside, $alert, $filter) {
+	//获取数据
+	var _channel = $scope.$stateParams.channel, common = '';
+	var _view = $scope.$stateParams.view;
+	var param = 'channel='+_channel+'&view='+_view;
+	$scope.loading.show();
+	$httpService.post('/app.do?'+param, $scope, function(result){
+		$scope.loading.hide();
+		if(result.data.success == '0') {
+			var message = $scope.getErrorByCode(result.data.code);
+			$alert({title: 'Error', content: message, templateUrl: '/modal-warning.html', show: true});
+		}
+		common = result.data.common;
+		$scope.setCommonSetting(common);
+		$scope.dataList = result.data.item.policyList;
+	});
+	//
+	var asidePolicy = '', begin_datetime = {}, end_datetime = {};
+	$scope.addPolicy = function(_this) {
+		$scope.param = {}; $scope.param["valid"] = "1";$scope.param["_rules_time"] = "2018-01-01T18:00:00.000Z";
+		$scope.param["_begin_datetime"] = "00-00";$scope.param["_end_datetime"] = "00-00";
+		if(_this != 0) {
+			var thisYear = $filter('date')($scope._baseDateTime(), 'yyyy', '0800')
+			$scope.param = _this;
+			$scope.param["_begin_datetime"] = thisYear+'-'+$scope.param["begin_datetime"] + 'T00:00:00.000Z';
+			$scope.param["_end_datetime"] = thisYear+'-'+$scope.param["end_datetime"] + 'T00:00:00.000Z';
+			$scope.param["_rules_time"] = $filter('date')($scope._baseDateTime(), 'yyyy-MM-dd', 'UTC') + 'T'+$scope.param["rules_time"]+'.000Z';
+		}
+		$scope.action = '添加/编辑';
+		asidePolicy = $aside({scope : $scope, title: $scope.action_nav_name, placement:'top',animation:'am-fade-and-slide-top',backdrop:"static",container:'body', templateUrl: '/resource/views/Setting/PolicyAddEdit.tpl.html'});
+		asidePolicy.$promise.then(function() {
+			asidePolicy.show();
+			$(document).ready(function(){
+				$('#rules').val($scope.param["rules"]);
+			});
+		})
+	};
+	$scope.saveData = function() {
+		var param = this.param;
+		if(param == null || param == '' || !angular.isDefined(param.rules)) {
+			$alert({title: 'Notice', content: '“取消政策规则”必须选择！', templateUrl: '/modal-warning.html', show: true});
+			return;
+		}
+		$scope.loading.show();
+		param.begin_datetime = $filter('date')(param._begin_datetime, 'MM-dd', '0000');
+		delete param._begin_datetime;
+		param.end_datetime = $filter('date')(param._end_datetime, 'MM-dd', '0000');
+		delete param._end_datetime;
+		param.rules_time = $filter('date')(param._rules_time, 'HH:mm', 'UTC');
+		delete param._rules_time;
+		$scope.param = param;
+		$httpService.post('/app.do?channel='+common.saveAddEditUrl, $scope, function(result){
+			$scope.loading.hide();
+			if(result.data.success == '0') {
+				return;
+			}
+			$scope.dataList = result.data.item.policyList;
+			asidePolicy.hide();
+			
+		});
+	}
+	$httpService.deleteHeader('refresh');
+	
+});
+
+</script>
