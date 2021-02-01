@@ -40,7 +40,7 @@ public abstract class AbstractAction {
 			this.release(request, response);
 		} catch (Exception e) {
 			successType.setSuccess(false);
-			successType.setErrorCode(ErrorCode.__F_SYS);
+			successType.setCode(ErrorCode.__F_SYS);
 			try {
 				this.rollback(request, response);
 			} catch (Exception ex) {

@@ -38,11 +38,11 @@ public class DbcpPool {
 		dataSource.setUsername(config.getDbUsername());
 		dataSource.setPassword(config.getDbPassword());
 		dataSource.setUrl(config.getDbDsn()+"&serverTimezone=GMT");
-		dataSource.setInitialSize(config.getMinConnection());
-		dataSource.setMaxTotal(config.getMaxConnection());
-		dataSource.setMaxIdle(100);
+		dataSource.setInitialSize(config.getMinConnection());//初始连接数
+		dataSource.setMaxTotal(config.getMaxConnection());//最大连接数
+		dataSource.setMaxIdle(10);//最大空闲连接数
 		dataSource.setMaxWaitMillis(5000);//5秒超时
-		dataSource.setMinIdle(10);
+		dataSource.setMinIdle(1);//最小空闲连接数
 		dbcpDataSource = dataSource;
 	}
 

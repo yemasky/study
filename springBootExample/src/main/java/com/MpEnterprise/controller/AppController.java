@@ -67,7 +67,7 @@ public class AppController extends AbstractController {
 		}
 		Success successType = new Success();
 		successType.setSuccess(false);
-		successType.setErrorCode(ErrorCode.__F_SYS);
+		successType.setCode(ErrorCode.__F_SYS);
 		return successType;
 	}
 

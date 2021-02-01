@@ -21,7 +21,7 @@ public class Success {
 		this.date = new Timestamp(thisDatetime);
 	}
 	
-	public void setErrorCode(ErrorCode error) {
+	public void setCode(ErrorCode error) {
 		this.code = error.getError_code();
 		this.message = error.getDescribe();
 		long thisDatetime = System.currentTimeMillis();
