@@ -24,9 +24,12 @@ public class DbcpPool {
 	}
 	
 	public Connection getConnection() throws SQLException {
-		System.out.println("Connection Active Num: " + dbcpDataSource.getNumActive());
 		Connection connection = dbcpDataSource.getConnection();
 		return connection;
+	}
+	
+	public int getActiveConnectionNum() {
+		return dbcpDataSource.getNumActive();
 	}
 
 	public void init() {

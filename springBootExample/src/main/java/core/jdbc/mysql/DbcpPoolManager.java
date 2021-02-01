@@ -106,7 +106,7 @@ public class DbcpPoolManager {
 		}
 		Connection connection = pool.getConnection();// 从选定的连接池中获得连接
 		if (connection != null) {
-			logger.info("得到 pool connection.");
+			logger.info("得到 pool connection. ActiveConnectionNum: " + pool.getActiveConnectionNum());
 		} else {
 			logger.warning("连接已满,等待0.5秒");
 			if (time == 0)
