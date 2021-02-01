@@ -2,9 +2,6 @@ package core.jdbc.mysql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.dbcp2.BasicDataSource;
 
 public class DbcpPool {
@@ -13,7 +10,7 @@ public class DbcpPool {
 	/**
 	 * 数据库连接池（dbcp连接池）对象引用
 	 */
-	private DataSource dbcpDataSource;
+	private BasicDataSource dbcpDataSource;
 
 	public DbcpPool(Config config) throws SQLException {
 		try {
@@ -27,7 +24,7 @@ public class DbcpPool {
 	}
 	
 	public Connection getConnection() throws SQLException {
-		System.out.println("NumActive: " + ((BasicDataSource) dbcpDataSource).getNumActive());
+		System.out.println("Connection Active Num: " + dbcpDataSource.getNumActive());
 		Connection connection = dbcpDataSource.getConnection();
 		return connection;
 	}
