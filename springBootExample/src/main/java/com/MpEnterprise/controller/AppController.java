@@ -58,9 +58,9 @@ public class AppController extends AbstractController {
 			Object controllerAction = controllerClass.newInstance();
 
 			Method excute = controllerClass.getMethod("excute", HttpServletRequest.class, HttpServletResponse.class);
-			Object tempObj = excute.invoke(controllerAction, request, response);
-
-			return (Success) tempObj;
+			Success tempObj = (Success) excute.invoke(controllerAction, request, response);
+			tempObj.setModule(module);
+			return tempObj;
 		} catch (Exception e) {
 			MDC.put("APP_NAME", "web_example_error");
 			//logger.error("系统错误", e);

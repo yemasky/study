@@ -55,7 +55,7 @@ public class IndexAction extends AbstractAction {
 	
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) {
 		
-		this.successType.setCode(ErrorCode.__T_LOGIN);
+		this.success.setCode(ErrorCode.__T_LOGIN);
 	}
 
 	public void doTest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -81,7 +81,7 @@ public class IndexAction extends AbstractAction {
 		
 		//exampleService.freeConnection();
 		
-		this.successType.setCode(ErrorCode.__T_SUCCESS);
+		this.success.setCode(ErrorCode.__T_SUCCESS);
 	}
 
 	

@@ -60,9 +60,10 @@ public class ExampleController extends AbstractController {
 			Object controllerAction = controllerClass.newInstance();
 
 			Method excute = controllerClass.getMethod("excute", HttpServletRequest.class, HttpServletResponse.class);
-			Object tempObj = excute.invoke(controllerAction, request, response);
+			Success tempObj = (Success) excute.invoke(controllerAction, request, response);
 			this.release(request, response);
-			return (Success) tempObj;
+			tempObj.setModule(module);
+			return tempObj;
 		} catch (Exception e) {
 			this.release(request, response);
 			MDC.put("APP_NAME", "web_error");

@@ -45,12 +45,12 @@ public class LoginAction extends AbstractAction {
 	}
 	
 	public Success doDefault(HttpServletRequest request, HttpServletResponse response) {
-		return successType;
+		return success;
 	}
 	//http://localhost:8081/wkllme-mp-Enterprise/mp/app.json?module=login&action=login&method=login
 	public Success doLogin(HttpServletRequest request, HttpServletResponse response) {
-		this.successType.setCode(ErrorCode.__T_LOGIN);
-		return this.successType;
+		this.success.setCode(ErrorCode.__T_LOGIN);
+		return this.success;
 	}
 
 }

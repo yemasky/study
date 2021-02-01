@@ -45,7 +45,7 @@ public class IndexAction extends AbstractAction {
 	}
 	
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) {
-		this.successType.setCode(ErrorCode.__T_LOGIN);
+		this.success.setCode(ErrorCode.__T_LOGIN);
 	}
 
 

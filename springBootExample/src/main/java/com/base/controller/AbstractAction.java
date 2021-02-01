@@ -13,7 +13,7 @@ import com.base.type.Success;
 
 public abstract class AbstractAction {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	protected Success successType = new Success();
+	protected Success success = new Success();
 	protected final String CLIENT_KEY = "client_key";
 	protected final String SESSION_KEY = "session_key";
 	protected String client_key;
@@ -28,7 +28,7 @@ public abstract class AbstractAction {
 	public abstract void rollback(HttpServletRequest request, HttpServletResponse response) throws Exception;
 	
 	public Success doDefault(HttpServletRequest request, HttpServletResponse response) {
-		return successType;
+		return success;
 	}
 	
 	public Success excute(HttpServletRequest request, HttpServletResponse response) {
@@ -39,21 +39,21 @@ public abstract class AbstractAction {
 			this.service(request, response);
 			this.release(request, response);
 		} catch (Exception e) {
-			successType.setSuccess(false);
-			successType.setCode(ErrorCode.__F_SYS);
+			success.setSuccess(false);
+			success.setCode(ErrorCode.__F_SYS);
 			try {
 				this.rollback(request, response);
 			} catch (Exception ex) {
 				// TODO Auto-generated catch block
 				MDC.put("APP_NAME", "web_error");
-				logger.error(successType.getMessage(), ex);
+				logger.error(success.getMessage(), ex);
 			}
 			// TODO Auto-generated catch block
 			MDC.put("APP_NAME", "web_error");
-			logger.error(successType.getMessage(), e);
+			logger.error(success.getMessage(), e);
 		}
 		
-		return successType;
+		return success;
 	}
 	
 }

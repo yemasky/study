@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class Success {
 	private boolean success = true;
 	private String code = "100001";
+	private String module;
 	private String message = "请求数据成功";
 	private Object data = null;
 	private Timestamp date = null;
@@ -26,6 +27,14 @@ public class Success {
 		this.message = error.getDescribe();
 		long thisDatetime = System.currentTimeMillis();
 		this.date = new Timestamp(thisDatetime);
+	}
+
+	public String getModule() {
+		return module;
+	}
+
+	public void setModule(String module) {
+		this.module = module;
 	}
 
 	public boolean isSuccess() {
