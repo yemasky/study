@@ -1,0 +1,3 @@
+wget -c -r -np -k -L -p http://v.bootstrapmb.com/2020/11/494ou9244/static/  下载整站
+tar -czvf bhulua2.tar.gz bhulua.thememinister.com
+
