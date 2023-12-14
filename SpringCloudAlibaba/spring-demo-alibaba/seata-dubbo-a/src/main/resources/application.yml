@@ -1,0 +1,37 @@
+db-name: demo_order
+server:
+  port: 8081
+spring:
+  application:
+    name: seata-dubbo-a
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.56.1:8848
+    alibaba:
+      seata:
+        # 注意这个名字最大长度为32，如果要增加需要修改seat库中字段
+        # 配置自定义的是否分组，默认为服务名称（spring.application.name）-seata-service-group
+        tx-service-group: seata-dubbo-a-seata-service-group
+dubbo:
+  protocol:
+    name: dubbo
+    port: 20881
+  registry:
+    address: spring-cloud://192.168.56.1
+  scan:
+    base-packages: top.vchar
+  cloud:
+    subscribed-services: seata-dubbo-b
+seata:
+  registry:
+    type: nacos
+    nacos:
+      serverAddr: 192.168.56.1:8848
+      application: seata-server
+      group: SEATA_GROUP
+  service:
+    vgroup-mapping:
+      seata-dubbo-a-seata-service-group: default

@@ -1,0 +1,21 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: dubbo-provider-demo
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        #server-addr: 192.168.56.1:8848
+        server-addr: 127.0.0.1:8848
+dubbo:
+  protocol:
+    name: dubbo
+    port: 20882
+  registry:
+    #//address: spring-cloud://192.168.56.1.102
+    address: spring-cloud://127.0.0.1
+  scan:
+    base-packages: top.vchar

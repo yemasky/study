@@ -1,0 +1,23 @@
+#spring:
+#  security:
+#    user:
+#      name: root
+#      password: root
+
+spring:
+  devtools:
+    restart:
+      enabled=true: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/demo?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  thymeleaf:
+    enabled: true
+
+jjwt:
+  security:
+    base64-secret: MDk5ZmU2YzdhZWE5NWRhZTU0MjgzMTVmMTkxYTI5ZGJmODc3NWU2ZDc5OWI1YWMxZTE5NWYxZWVhY2VmZGYwMWQ1NmExNjI4M2M2OWUzOGM0Nzg1ZGU2YzgxNWVjYzNhODg4YzE0ODhlZDA0YjZlYTgzYzk3MGE4NWFkMmJmOGI=
+    token-validity-in-seconds: 86400
+    token-validity-in-seconds-for-remember-me: 2592000

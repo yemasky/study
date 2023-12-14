@@ -1,0 +1,75 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: seata-order-samples
+  cloud:
+    nacos:
+      discovery:
+        #nacos服务地址
+        server-addr: 192.168.7.231:8848
+        #nacos命名空间ID
+        namespace: 5c2d3558-01c2-4f88-951b-e6d990872d5c
+    alibaba:
+      seata:
+        #事务群组，要和下方vgroup-mapping保持一致（可以每个应用独立取名，也可以使用相同的名字），要与服务端nacos-config.txt中service.vgroup_mapping中存在,并且要保证多个群组情况下后缀名要保持一致-tx_group
+        tx-service-group: ${spring.application.name}-tx_group
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.7.231:3306/seata-order?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+
+seata:
+  application-id: ${spring.application.name}
+  #事务群组（可以每个应用独立取名，也可以使用相同的名字），要与服务端nacos-config.txt中service.vgroup_mapping中存在,并且要保证多个群组情况下后缀名要保持一致-tx_group
+  service:
+    vgroup-mapping:
+      seata-order-samples-tx_group: default
+
+  registry:
+    type: nacos
+    nacos:
+      server-addr: ${spring.cloud.nacos.discovery.server-addr}
+      username: nacos
+      password: nacos
+      #seata分组名称
+      group: SEATA_GROUP
+      #nacos命名空间ID
+      namespace: 5c2d3558-01c2-4f88-951b-e6d990872d5c
+      #seata服务名
+      application: seata-server
+
+  config:
+    type: nacos
+    nacos:
+      server-addr: ${spring.cloud.nacos.discovery.server-addr}
+      username: nacos
+      password: nacos
+      #seata分组名称
+      group: SEATA_GROUP
+      #nacos命名空间ID
+      namespace: 5c2d3558-01c2-4f88-951b-e6d990872d5c
+
+
+
+# feign组件超时设置，用于查看seata数据库中的临时数据内容
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 30000
+        read-timeout: 30000
+
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+
+
+
+

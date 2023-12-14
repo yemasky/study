@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user
+          uri: lb://user
+          predicates:
+            - Path=/user/**
+        - id: business
+          uri: lb://business
+          predicates:
+            - Path=/business/**
+        - id: product
+          uri: lb://product
+          predicates:
+            - Path=/product/**
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8080
+      eager: true
+      scg:
+        fallback:
+          mode: response
+          response-status: 455
+          response-body: forbid

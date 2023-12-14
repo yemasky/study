@@ -1,0 +1,33 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: seata-dubbo-c
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.56.1:8848
+    alibaba:
+      seata:
+        tx-service-group: seata-dubbo-c-seata-service-group
+dubbo:
+  protocol:
+    name: dubbo
+    port: 20883
+  registry:
+    address: spring-cloud://192.168.56.1
+  scan:
+    base-packages: top.vchar
+db-name: demo_user
+seata:
+  registry:
+    type: nacos
+    nacos:
+      serverAddr: 192.168.56.1:8848
+      application: seata-server
+      group: SEATA_GROUP
+  service:
+    vgroup-mapping:
+      seata-dubbo-c-seata-service-group: default

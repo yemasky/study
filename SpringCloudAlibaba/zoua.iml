@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration>
+        <fileset id="fileset" name="Spring 应用程序上下文" removed="false">
+          <file>file://$MODULE_DIR$/zoua/Sentinel-1.7.2/sentinel-adapter/sentinel-dubbo-adapter/src/test/resources/spring-dubbo-provider-filter.xml</file>
+          <file>file://$MODULE_DIR$/zoua/Sentinel-1.8.4/sentinel-adapter/sentinel-apache-dubbo-adapter/src/test/resources/spring-dubbo-consumer-filter.xml</file>
+          <file>file://$MODULE_DIR$/zoua/Sentinel-1.7.2/sentinel-adapter/sentinel-dubbo-adapter/src/test/resources/spring-dubbo-consumer-filter.xml</file>
+          <file>file://$MODULE_DIR$/zoua/Sentinel-1.8.4/sentinel-adapter/sentinel-dubbo-adapter/src/test/resources/spring-dubbo-consumer-filter.xml</file>
+          <file>file://$MODULE_DIR$/zoua/Sentinel-1.8.4/sentinel-adapter/sentinel-dubbo-adapter/src/test/resources/spring-dubbo-provider-filter.xml</file>
+          <file>file://$MODULE_DIR$/zoua/Sentinel-1.7.2/sentinel-adapter/sentinel-apache-dubbo-adapter/src/test/resources/spring-dubbo-provider-filter.xml</file>
+          <file>file://$MODULE_DIR$/zoua/Sentinel-1.7.2/sentinel-adapter/sentinel-apache-dubbo-adapter/src/test/resources/spring-dubbo-consumer-filter.xml</file>
+          <file>file://$MODULE_DIR$/zoua/Sentinel-1.8.4/sentinel-adapter/sentinel-apache-dubbo-adapter/src/test/resources/spring-dubbo-provider-filter.xml</file>
+        </fileset>
+      </configuration>
+    </facet>
+  </component>
+</module>
