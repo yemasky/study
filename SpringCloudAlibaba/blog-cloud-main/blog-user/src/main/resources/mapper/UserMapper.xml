@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blog.mapper.UserMapper">
+
+    <select id="findByUsername" resultType="com.blog.vo.UserVo" parameterType="string">
+        SELECT id,birthday,salt,sex,update_time,avatar,password,create_time,phone,name,email,status,username
+        FROM sys_user
+        WHERE username = #{username}
+    </select>
+
+</mapper>

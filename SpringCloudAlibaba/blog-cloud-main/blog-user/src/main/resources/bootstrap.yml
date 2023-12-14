@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: blog-user
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848 # Nacos服务地址
+        file-extension: yaml # 配置格式
+#        shared-dataids: all-user.yaml # 全局引入的配置
+#        refresh-dataids: all-user.yaml # 实现动态配置刷新
+        namespace: 57cace63-8a7e-4051-825b-ba5ff39f9911 # 命名空间
+  profiles:
+    active: dev # 环境配置

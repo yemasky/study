@@ -1,0 +1,79 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: blog-gateway
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password:
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      probability: 1.0
+  cloud:
+    # Nacos注册中心
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: 57cace63-8a7e-4051-825b-ba5ff39f9911
+    # Sentinel熔断器
+    # 网关路由配置
+    gateway:
+      # 设置与服务注册发现组件结合，这样可以采用服务名的路由策略
+      discovery:
+        locator:
+          enabled: true
+      # 配置路由规则
+      routes:
+        # 采用自定义路由ID
+        - id: blog-auth
+          # 采用 LoadBalanceClient 方式请求，以 lb:// 开头，后面的是注册在 Nacos 上的服务名
+          uri: lb://blog-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix  # 熔断
+              args:
+                name: fallbackcmd
+                # fallback 时调用的方法 http://localhost:8080/fallback
+                fallbackUri: forward:/fallback
+            - name: RequestRateLimiter  # 限流
+              args:
+                key-resolver: '#{@uriKeyResolver}'  # 限流过滤器的 Bean 名称
+                redis-rate-limiter.replenishRate: 1  # 希望允许用户每秒处理多少个请求
+                redis-rate-limiter.burstCapacity: 3  # 用户允许在一秒钟内完成的最大请求数
+        - id: blog-user
+          # 采用 LoadBalanceClient 方式请求，以 lb:// 开头，后面的是注册在 Nacos 上的服务名
+          uri: lb://blog-user
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix # 熔断
+              args:
+                name: fallbackcmd
+                # fallback 时调用的方法 http://localhost:8080/fallback
+                fallbackUri: forward:/fallback
+            - name: RequestRateLimiter # 限流
+              args:
+                key-resolver: '#{@uriKeyResolver}'  # 限流过滤器的 Bean 名称
+                redis-rate-limiter.replenishRate: 1  # 希望允许用户每秒处理多少个请求
+                redis-rate-limiter.burstCapacity: 3  # 用户允许在一秒钟内完成的最大请求数
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000
+
+# 配置白名单路径
+exclusion:
+  url:
+    - /auth/checkUser
+    - /auth/login

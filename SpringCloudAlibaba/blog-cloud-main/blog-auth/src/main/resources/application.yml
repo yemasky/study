@@ -1,0 +1,50 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /
+spring:
+  application:
+    name: blog-auth
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: 57cace63-8a7e-4051-825b-ba5ff39f9911
+  main:
+    # Spring Boot 2.1 需要设定
+    allow-bean-definition-overriding: true
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password:
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      probability: 1.0
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+# dubbo配置
+dubbo:
+  protocol:
+    # dubbo 协议
+    name: dubbo
+    # dubbo 协议端口（ -1 表示自增端口，从 20880 开始）
+    port: 20881
+  registry:
+    # 挂载到 Spring Cloud 注册中心
+    address: spring-cloud://localhost
+  scan:
+    base-packages: com.blog.provider.impl
+  consumer:
+    check: false
+    timeout: 60000
+    retries: -1
+  provider:
+    timeout: 60000
+  cloud:
+    # 服务消费方订阅服务提供方的应用名称的列表，若需订阅多应用，使用 "," 分割。 不推荐使用默认值为 "*"，它将订阅所有应用。
+    subscribed-services: blog-user
