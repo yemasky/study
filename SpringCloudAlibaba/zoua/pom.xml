@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>zoua</groupId>
+	<artifactId>zoua</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>zoua</name>
+	<description>zoua</description>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>springclouAlibaba-nacos-client-8789</module>
+		<module>springcloudAlibaba-products-9090</module>
+		<module>springcloudAlibaba-users-8989</module>
+		<module>springcloudAlibaba-products-9091</module>
+		<module>springcloudAlibaba-config-client-8888</module>
+		<module>springcloudAlibaba-sentinel-8998</module>
+		<module>SpringCloudAlibabaGateWay-config-8688</module>
+		<module>SpringCloudAlibaba-Seata-Consumer-Config-8588</module>
+		<module>SpringCloudAlibaba-Seata-Producer-Config-8598</module>
+		<module>SpringCloudAlibabaRocketMQ</module>
+		<module>nacos-discovery-dubbo-api</module>
+		<module>nacos-discovery-dubbo-consumer</module>
+		<module>nacos-discovery-dubbo-provider</module>
+	</modules>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.7.RELEASE</version>
+	</parent>
+
+	<!--定义版本号-->
+	<properties>
+		<spring.cloud.version>Hoxton.SR9</spring.cloud.version>
+		<spring.cloud.alibaba.version>2.2.2.RELEASE</spring.cloud.alibaba.version>
+	</properties>
+
+	<!--维护依赖-->
+	<dependencyManagement>
+		<dependencies>
+			<!--维护springcloud-->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring.cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!--维护springcloud alibaba-->
+			<dependency>
+				<groupId>com.alibaba.cloud</groupId>
+				<artifactId>spring-cloud-alibaba-dependencies</artifactId>
+				<version>${spring.cloud.alibaba.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
